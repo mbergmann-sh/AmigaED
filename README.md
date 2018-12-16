@@ -13,7 +13,7 @@ Further information about Qt licensing is available at: http://www.trolltech.com
 Further information about QScintilla licensing is available at: https://www.riverbankcomputing.com/software/qscintilla/license or by contacting sales@riverbankcomputing.com.
 
 This program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-# FEATURES - a work in proress...
+# FEATURES - a work in progress...
 - load file from GUI or command line
 - save file to storage medium
 - recognize changes in text
