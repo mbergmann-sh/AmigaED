@@ -166,7 +166,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
         writeSettings();
         event->accept();
     } else {
-        event->ignore();
+        event->ignore();    // CANCEL: just stay where we are... ;)
     }
 }
 
