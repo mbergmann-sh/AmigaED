@@ -34,7 +34,7 @@ You'll need a computer with either MSVC, GCC or MinGW C/C++ compiler setup with 
 2. CD to this folder
 3. git clone https://github.com/mbergmann-sh/AmigaED.git
 4. CD to <your_folder>/AmigaED
-5. qmake application.pro
+5. qmake application.pro (creates neccessary descriptions for compiling and linking)
 6. qmake (creates Makefiles for Debug and Release versions)
 7. MSVC: nmake, GCC or MinGW: make -j4
 8. wait for compiler to finish
