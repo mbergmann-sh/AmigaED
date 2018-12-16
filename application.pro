@@ -1,7 +1,7 @@
 QT       += core gui widgets
 CONFIG += release qscintilla2 c++11
 
-TARGET = qAmigaED
+TARGET = AmigaED
 TEMPLATE = app
 
 macx {
