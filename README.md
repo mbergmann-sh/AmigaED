@@ -46,3 +46,7 @@ You'll need a computer with either MSVC, GCC or MinGW C/C++ compiler setup with 
 4. Manually copy appropriate Qt5PrintSupport.dll and qscintilla2_qt5.dll to that folder
 5. Add a PATH entry to that folder to your system if you want to call the app from command line!
 
+# Usefull links for Qt5/QScintilla coders
+- Qt5 documentation: http://doc.qt.io/qt-5/ 
+- QScintilla API documentation: http://pyqt.sourceforge.net/Docs/QScintilla2/annotated.html
+- A site showing the usage of QScintilla from Python to build an editor: https://qscintilla.com/
