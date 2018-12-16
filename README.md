@@ -33,10 +33,11 @@ You'll need a computer with either MSVC, GCC or MinGW C/C++ compiler setup with 
 1. Create a folder to store the app
 2. CD to this folder
 3. git clone https://github.com/mbergmann-sh/AmigaED.git
-4. qmake application.pro
-5. qmake (creates Makefiles for Debug and Release versions)
-6. MSVC: nmake, GCC or MinGW: make -j4
-7. wait for compiler to finish
+4. CD to <your_folder>/AmigaED
+5. qmake application.pro
+6. qmake (creates Makefiles for Debug and Release versions)
+7. MSVC: nmake, GCC or MinGW: make -j4
+8. wait for compiler to finish
 
 # Making the app run standalone on Windows
 1. Open a Qt command prompt correspondending to the compiler in use 
