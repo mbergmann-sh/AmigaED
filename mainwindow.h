@@ -63,13 +63,19 @@ private slots:
     bool save();
     bool saveAs();
     void about();
+    void initializeGUI();
+    void initializeLexer();
     void initializeFolding();
+    void initializeMargin();
+    void initializeCaretLine();
+    void initializeFont();
     void showCurrendCursorPosition();
     void documentWasModified();
     void actionGoto_Line();
     void actionGoto_matching_brace();
     void actionCompile();
     void actionEmulator();
+    void onTextChanged();
 
 private:
     void createActions();
@@ -118,6 +124,8 @@ private:
     QLabel *statusLabelY;
     QLCDNumber  *statusLCD_X;
     QLCDNumber  *statusLCD_Y;
+
+    QFont myfont;
 
 };
 

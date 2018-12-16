@@ -58,85 +58,8 @@ MainWindow::MainWindow(QString cmdFileName)
 {
     textEdit = new QsciScintilla;
     setCentralWidget(textEdit);
-    // give an icon and a name to the app:
-    this->setWindowIcon(QIcon(":/images/lemming.png"));
-    this->setWindowTitle("AmigaED");
 
-    // prepare statusbar items:
-    this->statusLabelX = new QLabel(this);
-
-    this->statusLCD_X = new QLCDNumber(this);
-    this->statusLCD_X->display(0);
-
-    this->statusLabelY = new QLabel(this);
-
-    this->statusLCD_Y = new QLCDNumber(this);
-    this->statusLCD_Y->display(0);
-
-    // add the controls to the status bar
-    statusBar()->addPermanentWidget(statusLabelX);
-    statusLabelX->setText(tr("Line:"));
-    statusBar()->addPermanentWidget(statusLCD_X);
-    statusLCD_X->display(1);
-    statusBar()->addPermanentWidget(statusLabelY);
-    statusLabelY->setText(tr("Column:"));
-    statusBar()->addPermanentWidget(statusLCD_Y);
-    statusLCD_Y->display(1);
-
-    // give some blackish style to MainWindow
-    this->setStyleSheet(QString::fromUtf8("background-color: rgb(175, 175, 175);"));
-    textEdit->setStyleSheet(QString::fromUtf8("background-color: rgb(175, 175, 175);"));
-
-    // make editor as Amiga-compatible as possible:
-    textEdit->setEolMode(QsciScintilla::EolUnix);
-    textEdit->setTabWidth(4);
-    // auto indent source codes:
-    textEdit->setAutoIndent(true);
-    textEdit->setIndentationGuides(true);
-    textEdit->setTabIndents(true);
-    textEdit->setBraceMatching(QsciScintilla::SloppyBraceMatch);
-    textEdit->setEolVisibility(false);
-    textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
-    // set minium window size
-    textEdit->setMinimumSize(600, 450);
-    // staRT WITH ALL FUNCTIONS UNFOLDED
-    textEdit->foldAll(false);
-
-    // set a readable default font for Linux and Windows:
-    #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-    QFont font("Courier New", 10);
-    qDebug() << "running on Windows...";
-    #else
-    QFont font("Source Code Pro", 10);
-    qDebug() << "running on Linux...";
-    #endif
-    QFont myfont = font;
-    font.setFixedPitch(true);
-    myfont.setFixedPitch(true);
-    textEdit->setFont(font);
-
-    // set margins and line numbering:
-    QFontMetrics fontmetrics = QFontMetrics(textEdit->font());
-    textEdit->setMarginsFont(textEdit->font());
-    textEdit->setMarginWidth(0, fontmetrics.width(QString::number(textEdit->lines())) + 10);
-    textEdit->setMarginLineNumbers(0, true);
-    textEdit->setMarginsBackgroundColor(QColor("#cccccc"));
-    textEdit->setMarginsForegroundColor(QColor("#ff0000ff"));
-
-    // initalize code folding:
-    initializeFolding();
-
-    // set lexer to C/C++ mode:
-    QsciLexerCPP *lexer = new QsciLexerCPP();
-    lexer->setDefaultFont(textEdit->font());
-    lexer->setFoldComments(true);
-    textEdit->setLexer(lexer);
-
-    // setup GUI:
-    createActions();
-    createMenus();
-    createToolBars();
-    createStatusBar();
+    initializeGUI();    // most initializations are done within tis method!
 
     // restore last saved position and size of the editor window
     readSettings();
@@ -164,7 +87,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     if (maybeSave()) {
         writeSettings();
-        event->accept();
+        event->accept();    // OK: Quit the app!
     } else {
         event->ignore();    // CANCEL: just stay where we are... ;)
     }
@@ -584,6 +507,71 @@ void MainWindow::actionEmulator()
 }
 
 //
+// set default fonts, depending on OS
+//
+void MainWindow::initializeFont()
+{
+    // set a readable default font for Linux and Windows:
+    #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+    QFont font("Courier New", 10);
+    #else
+    QFont font("Source Code Pro", 10);
+    #endif
+    myfont = font;
+    font.setFixedPitch(true);
+    myfont.setFixedPitch(true);
+    textEdit->setFont(font);
+}
+
+//
+// initialize editor's margins with decent values according to text sizes in use
+//
+void MainWindow::initializeMargin()
+{
+    QFontMetrics fontmetrics = QFontMetrics(textEdit->font());
+    textEdit->setMarginsFont(textEdit->font());
+    textEdit->setMarginWidth(0, fontmetrics.width(QString::number(textEdit->lines())) + 10);
+    textEdit->setMarginLineNumbers(0, true);
+    textEdit->setMarginsBackgroundColor(QColor("#cccccc"));
+    textEdit->setMarginsForegroundColor(QColor("#ff0000ff"));
+
+    // resize line numbers margin if needed!
+    connect(textEdit, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
+}
+
+//
+// resize line numbers margin
+//
+void MainWindow::onTextChanged()
+{
+    QFontMetrics fontmetrics = textEdit->fontMetrics();
+    textEdit->setMarginWidth(0, fontmetrics.width(QString::number(textEdit->lines())) + 10);
+}
+
+//
+// initialize C/C++ lexer bei default
+//
+void MainWindow::initializeLexer()
+{
+    QsciLexerCPP *lexer = new QsciLexerCPP();
+    lexer->setDefaultFont(textEdit->font());
+    lexer->setFoldComments(true);
+    textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
+    textEdit->setLexer(lexer);
+    textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
+}
+
+//
+// give decent values to carret line
+//
+void MainWindow::initializeCaretLine()
+{
+    // Current line visible with special background color
+    textEdit->setCaretLineVisible(false);
+    textEdit->setCaretLineBackgroundColor(QColor("#a7edfe"));
+}
+
+//
 // toggle code folding if called from action
 //
 void MainWindow::initializeFolding()
@@ -607,6 +595,64 @@ void MainWindow::showCurrendCursorPosition()
     textEdit->getCursorPosition(&line, &index);
     statusLCD_X->display(line + 1);
     statusLCD_Y->display(index +1);
+}
+
+//
+// this method initializes the whole GUI!
+//
+void MainWindow::initializeGUI()
+{
+    // give an icon and a name to the app:
+    this->setWindowIcon(QIcon(":/images/lemming.png"));
+    this->setWindowTitle("AmigaED");
+
+    // set a decent start value for app's size
+    this->setMinimumSize(600, 450);
+
+    // prepare and initialize statusbar items:
+    this->statusLabelX = new QLabel(this);
+
+    this->statusLCD_X = new QLCDNumber(this);
+    this->statusLCD_X->display(0);
+
+    this->statusLabelY = new QLabel(this);
+
+    this->statusLCD_Y = new QLCDNumber(this);
+    this->statusLCD_Y->display(0);
+
+    // permanently add the controls to the status bar
+    statusBar()->addPermanentWidget(statusLabelX);
+    statusLabelX->setText(tr("Line:"));
+    statusBar()->addPermanentWidget(statusLCD_X);
+    statusLCD_X->display(1);
+    statusBar()->addPermanentWidget(statusLabelY);
+    statusLabelY->setText(tr("Column:"));
+    statusBar()->addPermanentWidget(statusLCD_Y);
+    statusLCD_Y->display(1);
+
+    // give some blackish style to MainWindow
+    this->setStyleSheet(QString::fromUtf8("background-color: rgb(175, 175, 175);"));
+    textEdit->setStyleSheet(QString::fromUtf8("background-color: rgb(175, 175, 175);"));
+
+    // initialize textEdit's most needed attributes:
+    initializeFont();
+    initializeMargin();
+    initializeCaretLine();
+    initializeLexer();
+    initializeFolding();
+
+    // make editor as Amiga-compatible as possible:
+    textEdit->setEolMode(QsciScintilla::EolUnix);
+    textEdit->setTabWidth(4);
+    textEdit->setAutoIndent(true);
+    textEdit->setBraceMatching(QsciScintilla::SloppyBraceMatch);
+    textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
+
+    // create actions, menues, toolbars and status bar:
+    createActions();
+    createMenus();
+    createToolBars();
+    createStatusBar();
 }
 
 //
