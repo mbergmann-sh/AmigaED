@@ -1,18 +1,25 @@
 /****************************************************************************
 **
-** Copyright (C) 2004-2006 Trolltech ASA. All rights reserved.
+** Copyright (C) 2018/2019 Michael Bergmann. Placed in the public domain
+** with some restrictions!
 **
-** This file is part of the example classes of the Qt Toolkit.
+** This file is part of my enhanced AmigaED editor example, using classes of
+** the Qt and QScintilla toolkits.
 **
-** Licensees holding a valid Qt License Agreement may use this file in
-** accordance with the rights, responsibilities and obligations
-** contained therein.  Please consult your licensing agreement or
-** contact sales@trolltech.com if any conditions of this licensing
-** agreement are not clear to you.
+** You may use or enhance this piece of software anyway you want to - as long
+** as you don't violate laws or copyright issues.
+** I hereby explicitely prohibit the usage of my work for people who believe
+** in racism, fascism and any kind of attitude against democratic lifestyle.
+** It is self-explanatory that this prohibits the usage of my work to any
+** member or fan of the german AfD party.
 **
 ** Further information about Qt licensing is available at:
 ** http://www.trolltech.com/products/qt/licensing.html or by
 ** contacting info@trolltech.com.
+**
+** Further information about QScintilla licensing is available at:
+** https://www.riverbankcomputing.com/software/qscintilla/license or by
+** contacting sales@riverbankcomputing.com.
 **
 ** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
 ** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
@@ -44,17 +51,38 @@
 #include <Qsci/qsciscintilla.h>
 #include <Qsci/qscilexercpp.h>
 
-#include <QDebug>
-
 #include "mainwindow.h"
 
-MainWindow::MainWindow()
+// Open MainWindow with given filename...
+MainWindow::MainWindow(QString cmdFileName)
 {
     textEdit = new QsciScintilla;
     setCentralWidget(textEdit);
     // give an icon and a name to the app:
     this->setWindowIcon(QIcon(":/images/lemming.png"));
     this->setWindowTitle("AmigaED");
+
+    // prepare statusbar items:
+    this->statusLabelX = new QLabel(this);
+
+    this->statusLCD_X = new QLCDNumber(this);
+    this->statusLCD_X->display(0);
+
+    this->statusLabelY = new QLabel(this);
+
+    this->statusLCD_Y = new QLCDNumber(this);
+    this->statusLCD_Y->display(0);
+
+    // add the controls to the status bar
+    statusBar()->addPermanentWidget(statusLabelX);
+    statusLabelX->setText(tr("Line:"));
+    statusBar()->addPermanentWidget(statusLCD_X);
+    statusLCD_X->display(1);
+    statusBar()->addPermanentWidget(statusLabelY);
+    statusLabelY->setText(tr("Column:"));
+    statusBar()->addPermanentWidget(statusLCD_Y);
+    statusLCD_Y->display(1);
+
     // give some blackish style to MainWindow
     this->setStyleSheet(QString::fromUtf8("background-color: rgb(175, 175, 175);"));
     textEdit->setStyleSheet(QString::fromUtf8("background-color: rgb(175, 175, 175);"));
@@ -71,8 +99,8 @@ MainWindow::MainWindow()
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
     // set minium window size
     textEdit->setMinimumSize(600, 450);
-    // staRT WITH ALL FUNCTIONS FOLDED
-    textEdit->foldAll(true);
+    // staRT WITH ALL FUNCTIONS UNFOLDED
+    textEdit->foldAll(false);
 
     // set a readable default font for Linux and Windows:
     #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
@@ -95,27 +123,43 @@ MainWindow::MainWindow()
     textEdit->setMarginsBackgroundColor(QColor("#cccccc"));
     textEdit->setMarginsForegroundColor(QColor("#ff0000ff"));
 
+    // initalize code folding:
+    initializeFolding();
+
     // set lexer to C/C++ mode:
     QsciLexerCPP *lexer = new QsciLexerCPP();
     lexer->setDefaultFont(textEdit->font());
     lexer->setFoldComments(true);
     textEdit->setLexer(lexer);
-   // textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
 
-
-
+    // setup GUI:
     createActions();
     createMenus();
     createToolBars();
     createStatusBar();
 
+    // restore last saved position and size of the editor window
     readSettings();
 
+    // react if document was modified
     connect(textEdit, SIGNAL(textChanged()), this, SLOT(documentWasModified()));
 
+    // notify if cursor position changed
+    connect(textEdit, SIGNAL(cursorPositionChanged(int, int)), this, SLOT(showCurrendCursorPosition()));
+
     setCurrentFile("");
+
+    // Load a file if specified on command line...
+    if(!(cmdFileName.isEmpty()))
+    {
+        loadFile(cmdFileName);
+    }
 }
 
+//
+// catch close() event and react
+// on changes in current text document
+//
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     if (maybeSave()) {
@@ -126,6 +170,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 }
 
+//
+// create a new, empty file
+//
 void MainWindow::newFile()
 {
     if (maybeSave()) {
@@ -134,6 +181,9 @@ void MainWindow::newFile()
     }
 }
 
+//
+// open file from disk
+//
 void MainWindow::open()
 {
     if (maybeSave()) {
@@ -144,15 +194,22 @@ void MainWindow::open()
     //textEdit->foldAll(false);
 }
 
+//
+// save file to disk
+//
 bool MainWindow::save()
 {
+    // if no file name has been given until now..
     if (curFile.isEmpty()) {
-        return saveAs();
+        return saveAs();        // ...call saveAs dialog!
     } else {
         return saveFile(curFile);
     }
 }
 
+//
+// save file, let user choose a filename
+//
 bool MainWindow::saveAs()
 {
     QString fileName = QFileDialog::getSaveFileName(this);
@@ -162,6 +219,9 @@ bool MainWindow::saveAs()
     return saveFile(fileName);
 }
 
+//
+// show information about this app...
+//
 void MainWindow::about()
 {
    QMessageBox::about(this, tr("About AmigaED"),
@@ -172,17 +232,32 @@ void MainWindow::about()
                "<br>Modifications and Enhancements: Michael Bergmann</br>"));
 }
 
+//
+// react on SIGNAL textChanged() if text was modified
+//
 void MainWindow::documentWasModified()
 {
-    setWindowModified(textEdit->isModified());
+    setWindowModified(textEdit->isModified());  // put asterix (*) into filename!
 }
 
+//
+// you'll need some fucking actions first if you
+// want to create menues!
+//
 void MainWindow::createActions()
 {
-    newAct = new QAction(QIcon(":/images/new.png"), tr("&New"), this);
-    newAct->setShortcut(tr("Ctrl+N"));
-    newAct->setStatusTip(tr("Create a new file"));
-    connect(newAct, SIGNAL(triggered()), this, SLOT(newFile()));
+    // Menue actions consist of:
+    newAct = new QAction(QIcon(":/images/new.png"), tr("&New"), this);  // this is the action itsself, equipped with an image
+                                                                        // and a shortcut (<alt> + <n>) for opening the menue
+
+    newAct->setShortcut(tr("Ctrl+N"));                                  // this is the instant shortcut for calling the action
+                                                                        // without opening the menue first
+
+    newAct->setStatusTip(tr("Create a new file"));                      // Display a help message in app's status bar
+    connect(newAct, SIGNAL(triggered()), this, SLOT(newFile()));        // connect the action to a Qt SIGNAL for calling
+                                                                        // the approbiate class method to handle the request.
+                                                                        // Here: MainWindow::newFile()
+                                                                        // see "mainwindow.h" for details!
 
     openAct = new QAction(QIcon(":/images/open.png"), tr("&Open..."), this);
     openAct->setShortcut(tr("Ctrl+O"));
@@ -255,10 +330,13 @@ void MainWindow::createActions()
     connect(emulatorAct, SIGNAL(triggered()), this, SLOT(actionEmulator()));
 }
 
+//
+// ...now that we've created actions, let's create some menues for our app!
+//
 void MainWindow::createMenus()
 {
-    fileMenu = menuBar()->addMenu(tr("&File"));
-    fileMenu->addAction(newAct);
+    fileMenu = menuBar()->addMenu(tr("&File")); // this is a main menue entry as shown in the menue bar of the app window (File)
+    fileMenu->addAction(newAct);                // this is menue entry (File/New)
     fileMenu->addAction(openAct);
     fileMenu->addAction(saveAct);
     fileMenu->addAction(saveAsAct);
@@ -295,10 +373,15 @@ void MainWindow::createMenus()
     helpMenu->addAction(aboutQtAct);
 }
 
+//
+// Let's put some of our actions into the app's toolbar!
+// You can put any action into any toolbar section - as
+// long as you have created that section before!
+//
 void MainWindow::createToolBars()
 {
-    fileToolBar = addToolBar(tr("File"));
-    fileToolBar->addAction(newAct);
+    fileToolBar = addToolBar(tr("File"));   // this is a section, correspondending to main menue "File"
+    fileToolBar->addAction(newAct);         // this is a section entry, correspondending to menue entry "File/New"
     fileToolBar->addAction(openAct);
     fileToolBar->addAction(saveAct);
 
@@ -319,11 +402,17 @@ void MainWindow::createToolBars()
     miscToolBar->addAction(exitAct);
 }
 
+//
+// Show initial message in the app's status bar
+//
 void MainWindow::createStatusBar()
 {
     statusBar()->showMessage(tr("Ready"));
 }
 
+//
+// read app's last saved position and sizes
+//
 void MainWindow::readSettings()
 {
     QSettings settings("MB-SoftWorX", "QScintilla AmigaED Example");
@@ -333,6 +422,9 @@ void MainWindow::readSettings()
     move(pos);
 }
 
+//
+// Store app's last known position and sizes
+//
 void MainWindow::writeSettings()
 {
     QSettings settings("MB-SoftWorX", "QScintilla AmigaED Example");
@@ -340,6 +432,10 @@ void MainWindow::writeSettings()
     settings.setValue("size", size());
 }
 
+//
+// react on changed document text, allow the user to
+// decide if he wants to keep or abandon his work
+//
 bool MainWindow::maybeSave()
 {
     if (textEdit->isModified()) {
@@ -357,6 +453,9 @@ bool MainWindow::maybeSave()
     return true;
 }
 
+//
+// user defined loading for source files
+//
 void MainWindow::loadFile(const QString &fileName)
 {
     QFile file(fileName);
@@ -377,6 +476,9 @@ void MainWindow::loadFile(const QString &fileName)
     statusBar()->showMessage(tr("File loaded"), 2000);
 }
 
+//
+// save current file
+//
 bool MainWindow::saveFile(const QString &fileName)
 {
     QFile file(fileName);
@@ -398,6 +500,10 @@ bool MainWindow::saveFile(const QString &fileName)
     return true;
 }
 
+//
+// set current file name, placing name and status
+// in app's window title
+//
 void MainWindow::setCurrentFile(const QString &fileName)
 {
     curFile = fileName;
@@ -413,12 +519,17 @@ void MainWindow::setCurrentFile(const QString &fileName)
     setWindowTitle(tr("%1[*] - %2").arg(shownName).arg(tr("C/C++ AmigaED")));
 }
 
+//
+// Strip path from current file name
+//
 QString MainWindow::strippedName(const QString &fullFileName)
 {
     return QFileInfo(fullFileName).fileName();
 }
 
+//
 // Jump to line No. X...
+//
 void MainWindow::actionGoto_Line()
 {
     int max = textEdit->lines(); // max. count of lines in code window
@@ -433,12 +544,18 @@ void MainWindow::actionGoto_Line()
     }
 }
 
+//
+// jump to matching brace: {...}, [...], (...)
+//
 void MainWindow::actionGoto_matching_brace()
 {
     textEdit->moveToMatchingBrace();
 }
 
-// compile current file
+//
+// Compile current file
+// CHANGE THIS according to your compiler and opts!
+//
 void MainWindow::actionCompile()
 {
     bool ok;
@@ -449,7 +566,10 @@ void MainWindow::actionCompile()
               qDebug() << text;
 }
 
-// start uae emulation
+//
+// Start UAE emulation
+// CHANGE THIS according to your installation path!
+//
 void MainWindow::actionEmulator()
 {
     bool ok;
@@ -458,4 +578,30 @@ void MainWindow::actionEmulator()
                                                "C:/Program Files/WinUAE/winuae64.exe -f E:/AmiKit/WinUAE/Configurations/GCC-AmigaOS_HD.uae", &ok);
           if (ok && !text.isEmpty())
               qDebug() << text;
+}
+
+//
+// toggle code folding if called from action
+//
+void MainWindow::initializeFolding()
+{
+    QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
+    if (!state)
+        textEdit->foldAll(false);
+    else
+        textEdit->foldAll(true);
+
+    textEdit->setFolding(state);
+}
+
+//
+// show current cursor position and display
+// line and row in app's status bar's LCD widgets
+//
+void MainWindow::showCurrendCursorPosition()
+{
+    int line, index;
+    textEdit->getCursorPosition(&line, &index);
+    statusLCD_X->display(line + 1);
+    statusLCD_Y->display(index +1);
 }
