@@ -1,6 +1,7 @@
 # AmigaED
-qAmigaED is an enhanced example for writing a coder's editor using Qt5 and QScintilla, containig a menu bar, toolbar, menus and some sophisticated editing actions. The source is based on QScintilla's original editor example. This project was started as an entry point for learning how to use QScintilla. Though somewhat of a working editor, the project is meant for studies and as a base for own enhancements. Feel free to use it!
-#LICENSE
+qAmigaED is an enhanced example for writing a coder's editor using Qt5 and QScintilla, containig a menu bar, toolbar, menus and some sophisticated editing actions. The source is based on QScintilla's original editor example. This project was started as an entry point for learning how to use QScintilla. Though somewhat of a working editor, the project is meant for studies and as a base for own enhancements. 
+
+# LICENSE
 Copyright (C) 2018/2019 Michael Bergmann. Placed in the public domain with some restrictions!
 
 These files are part of my enhanced AmigaED editor example, using classes of the Qt and QScintilla toolkits.
