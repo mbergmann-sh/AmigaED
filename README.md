@@ -2,9 +2,9 @@
 AmigaED is an example for writing an advanced coder's editor using the Qt5 and QScintilla frameworks in C++, containig a menu bar, toolbar, menus, an enhanced statusbar and some sophisticated editing actions. The source is based on Riverbank's original editor example, as provided with the QScintilla sources. This project was started as an entry point for learning how to use QScintilla. Though somewhat of a working editor, this project is meant for studies and as a base for own enhancements. 
 
 # LICENSE
-Copyright (C) 2018/2019 Michael Bergmann. Placed in the public domain with some restrictions!
+Copyright (C) 2018/2019 held by Michael Bergmann. Placed in the public domain with some restrictions!
 
-These files are part of my enhanced AmigaED editor example, using classes of the Qt and QScintilla toolkits.
+These files are part of my advanced AmigaED C/C++ editor example, using classes of the Qt and QScintilla toolkits.
 
 You may use or enhance this piece of software anyway you want to - as long as you don't violate laws or copyright issues. I hereby explicitely prohibit the usage of my work to people who believe in racism, fascism and any kind of attitude against democratic lifestyle. It is self-explanatory that this prohibits the usage of my work to any member or fan of the german AfD party.
 
