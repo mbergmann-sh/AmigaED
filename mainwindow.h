@@ -57,7 +57,7 @@ protected:
     void closeEvent(QCloseEvent *event);
 
 private slots:
-    void showNotImplemented();
+    void popNotImplemented();
     void newFile();
     void open();
     bool save();

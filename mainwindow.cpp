@@ -558,6 +558,7 @@ void MainWindow::actionGoto_matching_brace()
 //
 void MainWindow::actionCompile()
 {
+    popNotImplemented();
     bool ok;
           QString text = QInputDialog::getText(this, tr("Compile!"),
                                                tr("Compiler Options:"), QLineEdit::Normal,
@@ -568,11 +569,11 @@ void MainWindow::actionCompile()
 
 //
 // Start UAE emulation
-// CHANGE THIS according to your installation path!
+// CHANGE THIS according to your installation path and UAE flavour!
 //
 void MainWindow::actionEmulator()
 {
-    showNotImplemented();
+    popNotImplemented();
 
     bool ok;
           QString text = QInputDialog::getText(this, tr("Start Emulator"),
@@ -611,10 +612,10 @@ void MainWindow::showCurrendCursorPosition()
 //
 // inform user about unimplemented feature
 //
-void MainWindow::showNotImplemented()
+void MainWindow::popNotImplemented()
 {
-    QMessageBox::StandardButton reply = QMessageBox::information(this,
-                                       "Not implemented - AmigaED", "You have requested a feature that is <i><b>not</b></i> fully<br>implemented yet! The requested feature might not work as expected...",
-                                        QMessageBox::Ok);
+     QMessageBox::information(this,
+                   "Not implemented - AmigaED", "You have requested a feature that is <i><b>not</b></i> fully<br>implemented yet! The requested feature might not work as expected...",
+                    QMessageBox::Ok);
 
 }
