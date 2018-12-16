@@ -42,7 +42,7 @@ You'll need a computer with either MSVC, GCC or MinGW C/C++ compiler setup with 
 # Making the app run standalone on Windows
 1. Open a Qt command prompt correspondending to the compiler in use 
 2. CD to folder where the release version was stored
-3. windeployqt --angle --compiler-runtime --release qAmigaED.exe
+3. windeployqt --angle --compiler-runtime --release qAmigaED.exe (this will create some additional folders and copy most of the needed DLLs to the folder containing your executable)
 4. Manually copy appropriate Qt5PrintSupport.dll and qscintilla2_qt5.dll to that folder
 5. Add a PATH entry to that folder to your system if you want to call the app from command line!
 
