@@ -15,6 +15,8 @@ Further information about QScintilla licensing is available at: https://www.rive
 This program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 # FEATURES - a work in proress...
 - load file from GUI or command line
+- save file to storage medium
+- recognize changes in text
 - code folding
 - goto line number X
 - jump to matching bracket {...} | [...] | (...)
