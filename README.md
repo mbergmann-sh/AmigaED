@@ -1,5 +1,5 @@
 # AmigaED
-AmigaED is an enhanced example for writing a coder's editor using Qt5 and QScintilla, containig a menu bar, toolbar, menus and some sophisticated editing actions. The source is based on QScintilla's original editor example. This project was started as an entry point for learning how to use QScintilla. Though somewhat of a working editor, the project is meant for studies and as a base for own enhancements. 
+AmigaED is an enhanced example for writing a coder's editor using Qt5 and QScintilla in C++, containig a menu bar, toolbar, menus and some sophisticated editing actions. The source is based on QScintilla's original editor example. This project was started as an entry point for learning how to use QScintilla. Though somewhat of a working editor, the project is meant for studies and as a base for own enhancements. 
 
 # LICENSE
 Copyright (C) 2018/2019 Michael Bergmann. Placed in the public domain with some restrictions!
@@ -51,4 +51,4 @@ You'll need a computer with either MSVC, GCC or MinGW C/C++ compiler setup with 
 - QScintilla download site: https://www.riverbankcomputing.com/software/qscintilla/download
 - Qt5 documentation: http://doc.qt.io/qt-5/ 
 - QScintilla API documentation: http://pyqt.sourceforge.net/Docs/QScintilla2/annotated.html
-- A site showing the usage of QScintilla from Python in order to build an editor: https://qscintilla.com/ (...you might want to use this one as a starting point for understanding how QScintilla works!)
+- A site showing the usage of QScintilla from Python in order to build an editor: https://qscintilla.com/ (...you might want to use this one as a starting point for understanding how QScintilla works if you are able to read and understand Python code!)
