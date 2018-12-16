@@ -37,7 +37,13 @@ int main(int argc, char *argv[])
     QString cmdFileName = argv[1];
 
     QApplication app(argc, argv);
+    app.setApplicationName("AmigaED");
+    app.setApplicationVersion("1.0");
+    app.setOrganizationName("MB-SoftWorX");
+    app.setOrganizationDomain("http://www.mbergmann-sh.de");
+
     MainWindow mainWin(cmdFileName);   // take first cmd argument to load a file
+    QGuiApplication::setQuitOnLastWindowClosed(true);
 
     mainWin.show();
     return app.exec();
