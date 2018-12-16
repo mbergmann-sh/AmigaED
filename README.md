@@ -51,4 +51,4 @@ You'll need a computer with either MSVC, GCC or MinGW C/C++ compiler setup with 
 - QScintilla download site: https://www.riverbankcomputing.com/software/qscintilla/download
 - Qt5 documentation: http://doc.qt.io/qt-5/ 
 - QScintilla API documentation: http://pyqt.sourceforge.net/Docs/QScintilla2/annotated.html
-- A site showing the usage of QScintilla from Python to build an editor: https://qscintilla.com/
+- A site showing the usage of QScintilla from Python in order to build an editor: https://qscintilla.com/ (...you might want to use this one as a starting point for understanding how QScintilla works!)
