@@ -27,7 +27,7 @@ This program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRA
 more to come...
 
 # Compiling the app...
-...should work fine under Linux, Windows, MacOS X and propably under BSD, too (didn't test that!).
+...should work fine under Linux, Windows, MacOS X and probably under BSD, too (didn't test that!).
 You'll need a computer with either MSVC, GCC or MinGW C/C++ compiler setup with Qt5 and QScintilla installed and working!
 
 1. Create a folder to store the app
