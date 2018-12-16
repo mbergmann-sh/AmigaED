@@ -572,6 +572,8 @@ void MainWindow::actionCompile()
 //
 void MainWindow::actionEmulator()
 {
+    showNotImplemented();
+
     bool ok;
           QString text = QInputDialog::getText(this, tr("Start Emulator"),
                                                tr("UAE Options:"), QLineEdit::Normal,
@@ -604,4 +606,15 @@ void MainWindow::showCurrendCursorPosition()
     textEdit->getCursorPosition(&line, &index);
     statusLCD_X->display(line + 1);
     statusLCD_Y->display(index +1);
+}
+
+//
+// inform user about unimplemented feature
+//
+void MainWindow::showNotImplemented()
+{
+    QMessageBox::StandardButton reply = QMessageBox::information(this,
+                                       "Not implemented - AmigaED", "You have requested a feature that is <i><b>not</b></i> fully<br>implemented yet! The requested feature might not work as expected...",
+                                        QMessageBox::Ok);
+
 }

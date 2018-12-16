@@ -30,6 +30,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QMessageBox>
 #include <QString>
 #include <QStyle>
 #include <QFile>
@@ -56,6 +57,7 @@ protected:
     void closeEvent(QCloseEvent *event);
 
 private slots:
+    void showNotImplemented();
     void newFile();
     void open();
     bool save();
