@@ -44,4 +44,3 @@ You'll need a computer with Qt5 and QScintilla installed and working!
 4. Manually copy appropriate Qt5PrintSupport.dll and qscintilla2_qt5.dll to that folder
 5. Add a PATH entry to that folder to your system if you want to call the app from command line!
 
-2. 
