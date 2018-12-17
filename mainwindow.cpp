@@ -110,11 +110,14 @@ void MainWindow::newFile()
 void MainWindow::open()
 {
     if (maybeSave()) {
-        QString fileName = QFileDialog::getOpenFileName(this);
+        QString fileName = QFileDialog::getOpenFileName(this,
+                "Open source file",
+                QDir::currentPath(),
+                "C/C++ source files (*.c *.cpp) ;; C/C++ header files (*.h *.hpp) ;; ASM source files (*.a *.asm) ;; Makefiles (*.mak) ;; AmigaE source files (*.e) ;; PASCAL source files (*.p *.pas) ;; All files (*.*)");
+
         if (!fileName.isEmpty())
             loadFile(fileName);
     }
-    //textEdit->foldAll(false);
 }
 
 //
@@ -135,7 +138,11 @@ bool MainWindow::save()
 //
 bool MainWindow::saveAs()
 {
-    QString fileName = QFileDialog::getSaveFileName(this);
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    "Save source file",
+                                                    nullptr,
+                                                    "C/C++ source files (*.c *.cpp) ;; C/C++ header files (*.h *.hpp) ;; ASM source files (*.a *.asm) ;; Makefiles (*.mak) ;; AmigaE source files (*.e) ;; PASCAL source files (*.p *.pas) ;; All files (*.*)");
+
     if (fileName.isEmpty())
         return false;
 
@@ -151,7 +158,7 @@ void MainWindow::about()
             tr("This <b>Application</b> example demonstrates how to "
                "write modern GUI applications using Qt and QScintilla, with a menu bar, "
                "toolbars, and a status bar.<br>"
-               "<br>Source: QScintilla example app</br>"
+               "<br>Source: Riverbank QScintilla example app</br>"
                "<br>Modifications and Enhancements: Michael Bergmann</br>"));
 }
 
@@ -435,7 +442,7 @@ void MainWindow::setCurrentFile(const QString &fileName)
 
     QString shownName;
     if (curFile.isEmpty())
-        shownName = "untitled.txt";
+        shownName = "untitled.c";
     else
         shownName = strippedName(curFile);
 
