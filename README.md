@@ -38,6 +38,7 @@ You'll need a computer with either MSVC, GCC or MinGW C/C++ compiler setup with 
 6. qmake (creates Makefiles for Debug and Release versions)
 7. MSVC: nmake, GCC or MinGW: make -j4
 8. wait for compiler to finish
+The easy way: simply import the .pro file into Qt Creator, configure your toolchain and build the app... ;)
 
 # Making the app run standalone on Windows
 1. Open a Qt command prompt correspondending to the compiler in use 

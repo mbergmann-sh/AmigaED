@@ -112,8 +112,10 @@ void MainWindow::open()
     if (maybeSave()) {
         QString fileName = QFileDialog::getOpenFileName(this,
                 "Open source file",
-                QDir::currentPath(),
-                "C/C++ source files (*.c *.cpp) ;; C/C++ header files (*.h *.hpp) ;; ASM source files (*.a *.asm) ;; Makefiles (*.mak) ;; AmigaE source files (*.e) ;; PASCAL source files (*.p *.pas) ;; All files (*.*)");
+                QDir::currentPath(),    // look up for files in PROGDIR first!
+                "C/C++ source files (*.c *.cpp) ;; C/C++ header files (*.h *.hpp) ;; "
+                "ASM source files (*.a *.asm) ;; Makefiles (*.mak) ;; "
+                "AmigaE source files (*.e) ;; PASCAL source files (*.p *.pas) ;; All files (*.*)");
 
         if (!fileName.isEmpty())
             loadFile(fileName);
@@ -140,8 +142,11 @@ bool MainWindow::saveAs()
 {
     QString fileName = QFileDialog::getSaveFileName(this,
                                                     "Save source file",
-                                                    nullptr,
-                                                    "C/C++ source files (*.c *.cpp) ;; C/C++ header files (*.h *.hpp) ;; ASM source files (*.a *.asm) ;; Makefiles (*.mak) ;; AmigaE source files (*.e) ;; PASCAL source files (*.p *.pas) ;; All files (*.*)");
+                                                    nullptr,    // save files into last used folder
+                                                    "C/C++ source files (*.c *.cpp) ;; C/C++ header files (*.h *.hpp) ;; "
+                                                    "ASM source files (*.a *.asm) ;; Makefiles (*.mak) ;; "
+                                                    "AmigaE source files (*.e) ;; PASCAL source files (*.p *.pas) ;; "
+                                                    "All files (*.*)");
 
     if (fileName.isEmpty())
         return false;
@@ -470,7 +475,8 @@ void MainWindow::actionGoto_Line()
     {
         textEdit->setCursorPosition(i-1,0);
         textEdit->setCaretLineVisible(true);
-        textEdit->foldLine(i-1);
+        //textEdit->foldLine(i-1);
+       // textEdit->foldAll(false);
     }
 }
 
@@ -525,9 +531,8 @@ void MainWindow::initializeFont()
     QFont font("Source Code Pro", 10);
     #endif
     myfont = font;
-    font.setFixedPitch(true);
     myfont.setFixedPitch(true);
-    textEdit->setFont(font);
+    textEdit->setFont(myfont);
 }
 
 //
@@ -543,13 +548,13 @@ void MainWindow::initializeMargin()
     textEdit->setMarginsForegroundColor(QColor("#ff0000ff"));
 
     // resize line numbers margin if needed!
-    connect(textEdit, SIGNAL(textChanged()), this, SLOT(onTextChanged()));
+    connect(textEdit, SIGNAL(textChanged()), this, SLOT(fitMarginLines()));
 }
 
 //
 // resize line numbers margin
 //
-void MainWindow::onTextChanged()
+void MainWindow::fitMarginLines()
 {
     QFontMetrics fontmetrics = textEdit->fontMetrics();
     textEdit->setMarginWidth(0, fontmetrics.width(QString::number(textEdit->lines())) + 10);
@@ -563,7 +568,7 @@ void MainWindow::initializeLexer()
     QsciLexerCPP *lexer = new QsciLexerCPP();
     lexer->setDefaultFont(textEdit->font());
     lexer->setFoldComments(true);
-    textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
+   // textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
     textEdit->setLexer(lexer);
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
 }
@@ -585,11 +590,16 @@ void MainWindow::initializeFolding()
 {
     QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
     if (!state)
+    {
         textEdit->foldAll(false);
+    }
     else
+    {
         textEdit->foldAll(true);
+    }
 
     textEdit->setFolding(state);
+    qDebug() << "Folding: " << state;
 }
 
 //
