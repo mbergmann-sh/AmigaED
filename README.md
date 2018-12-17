@@ -53,4 +53,4 @@ The easy way: Simply import the .pro file into Qt Creator, configure your toolch
 - QScintilla download site: https://www.riverbankcomputing.com/software/qscintilla/download
 - Qt5 documentation: http://doc.qt.io/qt-5/ 
 - QScintilla API documentation: http://pyqt.sourceforge.net/Docs/QScintilla2/annotated.html
-- A site showing the usage of QScintilla from Python in order to build an editor: https://qscintilla.com/ (...you might want to use this one as a starting point for understanding how QScintilla works if you are able to read and understand Python code!)
+- A site showing the usage of QScintilla from within Python in order to build an editor: https://qscintilla.com/ (...you might want to use this one as a starting point for understanding how QScintilla works if you are able to read and understand Python code!)
