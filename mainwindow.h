@@ -108,7 +108,7 @@ private:
     QMenu *viewMenue;           // holds actions to change editors view
     QMenu *buildMenue;          // holds compiler / build actions
     QMenu *helpMenue;           // holds help topics
-    QMenu *miscMenue;           // holds misc actions
+    QMenu *toolsMenue;           // holds misc actions
     QMenu *insertMenu;          // holds snippet insertions
 
     // Toolbars
@@ -116,7 +116,7 @@ private:
     QToolBar *editToolBar;          // holds copy, paste and some more...
     QToolBar *navigationToolBar;    // holds actions to move around in text
     QToolBar *buildToolBar;         // holds compiler / build actions
-    QToolBar *miscToolBar;          // holds misc actions
+    QToolBar *toolsToolBar;          // holds misc actions
 
     //Actions
     QAction *newAct;                // create new empty window

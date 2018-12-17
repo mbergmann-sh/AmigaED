@@ -128,9 +128,11 @@ void MainWindow::open()
 bool MainWindow::save()
 {
     // if no file name has been given until now..
-    if (curFile.isEmpty()) {
+    if (curFile.isEmpty())
+    {
         return saveAs();        // ...call saveAs dialog!
-    } else {
+    } else
+    {
         return saveFile(curFile);
     }
 }
@@ -164,7 +166,7 @@ void MainWindow::about()
                "write modern GUI applications using Qt and QScintilla, with a menu bar, "
                "toolbars, and a status bar.<br>"
                "<br>Source: Riverbank QScintilla example app</br>"
-               "<br>Modifications and Enhancements: Michael Bergmann</br>"));
+               "<br>Modifications and Enhancements: Michael Bergmann 2018/2019</br>"));
 }
 
 //
@@ -249,6 +251,10 @@ void MainWindow::createActions()
     gotoLineAct->setStatusTip(tr("Goto line X..."));
     connect(gotoLineAct, SIGNAL(triggered()), this, SLOT(actionGoto_Line()));
 
+    toggleFoldAct = new QAction(QIcon(":/images/gotoline.png"), tr("Toggle &folding..."), this);
+    toggleFoldAct->setShortcut(tr("Ctrl+f"));
+    connect(toggleFoldAct, SIGNAL(triggered()), this, SLOT(initializeFolding()));
+
     gotoMatchingBraceAct = new QAction(QIcon(":/images/brackets.png"), tr("Goto &matching bracket {} ... [] ... ()..."), this);
     gotoMatchingBraceAct->setShortcut(tr("Ctrl+b"));
     gotoMatchingBraceAct->setStatusTip(tr("Goto matching bracket..."));
@@ -297,11 +303,11 @@ void MainWindow::createMenus()
     menuBar()->addSeparator();
 
     viewMenue = menuBar()->addMenu(tr("&View"));
+    viewMenue->addAction(toggleFoldAct);
 
     menuBar()->addSeparator();
-
-    miscMenue = menuBar()->addMenu(tr("&Misc"));
-    miscMenue->addAction(emulatorAct);
+    toolsMenue = menuBar()->addMenu(tr("&Tools"));
+    toolsMenue->addAction(emulatorAct);
 
     helpMenue = menuBar()->addMenu(tr("&Help"));
     helpMenue->addAction(aboutAct);
@@ -333,8 +339,8 @@ void MainWindow::createToolBars()
     buildToolBar->addAction(compileAct);
     buildToolBar->addAction(emulatorAct);
 
-    miscToolBar = addToolBar(tr("Navigation"));
-    miscToolBar->addAction(exitAct);
+    toolsToolBar = addToolBar(tr("Navigation"));
+    toolsToolBar->addAction(exitAct);
 }
 
 //
@@ -473,10 +479,16 @@ void MainWindow::actionGoto_Line()
                                  tr("Line number:"), 1, 0, max, 1, &ok);
     if (ok)
     {
-        textEdit->setCursorPosition(i-1,0);
+        // check if text is folded!
+        QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
+        qDebug() << state;
+        // if folded: unfold first!!
+        if (state > 0)
+        {
+            textEdit->foldAll(false);
+        }
+        textEdit->setCursorPosition(i-1,1);
         textEdit->setCaretLineVisible(true);
-        //textEdit->foldLine(i-1);
-       // textEdit->foldAll(false);
     }
 }
 
@@ -599,7 +611,7 @@ void MainWindow::initializeFolding()
     }
 
     textEdit->setFolding(state);
-    qDebug() << "Folding: " << state;
+    statusBar()->showMessage(tr("Folding toggled"), 2000);
 }
 
 //

@@ -18,6 +18,7 @@ This program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRA
 - save file to storage medium
 - recognize changes in text
 - code folding
+- fold/unfold all (toggle folding)
 - goto line number X
 - jump to matching bracket {...} | [...] | (...)
 - C/C++ syntax highlighting
