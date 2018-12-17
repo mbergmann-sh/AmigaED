@@ -270,18 +270,18 @@ void MainWindow::createActions()
 //
 void MainWindow::createMenus()
 {
-    fileMenu = menuBar()->addMenu(tr("&File")); // this is a main menue entry as shown in the menue bar of the app window (File)
-    fileMenu->addAction(newAct);                // this is menue entry (File/New)
-    fileMenu->addAction(openAct);
-    fileMenu->addAction(saveAct);
-    fileMenu->addAction(saveAsAct);
-    fileMenu->addSeparator();
-    fileMenu->addAction(exitAct);
+    fileMenue = menuBar()->addMenu(tr("&File")); // this is a main menue entry as shown in the menue bar of the app window (File)
+    fileMenue->addAction(newAct);                // this is menue entry (File/New)
+    fileMenue->addAction(openAct);
+    fileMenue->addAction(saveAct);
+    fileMenue->addAction(saveAsAct);
+    fileMenue->addSeparator();
+    fileMenue->addAction(exitAct);
 
-    editMenu = menuBar()->addMenu(tr("&Edit"));
-    editMenu->addAction(cutAct);
-    editMenu->addAction(copyAct);
-    editMenu->addAction(pasteAct);
+    editMenue = menuBar()->addMenu(tr("&Edit"));
+    editMenue->addAction(cutAct);
+    editMenue->addAction(copyAct);
+    editMenue->addAction(pasteAct);
 
     menuBar()->addSeparator();
 
@@ -303,9 +303,9 @@ void MainWindow::createMenus()
     miscMenue = menuBar()->addMenu(tr("&Misc"));
     miscMenue->addAction(emulatorAct);
 
-    helpMenu = menuBar()->addMenu(tr("&Help"));
-    helpMenu->addAction(aboutAct);
-    helpMenu->addAction(aboutQtAct);
+    helpMenue = menuBar()->addMenu(tr("&Help"));
+    helpMenue->addAction(aboutAct);
+    helpMenue->addAction(aboutQtAct);
 }
 
 //
