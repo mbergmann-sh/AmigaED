@@ -75,7 +75,8 @@ private slots:
     void documentWasModified();             // marks document as modified if text was changed
     void fitMarginLines();                  // adjusts margin sizes to fit line numbers
     // Menu actions...
-    void actionGoto_Line();
+    void printFile();                   // print current file
+    void actionGoto_Line();             // jump to line X
     void actionGoto_matching_brace();   // jumps to matching brace
     void actionCompile();               // calls compilation of current file
     void actionEmulator();              // starts UAE
@@ -123,6 +124,7 @@ private:
     QAction *openAct;               // open file
     QAction *saveAct;               // save file
     QAction *saveAsAct;             // save file as...
+    QAction *printAct;              // print current file
     QAction *exitAct;               // quit the app
     QAction *cutAct;                // copy marked text into clipboard and delete original
     QAction *copyAct;               // copy marked text into clipboard

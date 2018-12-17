@@ -12,5 +12,7 @@
         <file>images/dice.png</file>
         <file>images/fileexit.png</file>
         <file>images/workbench.png</file>
+        <file>images/filesaveas.png</file>
+        <file>images/printer.png</file>
     </qresource>
 </RCC>

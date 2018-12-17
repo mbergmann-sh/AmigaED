@@ -206,9 +206,14 @@ void MainWindow::createActions()
     saveAct->setStatusTip(tr("Save the document to disk"));
     connect(saveAct, SIGNAL(triggered()), this, SLOT(save()));
 
-    saveAsAct = new QAction(tr("Save &As..."), this);
+    saveAsAct = new QAction(QIcon(":/images/filesaveas.png"),tr("Save &As..."), this);
     saveAsAct->setStatusTip(tr("Save the document under a new name"));
     connect(saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
+
+    printAct = new QAction(QIcon(":/images/printer.png"),tr("&Print file..."), this);
+    printAct->setShortcut(tr("Ctrl+p"));
+    printAct->setStatusTip(tr("Print current file"));
+    connect(printAct, SIGNAL(triggered()), this, SLOT(printFile()));
 
     exitAct = new QAction(QIcon(":/images/fileexit.png"), tr("&Exit"), this);
     exitAct->setShortcut(tr("Ctrl+Q"));
@@ -282,6 +287,8 @@ void MainWindow::createMenus()
     fileMenue->addAction(saveAct);
     fileMenue->addAction(saveAsAct);
     fileMenue->addSeparator();
+    fileMenue->addAction(printAct);
+    fileMenue->addSeparator();
     fileMenue->addAction(exitAct);
 
     editMenue = menuBar()->addMenu(tr("&Edit"));
@@ -306,6 +313,7 @@ void MainWindow::createMenus()
     viewMenue->addAction(toggleFoldAct);
 
     menuBar()->addSeparator();
+
     toolsMenue = menuBar()->addMenu(tr("&Tools"));
     toolsMenue->addAction(emulatorAct);
 
@@ -323,8 +331,12 @@ void MainWindow::createToolBars()
 {
     fileToolBar = addToolBar(tr("File"));   // this is a section, correspondending to main menue "File"
     fileToolBar->addAction(newAct);         // this is a section entry, correspondending to menue entry "File/New"
+    fileToolBar->addSeparator();
     fileToolBar->addAction(openAct);
     fileToolBar->addAction(saveAct);
+    fileToolBar->addAction(saveAsAct);
+    fileToolBar->addSeparator();
+    fileToolBar->addAction(printAct);
 
     editToolBar = addToolBar(tr("Edit"));
     editToolBar->addAction(cutAct);
@@ -682,6 +694,14 @@ void MainWindow::initializeGUI()
     createMenus();
     createToolBars();
     createStatusBar();
+}
+
+//
+// print current file
+//
+void MainWindow::printFile()
+{
+    popNotImplemented();
 }
 
 //
