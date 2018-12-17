@@ -37,16 +37,16 @@ You'll need a computer with either MSVC, GCC or MinGW C/C++ compiler setup with 
 5. qmake application.pro (creates neccessary descriptions for compiling and linking)
 6. qmake (creates Makefiles for Debug and Release versions)
 7. MSVC: nmake, GCC or MinGW: make -j4
-8. wait for compiler to finish
+8. Wait for compiler to finish
 
-The easy way: simply import the .pro file into Qt Creator, configure your toolchain and build the app... ;)
+The easy way: Simply import the .pro file into Qt Creator, configure your toolchain and build the app... ;)
 
 # Making the app run standalone on Windows
 1. Open a Qt command prompt correspondending to the compiler in use 
 2. CD to folder where the release version was stored
 3. windeployqt --angle --compiler-runtime --release qAmigaED.exe (this will create some additional folders and copy most of the needed DLLs to the folder containing your executable)
 4. Manually copy appropriate Qt5PrintSupport.dll and qscintilla2_qt5.dll to that folder
-5. Add a PATH entry to that folder to your system if you want to call the app from command line!
+5. Add an entry containing the path to that folder to your system's $PATH variable if you want to call the app from command line!
 
 # Usefull links for Qt5/QScintilla coders
 - Qt5 open source edition download site: https://www.qt.io/download-qt-installer?hsCtaTracking=9f6a2170-a938-42df-a8e2-a9f0b1d6cdce%7C6cb0de4f-9bb5-4778-ab02-bfb62735f3e5
