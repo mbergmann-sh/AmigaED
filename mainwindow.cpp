@@ -656,7 +656,10 @@ void MainWindow::showCurrendCursorPosition()
 void MainWindow::initializeGUI()
 {
     // if on Mac, immitate its GUI behaviour:
-    this->setUnifiedTitleAndToolBarOnMac(true);
+    #if defined(__APPLE__)
+        this->setUnifiedTitleAndToolBarOnMac(true);
+        qDebug() << "running on some kind of Mac..."
+    #endif
 
     // give an icon and a name to the app:
     this->setWindowIcon(QIcon(":/images/lemming.png"));
@@ -687,8 +690,10 @@ void MainWindow::initializeGUI()
     statusLCD_Y->display(1);
 
     // give some blackish style to MainWindow
-    this->setStyleSheet(QString::fromUtf8("background-color: rgb(175, 175, 175);"));
-    textEdit->setStyleSheet(QString::fromUtf8("background-color: rgb(175, 175, 175);"));
+    // ...surely looks nasty on OS X, so we will skip that for Mac!
+    #if !defined(__APPLE__)
+        textEdit->setStyleSheet(QString::fromUtf8("background-color: rgb(175, 175, 175);"));
+    #endif
 
     // initialize textEdit's most needed attributes:
     initializeFont();
