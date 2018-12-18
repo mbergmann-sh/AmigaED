@@ -563,6 +563,9 @@ void MainWindow::initializeFont()
     // set a readable default font for Linux and Windows:
     #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
     QFont font("Courier New", 10);
+    #elif defined(__APPLE__)
+    QFont font("SF Mono Regular", 11);
+    qDebug() << "Running on Mac. Font is SF Mono Regular now!"
     #else
     QFont font("Source Code Pro", 10);
     #endif
@@ -658,7 +661,7 @@ void MainWindow::initializeGUI()
     // if on Mac, immitate its GUI behaviour:
     #if defined(__APPLE__)
         this->setUnifiedTitleAndToolBarOnMac(true);
-        qDebug() << "running on some kind of Mac..."
+        qDebug() << "running on some kind of Mac...";
     #endif
 
     // give an icon and a name to the app:
