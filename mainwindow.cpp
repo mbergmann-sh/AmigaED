@@ -281,6 +281,7 @@ void MainWindow::createActions()
 //
 void MainWindow::createMenus()
 {
+    // File menu
     fileMenue = menuBar()->addMenu(tr("&File")); // this is a main menue entry as shown in the menue bar of the app window (File)
     fileMenue->addAction(newAct);                // this is menue entry (File/New)
     fileMenue->addAction(openAct);
@@ -291,6 +292,7 @@ void MainWindow::createMenus()
     fileMenue->addSeparator();
     fileMenue->addAction(exitAct);
 
+    // Edit menue
     editMenue = menuBar()->addMenu(tr("&Edit"));
     editMenue->addAction(cutAct);
     editMenue->addAction(copyAct);
@@ -298,25 +300,35 @@ void MainWindow::createMenus()
 
     menuBar()->addSeparator();
 
+    // Inserts menue
+    insertMenue = menuBar()->addMenu(tr("&Inserts"));
+
+    menuBar()->addSeparator();
+
+    // Build menue
     buildMenue = menuBar()->addMenu(tr("&Build"));
     buildMenue->addAction(compileAct);
 
     menuBar()->addSeparator();
 
+    // Navigation menue
     navigationMenue = menuBar()->addMenu(tr("&Navigation"));
     navigationMenue->addAction(gotoLineAct);
     navigationMenue->addAction(gotoMatchingBraceAct);
 
     menuBar()->addSeparator();
 
+    // View menue
     viewMenue = menuBar()->addMenu(tr("&View"));
     viewMenue->addAction(toggleFoldAct);
 
     menuBar()->addSeparator();
 
+    // Tools menue
     toolsMenue = menuBar()->addMenu(tr("&Tools"));
     toolsMenue->addAction(emulatorAct);
 
+    // Help menue
     helpMenue = menuBar()->addMenu(tr("&Help"));
     helpMenue->addAction(aboutAct);
     helpMenue->addAction(aboutQtAct);
@@ -368,7 +380,7 @@ void MainWindow::createStatusBar()
 //
 void MainWindow::readSettings()
 {
-    QSettings settings("MB-SoftWorX", "QScintilla AmigaED Example");
+    QSettings settings("MB-SoftWorX", "QScintilla Amiga Cross Editor Example");
     QPoint pos = settings.value("pos", QPoint(200, 200)).toPoint();
     QSize size = settings.value("size", QSize(400, 400)).toSize();
     resize(size);
@@ -380,7 +392,7 @@ void MainWindow::readSettings()
 //
 void MainWindow::writeSettings()
 {
-    QSettings settings("MB-SoftWorX", "QScintilla AmigaED Example");
+    QSettings settings("MB-SoftWorX", "QScintilla Amiga Cross Editor Example");
     settings.setValue("pos", pos());
     settings.setValue("size", size());
 }
@@ -392,7 +404,7 @@ void MainWindow::writeSettings()
 bool MainWindow::maybeSave()
 {
     if (textEdit->isModified()) {
-        int ret = QMessageBox::warning(this, tr("C/C++ AmigaED"),
+        int ret = QMessageBox::warning(this, tr("C/C++ Amiga Cross Editor"),
                      tr("The document has been modified.\n"
                         "Do you want to save your changes?"),
                      QMessageBox::Yes | QMessageBox::Default,
@@ -413,7 +425,7 @@ void MainWindow::loadFile(const QString &fileName)
 {
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly)) {
-        QMessageBox::warning(this, tr("C/C++ AmigaED"),
+        QMessageBox::warning(this, tr("C/C++ Amiga Cross Editor"),
                              tr("Cannot read file %1:\n%2.")
                              .arg(fileName)
                              .arg(file.errorString()));
@@ -436,7 +448,7 @@ bool MainWindow::saveFile(const QString &fileName)
 {
     QFile file(fileName);
     if (!file.open(QFile::WriteOnly)) {
-        QMessageBox::warning(this, tr("C/C++ AmigaED"),
+        QMessageBox::warning(this, tr("C/C++ Amiga Cross Editor"),
                              tr("Cannot write file %1:\n%2.")
                              .arg(fileName)
                              .arg(file.errorString()));
@@ -469,7 +481,7 @@ void MainWindow::setCurrentFile(const QString &fileName)
     else
         shownName = strippedName(curFile);
 
-    setWindowTitle(tr("%1[*] - %2").arg(shownName).arg(tr("C/C++ AmigaED")));
+    setWindowTitle(tr("%1[*] - %2").arg(shownName).arg(tr("C/C++ Amiga Cross Editor")));
 }
 
 //
@@ -643,9 +655,12 @@ void MainWindow::showCurrendCursorPosition()
 //
 void MainWindow::initializeGUI()
 {
+    // if on Mac, immitate its GUI behaviour:
+    this->setUnifiedTitleAndToolBarOnMac(true);
+
     // give an icon and a name to the app:
     this->setWindowIcon(QIcon(":/images/lemming.png"));
-    this->setWindowTitle("AmigaED");
+    this->setWindowTitle("Amiga Cross Editor");
 
     // set a decent start value for app's size
     this->setMinimumSize(600, 450);
@@ -710,7 +725,7 @@ void MainWindow::printFile()
 void MainWindow::popNotImplemented()
 {
      QMessageBox::information(this,
-                   "Not implemented - AmigaED", "You have requested a feature that is <i><b>not</b></i> fully<br>implemented yet! The requested feature might not work as expected...",
+                   "Not implemented - Amiga Cross Editor", "You have requested a feature that is <i><b>not</b></i> fully<br>implemented yet! The requested feature might not work as expected...",
                     QMessageBox::Ok);
 
 }

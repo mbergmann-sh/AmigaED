@@ -110,7 +110,7 @@ private:
     QMenu *buildMenue;          // holds compiler / build actions
     QMenu *helpMenue;           // holds help topics
     QMenu *toolsMenue;           // holds misc actions
-    QMenu *insertMenu;          // holds snippet insertions
+    QMenu *insertMenue;          // holds snippet insertions
 
     // Toolbars
     QToolBar *fileToolBar;          // holds file manipulating actions
