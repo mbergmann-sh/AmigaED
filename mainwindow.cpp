@@ -51,6 +51,7 @@
 #include <Qsci/qsciscintilla.h>
 #include <Qsci/qscilexercpp.h>
 
+// allways get your defaults!
 #include "mainwindow.h"
 
 // Open MainWindow with given filename...
