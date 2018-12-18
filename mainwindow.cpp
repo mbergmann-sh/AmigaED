@@ -565,7 +565,7 @@ void MainWindow::initializeFont()
     QFont font("Courier New", 10);
     #elif defined(__APPLE__)
     QFont font("SF Mono Regular", 11);
-    qDebug() << "Running on Mac. Font is SF Mono Regular now!"
+    qDebug() << "Running on Mac. Font is SF Mono Regular now!";
     #else
     QFont font("Source Code Pro", 10);
     #endif
