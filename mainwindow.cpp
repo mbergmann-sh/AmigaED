@@ -568,6 +568,7 @@ void MainWindow::initializeFont()
     qDebug() << "Running on Mac. Font is SF Mono Regular now!";
     #else
     QFont font("Source Code Pro", 10);
+    qDebug() << "Linux detected. Setting font to Source Code Pro";
     #endif
     myfont = font;
     myfont.setFixedPitch(true);
