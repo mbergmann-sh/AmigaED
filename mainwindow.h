@@ -48,6 +48,7 @@ class QsciScintilla;
 
 class MainWindow : public QMainWindow
 {
+    // give the meta compiler a chance!
     Q_OBJECT
 
 public:
