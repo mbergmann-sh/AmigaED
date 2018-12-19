@@ -1,4 +1,4 @@
-QT       += core gui widgets
+QT       += core gui widgets printsupport
 CONFIG += release qscintilla2 c++11
 
 TARGET = AmigaED
