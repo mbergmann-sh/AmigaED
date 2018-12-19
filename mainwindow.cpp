@@ -804,7 +804,7 @@ void MainWindow::printFile()
     else
     {
         (void)QMessageBox::information(this,
-                       "Printing - Amiga Cross Editor", "It seems there <i><b>no text</b></i> in this editor window!<br> Printing is cancelled due to waste of paper."
+                       "Printing - Amiga Cross Editor", "It seems there is <i><b>no text</b></i> in this editor window!<br> Printing is cancelled due to waste of paper."
                                                         "<br>There's allways a unicorn dying if you waste things, ya know?!",
                         QMessageBox::Ok);
     }
