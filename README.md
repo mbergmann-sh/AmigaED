@@ -65,7 +65,8 @@ The easy way: Simply import the .pro file into Qt Creator, configure your toolch
 - implement custom lexers for Amiga C and libraries, AmigaE
 - implement custom code beautifier
 - implement various wizards for code generation
-- implement GUI builders for BGUI, ReAction and probably MUI (YES - they have to be written for a PC/Mac environment! ;) )
+- MAYBE implement code creation and cross compiling for AmigaOS 4.1 PPC target... Somebody willing to donate a A1222 machine? ;)
+- implement GUI builders for BGUI, ReAction and probably MUI (YES - they have to be written for a PC/Mac environment!)
 - implement project time management, including per-project wordcount, charcount, linecount, work hours statistics
 
 # Usefull links for Qt5/QScintilla coders
