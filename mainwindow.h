@@ -41,6 +41,9 @@
 #include <QStatusTipEvent>
 #include <QCloseEvent>
 #include <QMouseEvent>
+#include <QPrinter>
+#include <QPrintDialog>
+#include <QPrintEngine>
 
 #include <QDebug>
 

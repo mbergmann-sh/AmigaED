@@ -50,6 +50,7 @@
 
 #include <Qsci/qsciscintilla.h>
 #include <Qsci/qscilexercpp.h>
+#include <Qsci/qsciprinter.h>
 
 // allways get your defaults!
 #include "mainwindow.h"
@@ -786,7 +787,27 @@ void MainWindow::initializeGUI()
 //
 void MainWindow::printFile()
 {
-    popNotImplemented();
+    int max = textEdit->lines(); // max. count of lines in code window
+
+    if (max > 1)    // more than one line, so there must be something...
+    {
+        QsciPrinter printer(QPrinter::HighResolution);
+        QPrintDialog printDialog(&printer, this);
+        if (printDialog.exec() == QDialog::Accepted)
+        {
+            printer.setPageSize(QsciPrinter::A4);
+            // print ...
+            // printer.printRange(textEdit, 1, max); REFUSES TO PRINT! Use this instead:
+            printer.printRange(textEdit);
+        }
+    }
+    else
+    {
+        (void)QMessageBox::information(this,
+                       "Printing - Amiga Cross Editor", "It seems there <i><b>no text</b></i> in this editor window!<br> Printing is cancelled due to waste of paper."
+                                                        "<br>There's allways a unicorn dying if you waste things, ya know?!",
+                        QMessageBox::Ok);
+    }
 }
 
 //
@@ -794,7 +815,7 @@ void MainWindow::printFile()
 //
 void MainWindow::popNotImplemented()
 {
-     (void)QMessageBox::information(this,
+    (void)QMessageBox::information(this,
                    "Not implemented - Amiga Cross Editor", "You have requested a feature that is <i><b>not</b></i> fully<br>implemented yet! The requested feature might not work as expected...",
                     QMessageBox::Ok);
 

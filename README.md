@@ -26,6 +26,7 @@ This program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRA
 - C/C++ syntax highlighting
 - clipboard support
 - display current cursor position
+- print current file if page not empty
 
 more to come...
 
@@ -55,7 +56,7 @@ The easy way: Simply import the .pro file into Qt Creator, configure your toolch
 - make the editor drag'n'drop-aware
 - implement inserts and snippets
 - add a search/replace dialog
-- implement printing
+- improve printing [partially done - prints text and line numbers on DIN A4 paper]
 - implement direct cross compiling to Amiga target vor vbcc and gcc cross compiler toolchain
 - startup Amiga Emulator
 - implement a prefs dialog
