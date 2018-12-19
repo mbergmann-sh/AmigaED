@@ -95,6 +95,14 @@ void MainWindow::closeEvent(QCloseEvent *event)
 }
 
 //
+// jump to line #1
+//
+void MainWindow::mousePressEvent(QMouseEvent *event)
+{
+    popNotImplemented();
+}
+
+//
 // create a new, empty file
 //
 void MainWindow::newFile()
@@ -252,6 +260,16 @@ void MainWindow::createActions()
     connect(textEdit, SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
     connect(textEdit, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
 
+    gotoTopAct = new QAction( tr("&Goto top..."), this);
+    gotoTopAct->setShortcut(tr("Ctrl+Home"));
+    gotoTopAct->setStatusTip(tr("Goto top of file..."));
+    connect(gotoTopAct, SIGNAL(triggered()), this, SLOT(actionGotoTop()));
+
+    gotoBottomAct = new QAction( tr("&Goto bottom..."), this);
+    gotoBottomAct->setShortcut(tr("Ctrl+End"));
+    gotoBottomAct->setStatusTip(tr("Goto bottom of file..."));
+    connect(gotoBottomAct, SIGNAL(triggered()), this, SLOT(actionGotoBottom()));
+
     gotoLineAct = new QAction(QIcon(":/images/gotoline.png"), tr("&Goto Line..."), this);
     gotoLineAct->setShortcut(tr("Ctrl+G"));
     gotoLineAct->setStatusTip(tr("Goto line X..."));
@@ -314,7 +332,10 @@ void MainWindow::createMenus()
 
     // Navigation menue
     navigationMenue = menuBar()->addMenu(tr("&Navigation"));
+    navigationMenue->addAction(gotoTopAct);
+    navigationMenue->addAction(gotoBottomAct);
     navigationMenue->addAction(gotoLineAct);
+    navigationMenue->addSeparator();
     navigationMenue->addAction(gotoMatchingBraceAct);
 
     menuBar()->addSeparator();
@@ -494,6 +515,44 @@ QString MainWindow::strippedName(const QString &fullFileName)
 }
 
 //
+// jump to line #1
+//
+// BUG: Shortcut not responding! To be fixed...
+//
+void MainWindow::actionGotoTop()
+{
+    const int i = 1;
+
+    // check if text is folded!
+    QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
+    // if folded: unfold first!!
+    if (state > 0)
+    {
+        textEdit->foldAll(false);
+    }
+    textEdit->setCursorPosition(i-1,0);
+    //textEdit->setCaretLineVisible(true);
+}
+
+//
+// jump to last line in text
+//
+// BUG: Shortcut not responding! To be fixed...
+//
+void MainWindow::actionGotoBottom()
+{
+    const int max_lines = textEdit->lines();    // number of lines in text!
+    // check if text is folded!
+    QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
+    // if folded: unfold first!!
+    if (state > 0)
+    {
+        textEdit->foldAll(false);
+    }
+    textEdit->setCursorPosition(max_lines, 0);
+}
+
+//
 // Jump to line No. X...
 //
 void MainWindow::actionGoto_Line()
@@ -512,7 +571,7 @@ void MainWindow::actionGoto_Line()
         {
             textEdit->foldAll(false);
         }
-        textEdit->setCursorPosition(i-1,1);
+        textEdit->setCursorPosition(i-1,0);
         textEdit->setCaretLineVisible(true);
     }
 }
@@ -555,6 +614,7 @@ void MainWindow::actionEmulator()
           if (ok && !text.isEmpty())
               qDebug() << text;
 }
+
 
 //
 // set default fonts, depending on OS

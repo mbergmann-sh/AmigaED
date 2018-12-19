@@ -39,6 +39,8 @@
 #include <QLabel>
 #include <QLCDNumber>
 #include <QStatusTipEvent>
+#include <QCloseEvent>
+#include <QMouseEvent>
 
 #include <QDebug>
 
@@ -55,7 +57,8 @@ public:
     explicit MainWindow(QString cmdFileName);
 
 protected:
-    void closeEvent(QCloseEvent *event);
+    void closeEvent(QCloseEvent *event);        // catch close() event
+    void mousePressEvent(QMouseEvent *event);   // catch mouse press event
 
 private slots:
     void popNotImplemented();       // shows "not implemented" MessageBox
@@ -77,6 +80,8 @@ private slots:
     void fitMarginLines();                  // adjusts margin sizes to fit line numbers
     // Menu actions...
     void printFile();                   // print current file
+    void actionGotoTop();               // jump to line #1
+    void actionGotoBottom();            // jump to last line in text
     void actionGoto_Line();             // jump to line X
     void actionGoto_matching_brace();   // jumps to matching brace
     void actionCompile();               // calls compilation of current file
@@ -96,6 +101,7 @@ private:
     bool saveFile(const QString &fileName);             // save current file
     void setCurrentFile(const QString &fileName);       // will be called to store current filename and put it into window title
     QString strippedName(const QString &fullFileName);  // gives back current filename without path
+
 
     // Qscintila Editor widget instance
     QsciScintilla *textEdit;
@@ -132,6 +138,8 @@ private:
     QAction *pasteAct;              // paste clipboard
     QAction *aboutAct;              // show about message
     QAction *aboutQtAct;            // show about-Qt message
+    QAction *gotoTopAct;            // jump to line #1...
+    QAction *gotoBottomAct;         // jump to line #1...
     QAction *gotoLineAct;           // jump to line X...
     QAction *toggleFoldAct;         // toggle text folding
     QAction *gotoMatchingBraceAct;  // jump to matching brace
