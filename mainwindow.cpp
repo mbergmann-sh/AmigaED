@@ -757,7 +757,7 @@ void MainWindow::initializeGUI()
     // give some blackish style to MainWindow
     // ...surely looks nasty on OS X, so we will skip that for Mac!
     #if !defined(__APPLE__)
-        textEdit->setStyleSheet(QString::fromUtf8("background-color: rgb(175, 175, 175);"));
+        this->setStyleSheet(QString::fromUtf8("background-color: rgb(175, 175, 175);"));
     #endif
 
     // initialize textEdit's most needed attributes:
@@ -794,7 +794,7 @@ void MainWindow::printFile()
 //
 void MainWindow::popNotImplemented()
 {
-     QMessageBox::information(this,
+     (void)QMessageBox::information(this,
                    "Not implemented - Amiga Cross Editor", "You have requested a feature that is <i><b>not</b></i> fully<br>implemented yet! The requested feature might not work as expected...",
                     QMessageBox::Ok);
 
