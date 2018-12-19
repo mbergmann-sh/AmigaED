@@ -61,7 +61,7 @@ The easy way: Simply import the .pro file into Qt Creator, configure your toolch
 - implement custom lexers for Amiga C and libraries, AmigaE
 - implement custom code beautifier
 - implement various wizards for code generation
-- implement GUI builders for wizard.library, ReAction and probably MUI
+- implement GUI builders for BGUI, ReAction and probably MUI
 
 # Usefull links for Qt5/QScintilla coders
 - Qt5 open source edition download site: https://www.qt.io/download-qt-installer?hsCtaTracking=9f6a2170-a938-42df-a8e2-a9f0b1d6cdce%7C6cb0de4f-9bb5-4778-ab02-bfb62735f3e5
