@@ -393,9 +393,9 @@ void MainWindow::createToolBars()
 //
 // Show initial message in the app's status bar
 //
-void MainWindow::createStatusBar()
+void MainWindow::createStatusBar(QString statusmessage, int timeout)
 {
-    statusBar()->showMessage(tr("Ready"));
+    statusBar()->showMessage(statusmessage, timeout);
 }
 
 //
@@ -779,7 +779,7 @@ void MainWindow::initializeGUI()
     createActions();
     createMenus();
     createToolBars();
-    createStatusBar();
+    createStatusBar(tr("Ready"), 0);
 }
 
 //
@@ -791,6 +791,7 @@ void MainWindow::printFile()
 
     if (max > 1)    // more than one line, so there must be something...
     {
+        this->createStatusBar(tr("Printing started..."), 6000);
         QsciPrinter printer(QPrinter::HighResolution);
         QPrintDialog printDialog(&printer, this);
         if (printDialog.exec() == QDialog::Accepted)
@@ -803,6 +804,7 @@ void MainWindow::printFile()
     }
     else
     {
+        this->createStatusBar(tr("Printing canceled tue to wasting!"), 6000);
         (void)QMessageBox::information(this,
                        "Printing - Amiga Cross Editor", "It seems there is <i><b>no text</b></i> in this editor window!<br> Printing is cancelled due to waste of paper."
                                                         "<br>There's allways a unicorn dying if you waste things, ya know?!",

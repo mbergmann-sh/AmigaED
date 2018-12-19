@@ -92,10 +92,10 @@ private slots:
 
 private:
     // GUI creation...
-    void createActions();                               // defines actions for menues and toolbars
-    void createMenus();                                 // creates menues from actions
-    void createToolBars();                              // creates toolbars from actions
-    void createStatusBar();                             // sets up the statusbar
+    void createActions();                                       // defines actions for menues and toolbars
+    void createMenus();                                         // creates menues from actions
+    void createToolBars();                                      // creates toolbars from actions
+    void createStatusBar(QString statusmessage, int timeout);   // sets up the statusbar
     // GUI methods...
     void readSettings();                                // read app settings
     void writeSettings();                               // write app settings
