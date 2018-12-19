@@ -68,7 +68,7 @@ The easy way: Simply import the .pro file into Qt Creator, configure your toolch
 - implement GUI builders for BGUI, ReAction and probably MUI (YES - they have to be written for a PC/Mac environment!)
 - implement project time management, including per-project wordcount, charcount, linecount, work hours statistics
 - MAYBE implement code creation and cross compiling for AmigaOS 4.1 PPC target... Somebody willing to donate a A1222 machine? ;)
-- MAYBE implement code creation and cross compiling for AROS native i386 target... if I can get hands of a working cross compiler
+- MAYBE implement code creation and cross compiling for AROS native i386 target... if I can get hands on a working cross compiler running on PC
 
 # Usefull links for Qt5/QScintilla coders
 - Qt5 open source edition download site: https://www.qt.io/download-qt-installer?hsCtaTracking=9f6a2170-a938-42df-a8e2-a9f0b1d6cdce%7C6cb0de4f-9bb5-4778-ab02-bfb62735f3e5
