@@ -20,6 +20,7 @@ This program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRA
 - code folding
 - fold/unfold all (toggle folding)
 - goto line number X
+- goto top/bottom
 - jump to matching bracket {...} | [...] | (...)
 - C/C++ syntax highlighting
 - clipboard support
@@ -54,6 +55,9 @@ The easy way: Simply import the .pro file into Qt Creator, configure your toolch
 - implement inserts and snippets
 - add a search/replace dialog
 - implement printing
+- implement direct cross compiling to Amiga target vor vbcc and gcc cross compiler toolchain
+- startup Amiga Emulator
+- implement a prefs dialog
 - implement project manager
 - implement makefile generator
 - implement compiler settings for vbcc, gcc, SAS/C
@@ -61,7 +65,7 @@ The easy way: Simply import the .pro file into Qt Creator, configure your toolch
 - implement custom lexers for Amiga C and libraries, AmigaE
 - implement custom code beautifier
 - implement various wizards for code generation
-- implement GUI builders for BGUI, ReAction and probably MUI
+- implement GUI builders for BGUI, ReAction and probably MUI (YES - they have to be written for a PC/Mac environment! ;) )
 - implement project time management, including per-project wordcount, charcount, linecount, work hours statistics
 
 # Usefull links for Qt5/QScintilla coders
