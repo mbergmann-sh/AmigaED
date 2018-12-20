@@ -50,6 +50,11 @@
 
 #include <Qsci/qsciscintilla.h>
 #include <Qsci/qscilexercpp.h>
+#include <Qsci/qscilexermakefile.h>
+#include <Qsci/qscilexerbatch.h>
+#include <Qsci/qscilexerpascal.h>
+#include <Qsci/qscilexerfortran.h>
+#include <Qsci/qscilexerfortran77.h>
 #include <Qsci/qsciprinter.h>
 
 // allways get your defaults!
@@ -112,6 +117,8 @@ void MainWindow::newFile()
         textEdit->clear();
         setCurrentFile("");
     }
+    // Let's asume our new file is C/C++
+    initializeLexerCPP();
 }
 
 //
@@ -124,7 +131,7 @@ void MainWindow::open()
                 "Open source file",
                 QDir::currentPath(),    // look up for files in PROGDIR first!
                 "C/C++ source files (*.c *.cpp) ;; C/C++ header files (*.h *.hpp) ;; "
-                "ASM source files (*.a *.asm) ;; Makefiles (*.mak) ;; "
+                "ASM source files (*.a *.asm) ;; Makefiles (Make*.* *.mak) ;; "
                 "AmigaE source files (*.e) ;; PASCAL source files (*.p *.pas) ;; All files (*.*)");
 
         if (!fileName.isEmpty())
@@ -294,6 +301,23 @@ void MainWindow::createActions()
     emulatorAct->setShortcut(tr("Ctrl+e"));
     emulatorAct->setStatusTip(tr("Start Amiga Emulation..."));
     connect(emulatorAct, SIGNAL(triggered()), this, SLOT(actionEmulator()));
+
+    // Lexers
+    lexCPPAct = new QAction(tr("C/C++..."), this);
+    connect(lexCPPAct, SIGNAL(triggered()), this, SLOT(initializeLexerCPP()));
+
+    lexMakefileAct = new QAction(tr("Makefile..."), this);
+    connect(lexMakefileAct, SIGNAL(triggered()), this, SLOT(initializeLexerMakefile()));
+
+    lexBatchAct = new QAction(tr("C/C++..."), this);
+    connect(lexBatchAct, SIGNAL(triggered()), this, SLOT(initializeLexerBatch()));
+
+    lexFortranAct = new QAction(tr("Amiga installer..."), this);
+    connect(lexFortranAct, SIGNAL(triggered()), this, SLOT(initializeLexerFortran()));
+
+    lexPascalAct = new QAction(tr("Pascal..."), this);
+    connect(lexPascalAct, SIGNAL(triggered()), this, SLOT(initializeLexerPascal()));
+
 }
 
 //
@@ -347,6 +371,18 @@ void MainWindow::createMenus()
 
     menuBar()->addSeparator();
 
+    // Syntax menue
+    syntaxMenue = menuBar()->addMenu(tr("Syn&tax"));
+    syntaxMenue->addAction(lexCPPAct);
+    syntaxMenue->addSeparator();
+    syntaxMenue->addAction(lexMakefileAct);
+    syntaxMenue->addSeparator();
+    syntaxMenue->addAction(lexFortranAct);
+    syntaxMenue->addSeparator();
+    syntaxMenue->addAction(lexPascalAct);
+
+    menuBar()->addSeparator();
+
     // Tools menue
     toolsMenue = menuBar()->addMenu(tr("&Tools"));
     toolsMenue->addAction(emulatorAct);
@@ -391,7 +427,7 @@ void MainWindow::createToolBars()
 }
 
 //
-// Show initial message in the app's status bar
+// Show initial message in the app's status bar or change it on demand
 //
 void MainWindow::createStatusBar(QString statusmessage, int timeout)
 {
@@ -665,14 +701,66 @@ void MainWindow::fitMarginLines()
 //
 // initialize C/C++ lexer bei default
 //
-void MainWindow::initializeLexer()
+void MainWindow::initializeLexerCPP()
 {
     QsciLexerCPP *lexer = new QsciLexerCPP();
     lexer->setDefaultFont(textEdit->font());
     lexer->setFoldComments(true);
-   // textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
     textEdit->setLexer(lexer);
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
+    createStatusBar(tr("Syntax changed to C/C++..."), 6000);
+}
+
+//
+// initialize lexer for Makefiles
+//
+void MainWindow::initializeLexerMakefile()
+{
+    QsciLexerMakefile *lexer = new QsciLexerMakefile;
+    lexer->setDefaultFont(textEdit->font());
+    //lexer->setFoldComments(true);
+    textEdit->setLexer(lexer);
+    textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
+    createStatusBar(tr("Syntax changed to Makefiles..."), 6000);
+}
+
+//
+// initialize lexer for Batch files
+//
+void MainWindow::initializeLexerBatch()
+{
+    QsciLexerBatch *lexer = new QsciLexerBatch;
+    lexer->setDefaultFont(textEdit->font());
+    //lexer->setFoldComments(true);
+    textEdit->setLexer(lexer);
+    textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
+    createStatusBar(tr("Syntax changed to Shell..."), 6000);
+}
+
+//
+// initialize lexer for Amiga Installer
+//
+void MainWindow::initializeLexerFortran()
+{
+    QsciLexerFortran *lexer = new QsciLexerFortran;
+    lexer->setDefaultFont(textEdit->font());
+    //lexer->setFoldComments(true);
+    textEdit->setLexer(lexer);
+    textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
+    createStatusBar(tr("Syntax changed to Amiga installer..."), 6000);
+}
+
+//
+// initialize lexer for Pascal
+//
+void MainWindow::initializeLexerPascal()
+{
+    QsciLexerPascal *lexer = new QsciLexerPascal;
+    lexer->setDefaultFont(textEdit->font());
+    lexer->setFoldComments(true);
+    textEdit->setLexer(lexer);
+    textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
+    createStatusBar(tr("Syntax changed to Pascal..."), 6000);
 }
 
 //
@@ -765,7 +853,7 @@ void MainWindow::initializeGUI()
     initializeFont();
     initializeMargin();
     initializeCaretLine();
-    initializeLexer();
+    initializeLexerCPP();
     initializeFolding();
 
     // make editor as Amiga-compatible as possible:

@@ -72,7 +72,11 @@ private slots:
     void about();                   // pops up "about" MessageBox
     // GUI creation...
     void initializeGUI();
-    void initializeLexer();
+    void initializeLexerCPP();
+    void initializeLexerMakefile();
+    void initializeLexerPascal();
+    void initializeLexerBatch();
+    void initializeLexerFortran();
     void initializeFolding();
     void initializeMargin();
     void initializeCaretLine();
@@ -115,12 +119,15 @@ private:
     // Menues
     QMenu *fileMenue;           // holds file manipulating actions
     QMenu *editMenue;           // holds copy, paste and some more...
+    QMenu *insertMenue;         // holds snippet insertions
+    QMenu *buildMenue;          // holds compiler / build actions
     QMenu *navigationMenue;     // holds actions to move around in text
     QMenu *viewMenue;           // holds actions to change editors view
-    QMenu *buildMenue;          // holds compiler / build actions
+    QMenu *syntaxMenue;         // holds actions to change syntax lexers
+    QMenu *toolsMenue;          // holds misc actions
     QMenu *helpMenue;           // holds help topics
-    QMenu *toolsMenue;           // holds misc actions
-    QMenu *insertMenue;          // holds snippet insertions
+
+
 
     // Toolbars
     QToolBar *fileToolBar;          // holds file manipulating actions
@@ -148,6 +155,11 @@ private:
     QAction *gotoMatchingBraceAct;  // jump to matching brace
     QAction *compileAct;            // calls compilation of current file
     QAction *emulatorAct;           // start UAE
+    QAction *lexCPPAct;             // switch lexer to C++ syntax
+    QAction *lexBatchAct;           // switch lexer to Batch / Shell syntax
+    QAction *lexMakefileAct;        // switch lexer to Makefile syntax
+    QAction *lexFortranAct;         // switch lexer to Amiga Installer (e.g. more like LISP) syntax
+    QAction *lexPascalAct;          // switch lexer to Pascal syntax
 
     // statusbar widgets
     QLabel *statusLabelX;
