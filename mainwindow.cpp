@@ -791,22 +791,32 @@ void MainWindow::initializeGUI()
 //
 void MainWindow::printFile()
 {
-    int max = textEdit->lines(); // max. count of lines in code window
-
-    if (max > 1)    // more than one line, so there must be something...
+    // Check if editor window contains some text...
+    int textsize = textEdit->text().size();  // if max > 0 then there must be some text in that editor window!
+    if (textsize > 0)                        // more than one character? So there is be something. Start printing!
     {
-        this->createStatusBar(tr("Printing started..."), 6000);
+        this->createStatusBar(tr("Calling Printer Dialog......"), 6000);
         QsciPrinter printer(QPrinter::HighResolution);
         QPrintDialog printDialog(&printer, this);
-        if (printDialog.exec() == QDialog::Accepted)
+
+        if (printDialog.exec() == QDialog::Accepted)    // if printer dialog was told to print...
         {
+            this->createStatusBar(tr("Printing started!"), 6000);
+            // set paper size to DIN A4
             printer.setPageSize(QsciPrinter::A4);
 
             // print ...
             // printer.printRange(textEdit, 1, max); REFUSES TO PRINT! Use this instead:
             printer.printRange(textEdit);
+
+            this->createStatusBar(tr("File was send to Printer and should be printed soon..."), 6000);
+        }
+        else    // ...if printer dialog was canceled
+        {
+            this->createStatusBar(tr("Printing canceled."), 6000);
         }
     }
+    // textEdit->text().size() == 0. No text available. We will not print anything!
     else
     {
         this->createStatusBar(tr("Printing canceled tue to wasting!"), 6000);
