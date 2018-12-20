@@ -16,4 +16,5 @@ RESOURCES    += application.qrc
 #RC_FILE = application.qrc
 
 DISTFILES += \
-    README.md
+    README.md \
+    aslrequest.txt
