@@ -793,10 +793,13 @@ void MainWindow::printFile()
 {
     // Check if editor window contains some text...
     int textsize = textEdit->text().size();  // if max > 0 then there must be some text in that editor window!
-    if (textsize > 0)                        // more than one character? So there is be something. Start printing!
+    if (textsize > 0)                        // more than one character? So there is some text available. Let's check for a printer!
     {
-        this->createStatusBar(tr("Calling Printer Dialog......"), 6000);
+        this->createStatusBar(tr("Calling printer dialog......"), 6000);
+
+        // create a high resolution QScintilla printer instance...
         QsciPrinter printer(QPrinter::HighResolution);
+        // ...now we need to know wich printer to use! Call standard system printer dialog:
         QPrintDialog printDialog(&printer, this);
 
         if (printDialog.exec() == QDialog::Accepted)    // if printer dialog was told to print...
@@ -809,7 +812,7 @@ void MainWindow::printFile()
             // printer.printRange(textEdit, 1, max); REFUSES TO PRINT! Use this instead:
             printer.printRange(textEdit);
 
-            this->createStatusBar(tr("File was send to Printer and should be printed soon..."), 6000);
+            this->createStatusBar(tr("File was send to printer and should be printed soon..."), 6000);
         }
         else    // ...if printer dialog was canceled
         {
