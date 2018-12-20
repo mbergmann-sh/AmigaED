@@ -222,7 +222,7 @@ void MainWindow::createActions()
 
     printAct = new QAction(QIcon(":/images/printer.png"),tr("&Print file..."), this);
     printAct->setShortcut(tr("Ctrl+p"));
-    printAct->setStatusTip(tr("Print current file"));
+    printAct->setStatusTip(tr("Prepare for printing..."));
     connect(printAct, SIGNAL(triggered()), this, SLOT(printFile()));
 
     exitAct = new QAction(QIcon(":/images/fileexit.png"), tr("&Exit"), this);
@@ -785,6 +785,10 @@ void MainWindow::initializeGUI()
 //
 // print current file
 //
+// TODO:    make printing printer prefs-aware!
+//          print printing header ("file %f printed on dd.mm.yyyy")
+//          ...use QPainter for that?
+//
 void MainWindow::printFile()
 {
     int max = textEdit->lines(); // max. count of lines in code window
@@ -797,6 +801,7 @@ void MainWindow::printFile()
         if (printDialog.exec() == QDialog::Accepted)
         {
             printer.setPageSize(QsciPrinter::A4);
+
             // print ...
             // printer.printRange(textEdit, 1, max); REFUSES TO PRINT! Use this instead:
             printer.printRange(textEdit);
