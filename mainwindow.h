@@ -176,7 +176,7 @@ private:
     bool foldall;
 
     // vars for controlling file header comments
-    const QString p_purpouse = "CHANGE_ME";
+    const QString p_purpose = "CHANGE_ME";
     const QString p_author = "Michael Bergmann";
     const QString p_email = "mb@mbergmann-sh.de";
     const QString p_version = "1.0";

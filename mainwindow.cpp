@@ -151,9 +151,9 @@ void MainWindow::open()
         QString fileName = QFileDialog::getOpenFileName(this,
                 "Open source file",
                 QDir::currentPath(),    // look up for files in PROGDIR first!
-                "C/C++ source and header files (*.c *.cpp *.h *.hpp) ;; "
+                "C/C++ files (*.c *.cpp *.h *.hpp) ;; "
                 "ASM source files (*.a *.asm) ;; Makefiles (Make*.* *.mak) ;; "
-                "AmigaE source files (*.e) ;; PASCAL source files (*.p *.pas) ;; All files (*.*)");
+                "AmigaE source files (*.e) ;; Pascal files (*.p *.pas) ;; All files (*.*)");
 
         if (!fileName.isEmpty())
             loadFile(fileName);
@@ -183,9 +183,9 @@ bool MainWindow::saveAs()
     QString fileName = QFileDialog::getSaveFileName(this,
                                                     "Save source file",
                                                     nullptr,    // save files into last used folder
-                                                    "C/C++ source files (*.c *.cpp) ;; C/C++ header files (*.h *.hpp) ;; "
+                                                    "C/C++ files (*.c *.cpp *.h *.hpp) ;; C/C++ header files (*.h *.hpp) ;; "
                                                     "ASM source files (*.a *.asm) ;; Makefiles (*.mak) ;; "
-                                                    "AmigaE source files (*.e) ;; PASCAL source files (*.p *.pas) ;; "
+                                                    "AmigaE files (*.e) ;; Pascal files (*.p *.pas) ;; "
                                                     "All files (*.*)");
 
     if (fileName.isEmpty())
@@ -573,12 +573,12 @@ int MainWindow::loadNonExistantFile(const QString &fileName)
                 qDebug() << "File opened successfull for streaming...";
 
                 QTextStream stream(&file);                      // instanciate a stream to write to...
-                stream << "/*\n * File:\t\t" << fileName;       // stream some comment into file..
+                stream << "/*\n * File:\t\t" << fileName;       // stream some comments into file..
                 stream << "\n * Version:\t\t" << p_version;
                 stream << "\n * Revision:\t\t" << p_revision;
                 stream << "\n *";
                 stream << "\n * Description:\t" << p_description;
-                stream << "\n * Purpouse:\t" << p_purpouse;
+                stream << "\n * Purpose:\t" << p_purpose;
                 stream << "\n *";
                 stream << "\n * Author:\t" << p_author;
                 stream << "\n * Email:\t" << p_email;
@@ -586,7 +586,7 @@ int MainWindow::loadNonExistantFile(const QString &fileName)
                 stream << "\n*/" << endl;
 
                 // ...close the freshly created file so we will
-                // be able to laod it into the editor window!
+                // be able to load it into the editor window!
                 file.close();
 
                 qDebug() << "Status: " << stream.status();

@@ -16,7 +16,7 @@ This program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRA
 
 # FEATURES that work so far - a work in progress...
 - load file from GUI or command line
-- create new file in working directory if called with command line argument
+- create new file with initial C comment header in working directory if called with command line argument
 - save file to storage medium
 - recognize changes in text
 - code folding
@@ -27,7 +27,7 @@ This program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRA
 - C/C++ | Pascal | Makefile  syntax highlighting
 - clipboard support
 - display current cursor position
-- print current file if page not empty
+- print current file if page not empty (could be done better - e.g. take parameters from default printer...)
 
 more to come...
 
