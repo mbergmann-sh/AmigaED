@@ -152,8 +152,9 @@ void MainWindow::open()
                 "Open source file",
                 QDir::currentPath(),    // look up for files in PROGDIR first!
                 "C/C++ files (*.c *.cpp *.h *.hpp) ;; "
-                "ASM source files (*.a *.asm) ;; Makefiles (Make*.* *.mak) ;; "
-                "AmigaE source files (*.e) ;; Pascal files (*.p *.pas) ;; All files (*.*)");
+                "ASM files (*.a *.asm *.s *.S *.m) ;; Makefiles (Make*.* *.mak) ;; "
+                "AmigaE files (*.e *.m) ;; Pascal files (*.p *.pas) ;; "
+                "Text files (*.txt *.md) ;; All files (*.*)");
 
         if (!fileName.isEmpty())
             loadFile(fileName);
@@ -183,10 +184,10 @@ bool MainWindow::saveAs()
     QString fileName = QFileDialog::getSaveFileName(this,
                                                     "Save source file",
                                                     nullptr,    // save files into last used folder
-                                                    "C/C++ files (*.c *.cpp *.h *.hpp) ;; C/C++ header files (*.h *.hpp) ;; "
-                                                    "ASM source files (*.a *.asm) ;; Makefiles (*.mak) ;; "
-                                                    "AmigaE files (*.e) ;; Pascal files (*.p *.pas) ;; "
-                                                    "All files (*.*)");
+                                                    "C/C++ files (*.c *.cpp *.h *.hpp) ;; "
+                                                    "ASM files (*.a *.asm *.s *.S *.m) ;; Makefiles (Make*.* *.mak) ;; "
+                                                    "AmigaE files (*.e *.m) ;; Pascal files (*.p *.pas) ;; "
+                                                    "Text files (*.txt *.md) ;; All files (*.*)");
 
     if (fileName.isEmpty())
         return false;
