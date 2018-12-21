@@ -1,5 +1,5 @@
 QT       += core gui widgets printsupport
-CONFIG += release qscintilla2 c++11
+CONFIG += console qscintilla2 c++11
 
 TARGET = AmigaED
 TEMPLATE = app

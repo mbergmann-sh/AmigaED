@@ -81,8 +81,18 @@ MainWindow::MainWindow(QString cmdFileName)
 
     // Load a file if specified on command line...
     if(!(cmdFileName.isEmpty()))
+    {        
+        int response = loadNonExistantFile(cmdFileName);
+        qDebug() << "loadNonExistantFile() returned " << response;
+        // return values:
+        //  0 - new file created
+        // -1 - file creation failed
+        //  1 - existing file loaded
+    }
+    else
     {
-        loadFile(cmdFileName);
+        qDebug() << "File does not exixt. We'll have to create it first!";
+
     }
 }
 
@@ -130,7 +140,7 @@ void MainWindow::open()
         QString fileName = QFileDialog::getOpenFileName(this,
                 "Open source file",
                 QDir::currentPath(),    // look up for files in PROGDIR first!
-                "C/C++ source files (*.c *.cpp) ;; C/C++ header files (*.h *.hpp) ;; "
+                "C/C++ source and header files (*.c *.cpp *.h *.hpp) ;; "
                 "ASM source files (*.a *.asm) ;; Makefiles (Make*.* *.mak) ;; "
                 "AmigaE source files (*.e) ;; PASCAL source files (*.p *.pas) ;; All files (*.*)");
 
@@ -192,6 +202,14 @@ void MainWindow::about()
 void MainWindow::documentWasModified()
 {
     setWindowModified(textEdit->isModified());  // put asterix (*) into filename!
+}
+
+//
+// Helper to set approbiate Lexer according to a file's .ext
+//
+void SetLexerAtFileExtension(QString)
+{
+    qDebug() << "Lexer changed!";
 }
 
 //
@@ -429,7 +447,7 @@ void MainWindow::createToolBars()
 //
 // Show initial message in the app's status bar or change it on demand
 //
-void MainWindow::createStatusBar(QString statusmessage, int timeout)
+void MainWindow::createStatusBarMessage(QString statusmessage, int timeout)
 {
     statusBar()->showMessage(statusmessage, timeout);
 }
@@ -482,9 +500,11 @@ bool MainWindow::maybeSave()
 //
 void MainWindow::loadFile(const QString &fileName)
 {
+    qDebug() << "loadFile() called with parameter: " << fileName;
     QFile file(fileName);
-    if (!file.open(QFile::ReadOnly)) {
-        QMessageBox::warning(this, tr("C/C++ Amiga Cross Editor"),
+    if (!file.open(QFile::ReadOnly))
+    {
+        QMessageBox::warning(this, tr("Amiga Cross Editor"),
                              tr("Cannot read file %1:\n%2.")
                              .arg(fileName)
                              .arg(file.errorString()));
@@ -498,6 +518,104 @@ void MainWindow::loadFile(const QString &fileName)
 
     setCurrentFile(fileName);
     statusBar()->showMessage(tr("File loaded"), 2000);
+}
+
+//
+// user defined file creationloading for source files
+// used for command line file loading
+//
+int MainWindow::loadNonExistantFile(const QString &fileName)
+{
+    int success = 1;
+
+    // We need a qualified path in order to create and load the new file,
+    // so let's build it:
+    QString fileToOpen = QDir::currentPath();   // Path part of the filename
+    fileToOpen.append(QDir::separator());       // add a unique separator after filename
+    fileToOpen.append(fileName);                // add the fileName that we've requested on command line
+
+    qDebug() << "created Filepath and -name: " << fileToOpen;;
+
+    // Now let's create a QFile instance to open our file and maybe write to it!
+    QFile file(fileToOpen);
+    QFileInfo fileInfo(file);
+    curFile = file.fileName();
+    qDebug() << "Filepath given to the app: " << file.fileName();
+
+    // does our requested file allready exist?
+    if (!file.open(QFile::ReadOnly))            // NO! File does NOT exist until now!
+    {
+        // Let's ask if it should be created!
+        int ret = QMessageBox::question(this, tr("Amiga Cross Editor"),
+                     tr("Cannot read file: %1<br>"
+                        "<br>Do you want me to create it?")
+                                            .arg(fileName),
+                     QMessageBox::Yes | QMessageBox::Default,
+                     QMessageBox::Cancel | QMessageBox::Escape);
+
+        // YES - we want the file to be created!
+        if (ret == QMessageBox::Yes)
+        {
+            qDebug() << "Now creating requested file!";
+            if(file.open(QIODevice::WriteOnly))
+            {
+                qDebug() << "File opened successfull for streaming...";
+
+                QTextStream stream(&file);                      // instanciate a stream to write to...
+                stream << "/*\n * File:\t\t" << fileName;       // stream some comment into file..
+                stream << "\n * Version:\t\t" << p_version;
+                stream << "\n * Revision:\t\t" << p_revision;
+                stream << "\n *";
+                stream << "\n * Description:\t" << p_description;
+                stream << "\n * Purpouse:\t" << p_purpouse;
+                stream << "\n *";
+                stream << "\n * Author:\t" << p_author;
+                stream << "\n * Email:\t" << p_email;
+                stream << "\n *";
+                stream << "\n*/" << endl;
+
+                // ...close the freshly created file so we will
+                // be able to laod it into the editor window!
+                file.close();
+
+                qDebug() << "Status: " << stream.status();
+                qDebug() << curFile;
+                loadFile(curFile);     //...and finally open that file in editor window
+
+                // jump to last line in file
+                actionGotoBottom();
+
+                return 0;
+            }
+            else
+            {
+                qDebug() << "ERROR: Could not create file!";
+                qDebug() << curFile;
+
+                return -1;
+            }
+        }
+        // NO - abandon file creation and start with a new, empty C file
+        else if (ret == QMessageBox::Cancel)
+        {
+            qDebug() << "File creation abandoned!";
+            newFile();
+        }
+    }
+
+    qDebug() << "DEBUG: Now trying to load file into editor!";
+    QTextStream in(&file);
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    textEdit->setText(in.readAll());
+    QApplication::restoreOverrideCursor();
+
+    setCurrentFile(fileName);
+    statusBar()->showMessage(tr("File loaded"), 6000);
+
+    // jump to last line in file
+    actionGotoBottom();
+
+    return success;
 }
 
 //
@@ -682,7 +800,14 @@ void MainWindow::initializeMargin()
     textEdit->setMarginsFont(textEdit->font());
     textEdit->setMarginWidth(0, fontmetrics.width(QString::number(textEdit->lines())) + 10);
     textEdit->setMarginLineNumbers(0, true);
-    textEdit->setMarginsBackgroundColor(QColor("#cccccc"));
+
+    // Make background the same color than the applied stylesheet for MainWindow
+    // rgb: (175, 175, 175), hex: (#afafaf)
+#if !defined(__APPLE__)
+    textEdit->setMarginsBackgroundColor(QColor("#afafaf"));
+#else
+    textEdit->setMarginsBackgroundColor(QColor("#cccccccc"));
+#endif
     textEdit->setMarginsForegroundColor(QColor("#ff0000ff"));
 
     // resize line numbers margin if needed!
@@ -708,7 +833,8 @@ void MainWindow::initializeLexerCPP()
     lexer->setFoldComments(true);
     textEdit->setLexer(lexer);
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
-    createStatusBar(tr("Syntax changed to C/C++..."), 6000);
+    initializeMargin();
+    createStatusBarMessage(tr("Syntax changed to C/C++"), 0);
 }
 
 //
@@ -721,7 +847,8 @@ void MainWindow::initializeLexerMakefile()
     //lexer->setFoldComments(true);
     textEdit->setLexer(lexer);
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
-    createStatusBar(tr("Syntax changed to Makefiles..."), 6000);
+    initializeMargin();
+    createStatusBarMessage(tr("Syntax changed to Makefiles"), 0);
 }
 
 //
@@ -734,7 +861,10 @@ void MainWindow::initializeLexerBatch()
     //lexer->setFoldComments(true);
     textEdit->setLexer(lexer);
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
-    createStatusBar(tr("Syntax changed to Shell..."), 6000);
+
+    // Make sure our Margins look the same as before!
+    initializeMargin();
+    createStatusBarMessage(tr("Syntax changed to Shell"), 0);
 }
 
 //
@@ -747,7 +877,8 @@ void MainWindow::initializeLexerFortran()
     //lexer->setFoldComments(true);
     textEdit->setLexer(lexer);
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
-    createStatusBar(tr("Syntax changed to Amiga installer..."), 6000);
+    initializeMargin();
+    createStatusBarMessage(tr("Syntax changed to Amiga installer"), 0);
 }
 
 //
@@ -760,7 +891,8 @@ void MainWindow::initializeLexerPascal()
     lexer->setFoldComments(true);
     textEdit->setLexer(lexer);
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
-    createStatusBar(tr("Syntax changed to Pascal..."), 6000);
+    initializeMargin();
+    createStatusBarMessage(tr("Syntax changed to Pascal"), 0);
 }
 
 //
@@ -867,7 +999,7 @@ void MainWindow::initializeGUI()
     createActions();
     createMenus();
     createToolBars();
-    createStatusBar(tr("Ready"), 0);
+    createStatusBarMessage(tr("Ready"), 0);
 }
 
 //
@@ -883,7 +1015,7 @@ void MainWindow::printFile()
     int textsize = textEdit->text().size();  // if max > 0 then there must be some text in that editor window!
     if (textsize > 0)                        // more than one character? So there is some text available. Let's check for a printer!
     {
-        this->createStatusBar(tr("Calling printer dialog......"), 6000);
+        this->createStatusBarMessage(tr("Calling printer dialog......"), 6000);
 
         // create a high resolution QScintilla printer instance...
         QsciPrinter printer(QPrinter::HighResolution);
@@ -892,7 +1024,7 @@ void MainWindow::printFile()
 
         if (printDialog.exec() == QDialog::Accepted)    // if printer dialog was told to print...
         {
-            this->createStatusBar(tr("Printing started!"), 6000);
+            this->createStatusBarMessage(tr("Printing started!"), 6000);
             // set paper size to DIN A4
             printer.setPageSize(QsciPrinter::A4);
 
@@ -900,17 +1032,17 @@ void MainWindow::printFile()
             // printer.printRange(textEdit, 1, max); REFUSES TO PRINT! Use this instead:
             printer.printRange(textEdit);
 
-            this->createStatusBar(tr("File was send to printer and should be printed soon..."), 6000);
+            this->createStatusBarMessage(tr("File was send to printer and should be printed soon..."), 6000);
         }
         else    // ...if printer dialog was canceled
         {
-            this->createStatusBar(tr("Printing canceled."), 6000);
+            this->createStatusBarMessage(tr("Printing canceled."), 6000);
         }
     }
     // textEdit->text().size() == 0. No text available. We will not print anything!
     else
     {
-        this->createStatusBar(tr("Printing canceled tue to wasting!"), 6000);
+        this->createStatusBarMessage(tr("Printing canceled tue to wasting!"), 6000);
         (void)QMessageBox::information(this,
                        "Printing - Amiga Cross Editor", "It seems there is <i><b>no text</b></i> in this editor window!<br> Printing is cancelled due to waste of paper."
                                                         "<br>There's allways a unicorn dying if you waste things, ya know?!",

@@ -34,6 +34,7 @@
 #include <QString>
 #include <QStyle>
 #include <QFile>
+#include <QFileInfo>
 #include <QTextStream>
 #include <QStatusBar>
 #include <QLabel>
@@ -96,19 +97,20 @@ private slots:
 
 private:
     // GUI creation...
-    void createActions();                                       // defines actions for menues and toolbars
-    void createMenus();                                         // creates menues from actions
-    void createToolBars();                                      // creates toolbars from actions
-    void createStatusBar(QString statusmessage, int timeout);   // sets up the statusbar
+    void createActions();                                               // defines actions for menues and toolbars
+    void createMenus();                                                 // creates menues from actions
+    void createToolBars();                                              // creates toolbars from actions
+    void createStatusBarMessage(QString statusmessage, int timeout);    // sets up the statusbar with a custom message
     // GUI methods...
+    void SetLexerAtFileExtension(QString fileName);     // Helper to set approbiate Lexer according to a file's .ext
     void readSettings();                                // read app settings
     void writeSettings();                               // write app settings
     bool maybeSave();                                   // will be called if user quits while text has changed
+    int loadNonExistantFile(const QString &fileName);   // ask for creation if a file does NOT exist (used for command line loading)
     void loadFile(const QString &fileName);             // open an existing file
     bool saveFile(const QString &fileName);             // save current file
     void setCurrentFile(const QString &fileName);       // will be called to store current filename and put it into window title
     QString strippedName(const QString &fullFileName);  // gives back current filename without path
-
 
     // Qscintila Editor widget instance
     QsciScintilla *textEdit;
@@ -172,6 +174,14 @@ private:
 
     // is document text folded?
     bool foldall;
+
+    // vars for controlling file header comments
+    const QString p_purpouse = "CHANGE_ME";
+    const QString p_author = "Michael Bergmann";
+    const QString p_email = "mb@mbergmann-sh.de";
+    const QString p_version = "1.0";
+    const QString p_revision = "0";
+    const QString p_description = "CHANGE_ME";
 
 };
 
