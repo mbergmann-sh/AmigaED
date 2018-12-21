@@ -83,11 +83,22 @@ MainWindow::MainWindow(QString cmdFileName)
     if(!(cmdFileName.isEmpty()))
     {        
         int response = loadNonExistantFile(cmdFileName);
+
         qDebug() << "loadNonExistantFile() returned " << response;
         // return values:
         //  0 - new file created
         // -1 - file creation failed
         //  1 - existing file loaded
+        // 10 - quit app due to failed file creation
+
+        if (response == 10)
+        {
+            // if file creation went wrong
+            // and MessageBox was answered 'Cancel':
+            exit(-1);   // kill the App!
+        }
+
+
     }
     else
     {
@@ -547,7 +558,7 @@ int MainWindow::loadNonExistantFile(const QString &fileName)
     {
         // Let's ask if it should be created!
         int ret = QMessageBox::question(this, tr("Amiga Cross Editor"),
-                     tr("Cannot read file: %1<br>"
+                     tr("File does not exist: %1<br>"
                         "<br>Do you want me to create it?")
                                             .arg(fileName),
                      QMessageBox::Yes | QMessageBox::Default,
@@ -592,7 +603,23 @@ int MainWindow::loadNonExistantFile(const QString &fileName)
                 qDebug() << "ERROR: Could not create file!";
                 qDebug() << curFile;
 
-                return -1;
+                int ret = QMessageBox::warning(this, tr("Amiga Cross Editor"),
+                             tr("<b>Something went terribly wrong!</b>"
+                                "<br>File could <b>not</b> been created: %1<br>"
+                                "<br>You will have to <b><i>save as...</i></b> an empty file,"
+                                "<br>providing the requested file name.<br>"
+                                "<br><b>Hint:</b> Selecting CANCEL quits AmigaED!")
+                                                    .arg(fileName),
+                                                    QMessageBox::Ok | QMessageBox::Cancel );
+                if (ret == QMessageBox::Cancel )
+                {
+                    return 10;
+                }
+                else
+                {
+                    return -1;
+                }
+
             }
         }
         // NO - abandon file creation and start with a new, empty C file
