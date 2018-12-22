@@ -57,6 +57,8 @@ The easy way: Simply import the .pro file into Qt Creator, configure your toolch
 1. CD to the folder where your compiled executable resides
 2. execute sudo cp -l -f AmigaED /usr/local/bin/amigaed
 
+you might also add this folder to your search path instead!
+
 # Roadmap - wanted features (at least hopefully planned...)
 - make the editor drag'n'drop-aware
 - implement inserts and snippets
