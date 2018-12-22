@@ -86,12 +86,15 @@ MainWindow::MainWindow(QString cmdFileName)
         // exists and create a new one if wanted...
         int response = loadNonExistantFile(cmdFileName);
 
-        qDebug() << "loadNonExistantFile() returned " << response;
-        // return values:
-        //  0 - new file created
-        // -1 - file creation failed
-        //  1 - existing file loaded
-        // 10 - quit app due to failed file creation
+        if(p_mydebug)
+        {
+            qDebug() << "loadNonExistantFile() returned " << response;
+            // return values:
+            //  0 - new file created
+            // -1 - file creation failed
+            //  1 - existing file loaded
+            // 10 - quit app due to failed file creation
+        }
 
         if (response == 10)
         {
@@ -104,7 +107,10 @@ MainWindow::MainWindow(QString cmdFileName)
     }
     else
     {
-        qDebug() << "AmigaED started with empty file.";
+        if(p_mydebug)
+        {
+            qDebug() << "AmigaED started with empty file.";
+        }
 
     }
 }
@@ -185,7 +191,7 @@ bool MainWindow::saveAs()
 {
     QString fileName = QFileDialog::getSaveFileName(this,
                                                     "Save source file",
-                                                    nullptr,    // save files into last used folder
+                                                    curFile,    // save files into last used folder
                                                     "C/C++ files (*.c *.cpp *.h *.hpp) ;; "
                                                     "ASM files (*.a *.asm *.s *.S *.m) ;; Makefiles (Make*.* *.mak) ;; "
                                                     "AmigaE files (*.e *.m) ;; Pascal files (*.p *.pas) ;; "
@@ -193,6 +199,11 @@ bool MainWindow::saveAs()
 
     if (fileName.isEmpty())
         return false;
+
+    if(p_mydebug)
+    {
+        qDebug() << " File to save: " << fileName;
+    }
 
     return saveFile(fileName);
 }
@@ -221,9 +232,12 @@ void MainWindow::documentWasModified()
 //
 // Helper to set approbiate Lexer according to a file's .ext
 //
-void SetLexerAtFileExtension(QString)
+void MainWindow::SetLexerAtFileExtension(QString)
 {
-    qDebug() << "Lexer changed!";
+    if(p_mydebug)
+    {
+        qDebug() << "Lexer changed!";
+    }
 }
 
 //
@@ -329,26 +343,50 @@ void MainWindow::createActions()
     compileAct->setStatusTip(tr("Compile current file..."));
     connect(compileAct, SIGNAL(triggered()), this, SLOT(actionCompile()));
 
-    emulatorAct = new QAction(QIcon(":/images/workbench.png"), tr("Start &UAE..."), this);
+    emulatorAct = new QAction(QIcon(":/images/workbench.png"), tr("Start UA&E..."), this);
     emulatorAct->setShortcut(tr("Ctrl+e"));
     emulatorAct->setStatusTip(tr("Start Amiga Emulation..."));
     connect(emulatorAct, SIGNAL(triggered()), this, SLOT(actionEmulator()));
 
     // Lexers
     lexCPPAct = new QAction(tr("C/C++..."), this);
+    lexCPPAct->setCheckable(true);
+    lexCPPAct->setChecked(true);
     connect(lexCPPAct, SIGNAL(triggered()), this, SLOT(initializeLexerCPP()));
 
     lexMakefileAct = new QAction(tr("Makefile..."), this);
+    lexMakefileAct->setCheckable(true);
+    lexMakefileAct->setChecked(false);
     connect(lexMakefileAct, SIGNAL(triggered()), this, SLOT(initializeLexerMakefile()));
 
     lexBatchAct = new QAction(tr("C/C++..."), this);
+    lexBatchAct->setCheckable(true);
+    lexBatchAct->setChecked(false);
     connect(lexBatchAct, SIGNAL(triggered()), this, SLOT(initializeLexerBatch()));
 
     lexFortranAct = new QAction(tr("Amiga installer..."), this);
+    lexFortranAct->setCheckable(true);
+    lexFortranAct->setChecked(false);
     connect(lexFortranAct, SIGNAL(triggered()), this, SLOT(initializeLexerFortran()));
 
     lexPascalAct = new QAction(tr("Pascal..."), this);
+    lexPascalAct->setCheckable(true);
+    lexPascalAct->setChecked(false);
     connect(lexPascalAct, SIGNAL(triggered()), this, SLOT(initializeLexerPascal()));
+
+    // this will put the lexers in our menue into a mutual exclusive
+    // group for automatically checking/unchecking each other!
+    syntaxGroup = new QActionGroup(this);
+    syntaxGroup->addAction(lexCPPAct);
+    syntaxGroup->addAction(lexMakefileAct);
+    syntaxGroup->addAction(lexFortranAct);
+    syntaxGroup->addAction(lexPascalAct);
+
+    showDebugInfoAct = new QAction(tr("Show debug output"), this);
+    showDebugInfoAct->setCheckable(true);
+    showDebugInfoAct->setChecked(p_mydebug);
+    showDebugInfoAct->setStatusTip(tr("Toggle debug output visibility"));
+    connect(showDebugInfoAct, SIGNAL(triggered()), this, SLOT(actionShowDebug()));
 
 }
 
@@ -400,11 +438,13 @@ void MainWindow::createMenus()
     // View menue
     viewMenue = menuBar()->addMenu(tr("&View"));
     viewMenue->addAction(toggleFoldAct);
+    viewMenue->addSeparator();
+    viewMenue->addAction(showDebugInfoAct);
 
     menuBar()->addSeparator();
 
     // Syntax menue
-    syntaxMenue = menuBar()->addMenu(tr("Syn&tax"));
+    syntaxMenue = menuBar()->addMenu(tr("Synta&x"));
     syntaxMenue->addAction(lexCPPAct);
     syntaxMenue->addSeparator();
     syntaxMenue->addAction(lexMakefileAct);
@@ -514,7 +554,10 @@ bool MainWindow::maybeSave()
 //
 void MainWindow::loadFile(const QString &fileName)
 {
-    qDebug() << "loadFile() called with parameter: " << fileName;
+    if(p_mydebug)
+    {
+        qDebug() << "loadFile() called with parameter: " << fileName;
+    }
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly))
     {
@@ -548,13 +591,19 @@ int MainWindow::loadNonExistantFile(const QString &fileName)
     fileToOpen.append(QDir::separator());       // add a unique separator after filename
     fileToOpen.append(fileName);                // add the fileName that we've requested on command line
 
-    qDebug() << "created Filepath and -name: " << fileToOpen;;
+    if(p_mydebug)
+    {
+        qDebug() << "created Filepath and -name: " << fileToOpen;
+    }
 
     // Now let's create a QFile instance to open our file and maybe write to it!
     QFile file(fileToOpen);
     QFileInfo fileInfo(file);
     curFile = file.fileName();
-    qDebug() << "Filepath given to the app: " << file.fileName();
+    if(p_mydebug)
+    {
+        qDebug() << "Filepath given to the app: " << file.fileName();
+    }
 
     // does our requested file allready exist?
     if (!file.open(QFile::ReadOnly))            // NO! File does NOT exist until now!
@@ -570,10 +619,17 @@ int MainWindow::loadNonExistantFile(const QString &fileName)
         // YES - we want the file to be created!
         if (ret == QMessageBox::Yes)
         {
-            qDebug() << "Now creating requested file!";
+            if(p_mydebug)
+            {
+                qDebug() << "Now creating requested file!";
+            }
+
             if(file.open(QIODevice::WriteOnly))
             {
-                qDebug() << "File opened successfull for streaming...";
+                if(p_mydebug)
+                {
+                    qDebug() << "File opened successfull for streaming...";
+                }
 
                 QTextStream stream(&file);                      // instanciate a stream to write to...
                 stream << "/*\n * File:\t\t" << fileName;       // stream some comments into file..
@@ -592,8 +648,11 @@ int MainWindow::loadNonExistantFile(const QString &fileName)
                 // be able to load it into the editor window!
                 file.close();
 
-                qDebug() << "Status: " << stream.status();
-                qDebug() << curFile;
+                if(p_mydebug)
+                {
+                    qDebug() << "Status: " << stream.status();
+                    qDebug() << curFile;
+                }
                 loadFile(curFile);     //...and finally open that file in editor window
 
                 // jump to last line in file
@@ -603,8 +662,11 @@ int MainWindow::loadNonExistantFile(const QString &fileName)
             }
             else
             {
-                qDebug() << "ERROR: Could not create file!";
-                qDebug() << curFile;
+                if(p_mydebug)
+                {
+                    qDebug() << "ERROR: Could not create file!";
+                    qDebug() << curFile;
+                }
 
                 int ret = QMessageBox::warning(this, tr("Amiga Cross Editor"),
                              tr("<b>Something went terribly wrong!</b>"
@@ -628,12 +690,18 @@ int MainWindow::loadNonExistantFile(const QString &fileName)
         // NO - abandon file creation and start with a new, empty C file
         else if (ret == QMessageBox::Cancel)
         {
-            qDebug() << "File creation abandoned!";
+            if(p_mydebug)
+            {
+                qDebug() << "File creation abandoned!";
+            }
             newFile();
         }
     }
 
-    qDebug() << "DEBUG: Now trying to load file into editor!";
+    if(p_mydebug)
+    {
+        qDebug() << "DEBUG: Now trying to load file into editor!";
+    }
     QTextStream in(&file);
     QApplication::setOverrideCursor(Qt::WaitCursor);
     textEdit->setText(in.readAll());
@@ -750,7 +818,7 @@ void MainWindow::actionGoto_Line()
     {
         // check if text is folded!
         QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
-        qDebug() << state;
+
         // if folded: unfold first!!
         if (state > 0)
         {
@@ -781,7 +849,9 @@ void MainWindow::actionCompile()
                                                tr("Compiler Options:"), QLineEdit::Normal,
                                                "vc +aos68k -v -lmiee -lamiga -lauto -O3 -size -cpu=68020 ", &ok);
           if (ok && !text.isEmpty())
-              qDebug() << text;
+          {
+              ;
+          }
 }
 
 //
@@ -797,7 +867,9 @@ void MainWindow::actionEmulator()
                                                tr("UAE Options:"), QLineEdit::Normal,
                                                "C:/Program Files/WinUAE/winuae64.exe -f E:/AmiKit/WinUAE/Configurations/GCC-AmigaOS_HD.uae", &ok);
           if (ok && !text.isEmpty())
-              qDebug() << text;
+          {
+              ;
+          }
 }
 
 
@@ -811,10 +883,16 @@ void MainWindow::initializeFont()
     QFont font("Courier New", 10);
     #elif defined(__APPLE__)
     QFont font("SF Mono Regular", 11);
-    qDebug() << "Running on Mac. Font is SF Mono Regular now!";
+    if(p_mydebug)
+    {
+        qDebug() << "Running on Mac. Font is SF Mono Regular now!";
+    }
     #else
     QFont font("Source Code Pro", 10);
-    qDebug() << "Linux detected. Setting font to Source Code Pro";
+    if(p_mydebug)
+    {
+        qDebug() << "Linux detected. Setting font to Source Code Pro";
+    }
     #endif
     myfont = font;
     myfont.setFixedPitch(true);
@@ -974,7 +1052,10 @@ void MainWindow::initializeGUI()
     // if on Mac, immitate its GUI behaviour:
     #if defined(__APPLE__)
         this->setUnifiedTitleAndToolBarOnMac(true);
-        qDebug() << "running on some kind of Mac...";
+        if(p_mydebug)
+        {
+            qDebug() << "running on some kind of Mac...";
+        }
     #endif
 
     // give an icon and a name to the app:
@@ -1090,3 +1171,21 @@ void MainWindow::popNotImplemented()
                     QMessageBox::Ok);
 
 }
+
+//
+// Show or hide debugging output
+// Value is stored in p_mydebug
+//
+void MainWindow::actionShowDebug()
+{
+    if(showDebugInfoAct->isChecked())
+    {
+        p_mydebug = true;
+    }
+    else
+        p_mydebug = false;
+
+    if(p_mydebug)
+        qDebug() << "p_mydebug = " << p_mydebug;
+}
+

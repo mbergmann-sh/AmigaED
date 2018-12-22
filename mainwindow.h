@@ -45,6 +45,9 @@
 #include <QPrinter>
 #include <QPrintDialog>
 #include <QPrintEngine>
+#include <QAction>
+#include <QActionGroup>
+#include <QActionEvent>
 
 #include <QDebug>
 
@@ -94,6 +97,7 @@ private slots:
     void actionGoto_matching_brace();   // jumps to matching brace
     void actionCompile();               // calls compilation of current file
     void actionEmulator();              // starts UAE
+    void actionShowDebug();             // sets showing or hideing for debugging informations
 
 private:
     // GUI creation...
@@ -112,6 +116,7 @@ private:
     void setCurrentFile(const QString &fileName);       // will be called to store current filename and put it into window title
     QString strippedName(const QString &fullFileName);  // gives back current filename without path
 
+
     // Qscintila Editor widget instance
     QsciScintilla *textEdit;
 
@@ -129,14 +134,15 @@ private:
     QMenu *toolsMenue;          // holds misc actions
     QMenu *helpMenue;           // holds help topics
 
-
-
     // Toolbars
     QToolBar *fileToolBar;          // holds file manipulating actions
     QToolBar *editToolBar;          // holds copy, paste and some more...
     QToolBar *navigationToolBar;    // holds actions to move around in text
     QToolBar *buildToolBar;         // holds compiler / build actions
-    QToolBar *toolsToolBar;          // holds misc actions
+    QToolBar *toolsToolBar;         // holds misc actions
+
+    // Synatxmenue mutual exclude ActionGroup
+    QActionGroup *syntaxGroup;      // holds different Lexers for mutual exclusion in menue
 
     //Actions
     QAction *newAct;                // create new empty window
@@ -162,6 +168,7 @@ private:
     QAction *lexMakefileAct;        // switch lexer to Makefile syntax
     QAction *lexFortranAct;         // switch lexer to Amiga Installer (e.g. more like LISP) syntax
     QAction *lexPascalAct;          // switch lexer to Pascal syntax
+    QAction *showDebugInfoAct;      // show or hide debugging informations
 
     // statusbar widgets
     QLabel *statusLabelX;
@@ -182,6 +189,9 @@ private:
     const QString p_version = "1.0";
     const QString p_revision = "0";
     const QString p_description = "CHANGE_ME";
+
+    // show or hide debugging informations
+    bool p_mydebug = true;
 
 };
 
