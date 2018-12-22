@@ -50,7 +50,7 @@ The easy way: Simply import the .pro file into Qt Creator, configure your toolch
 1. Open a Qt command prompt correspondending to the compiler in use 
 2. CD to folder where the release version was stored
 3. windeployqt --angle --compiler-runtime --release AmigaED.exe (this will create some additional folders and copy most of the needed DLLs to the folder containing your executable). Note that this step becomes neccessary whenever you have changed a feature and recompiled the sources!
-4. Manually copy appropriate Qt5PrintSupport.dll and qscintilla2_qt5.dll to that folder
+4. Manually copy appropriate Qt5PrintSupport.dll and qscintilla2_qt5.dll to that folder (...if not been done by windeployqt allready!)
 5. Add an entry containing the path to that folder to your system's $PATH variable if you want to call the app from command line!
 
 # Roadmap - wanted features (at least hopefully planned...)
