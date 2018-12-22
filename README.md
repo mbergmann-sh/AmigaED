@@ -53,6 +53,10 @@ The easy way: Simply import the .pro file into Qt Creator, configure your toolch
 4. Manually copy appropriate Qt5PrintSupport.dll and qscintilla2_qt5.dll to that folder (...if not been done by windeployqt allready!)
 5. Add an entry containing the path to that folder to your system's $PATH variable if you want to call the app from command line!
 
+# Making the app run standalone on Linux or MacOS X
+1. CD to the folder where your compiled executable resides
+2. execute sudo cp -l -f AmigaED /usr/local/bin/amigaed
+
 # Roadmap - wanted features (at least hopefully planned...)
 - make the editor drag'n'drop-aware
 - implement inserts and snippets
