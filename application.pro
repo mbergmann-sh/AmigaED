@@ -17,4 +17,5 @@ RESOURCES    += application.qrc
 
 DISTFILES += \
     README.md \
-    aslrequest.txt
+    aslrequest.txt \
+    install_linux.sh

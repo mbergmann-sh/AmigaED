@@ -81,7 +81,9 @@ MainWindow::MainWindow(QString cmdFileName)
 
     // Load a file if specified on command line...
     if(!(cmdFileName.isEmpty()))
-    {        
+    {
+        // Let's use our method for checking if a file allready
+        // exists and create a new one if wanted...
         int response = loadNonExistantFile(cmdFileName);
 
         qDebug() << "loadNonExistantFile() returned " << response;
@@ -102,7 +104,7 @@ MainWindow::MainWindow(QString cmdFileName)
     }
     else
     {
-        qDebug() << "File does not exixt. We'll have to create it first!";
+        qDebug() << "AmigaED started with empty file.";
 
     }
 }
