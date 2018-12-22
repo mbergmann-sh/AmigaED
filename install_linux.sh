@@ -1,4 +1,6 @@
 #! /bin/bash
+# Must be copied to your release output dir
+# and executed sudo from there!
 
 echo
 echo "Hard linking AmigaED as /usr/local/bin/amigaed"
