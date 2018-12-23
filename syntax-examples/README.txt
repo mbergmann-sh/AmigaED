@@ -63,6 +63,7 @@ you might also add this folder to your search path instead!
 # Roadmap - wanted features (at least hopefully planned...)
 - make the editor drag'n'drop-aware
 - implement inserts and snippets [partially done]
+- implement QScintilla custom context menus (standard Qt context menues are overridden!)
 - add a search/replace dialog
 - improve printing [partially done - prints text and line numbers on DIN A4 paper]
 - implement direct cross compiling to Amiga target for vbcc and gcc cross compiler toolchain

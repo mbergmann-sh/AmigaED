@@ -52,6 +52,7 @@
 #include <QDebug>
 
 class QAction;
+class QActionGroup;
 class QMenu;
 class QsciScintilla;
 
@@ -62,10 +63,6 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QString cmdFileName);
-
-protected:
-    void closeEvent(QCloseEvent *event);        // catch close() event
-    void mousePressEvent(QMouseEvent *event);   // catch mouse press event
 
 private slots:
     void popNotImplemented();       // shows "not implemented" MessageBox
@@ -158,6 +155,7 @@ private:
     QMenu *buildMenue;          // holds compiler / build actions
     QMenu *navigationMenue;     // holds actions to move around in text
     QMenu *viewMenue;           // holds actions to change editors view
+    QMenu *tabwidthMenue;       // Submenu of viewMenu, holds different values for tab width
     QMenu *syntaxMenue;         // holds actions to change syntax lexers
     QMenu *toolsMenue;          // holds misc actions
     QMenu *helpMenue;           // holds help topics
@@ -176,8 +174,9 @@ private:
     QToolBar *buildToolBar;         // holds compiler / build actions
     QToolBar *toolsToolBar;         // holds misc actions
 
-    // Synatxmenue mutual exclude ActionGroup
+    // synatxMenue/tabwithMenue mutual exclude ActionGroups
     QActionGroup *syntaxGroup;      // holds different Lexers for mutual exclusion in menue
+    QActionGroup *tabwidthGroup;     // holds different values for tab with
 
     //Actions for fileMenue
     QAction *newAct;                // create new empty window
@@ -199,8 +198,20 @@ private:
     QAction *gotoLineAct;           // jump to line X...    
     QAction *gotoMatchingBraceAct;  // jump to matching brace
     // Actions for viewMenue
-    QAction *toggleFoldAct;         // toggle text folding
-    QAction *showDebugInfoAct;      // show or hide debugging informations
+    QAction *showLineNumbersAct;        // toggle visibility of Line numbers
+    QAction *showCarretlineAct;         // toggle caret line
+    QAction *toggleFoldAct;             // toggle text folding
+    QAction *showIndentationLineAct;    // toggle visibility of indentation lines
+    QAction *showDebugInfoAct;          // show or hide debugging informations
+    QAction *showEOLAct;                // toggle visbility of EOL
+    QAction *showUnprintableAct;        // toggle visibility of unprintable characters
+    QAction *toggleAutoIndentAct;       // toggle automatic indentation
+    QAction *toggleIndentUsesTabAct;    // use TAB or whitespace for indentation
+    QAction *tabWith2Act;               // to be used in submenu tabwithMenue, sets tab with to 2
+    QAction *tabWith4Act;               // to be used in submenu tabwithMenue, sets tab with to 4 (default)
+    QAction *tabWith6Act;               // to be used in submenu tabwithMenue, sets tab with to 6
+    QAction *tabWith8Act;               // to be used in submenu tabwithMenue, sets tab with to 8
+
     // Actions for buildMenue
     QAction *compileAct;            // calls compilation of current file
     // Actions for toolsMenue
@@ -270,6 +281,13 @@ private:
 
     // show or hide debugging informations
     bool p_mydebug = true;
+
+protected:
+    void closeEvent(QCloseEvent *event);        // catch close() event
+    void mousePressEvent(QMouseEvent *event);   // catch mouse press event
+#ifndef QT_NO_CONTEXTMENU
+    void contextMenuEvent(QContextMenuEvent *event) override;
+#endif
 
 };
 

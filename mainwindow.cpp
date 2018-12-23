@@ -132,10 +132,10 @@ void MainWindow::closeEvent(QCloseEvent *event)
 //
 // jump to line #1
 //
-void MainWindow::mousePressEvent(QMouseEvent *event)
-{
-    popNotImplemented();
-}
+//void MainWindow::mousePressEvent(QMouseEvent *event)
+//{
+//    popNotImplemented();
+//}
 
 //
 // create a new, empty file
@@ -247,6 +247,7 @@ void MainWindow::SetLexerAtFileExtension(QString)
 void MainWindow::createActions()
 {
     // Menue actions consist of:
+    /* --- File ---------------------------------------------------*/
     newAct = new QAction(QIcon(":/images/new.png"), tr("&New"), this);  // this is the action itsself, equipped with an image
                                                                         // and a shortcut (<alt> + <n>) for opening the menue
 
@@ -283,6 +284,7 @@ void MainWindow::createActions()
     exitAct->setStatusTip(tr("Exit the application"));
     connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
 
+    /* --- Edit -----------------------------------------------------------------------*/
     cutAct = new QAction(QIcon(":/images/cut.png"), tr("Cu&t"), this);
     cutAct->setShortcut(tr("Ctrl+X"));
     cutAct->setStatusTip(tr("Cut the current selection's contents to the "
@@ -301,19 +303,21 @@ void MainWindow::createActions()
                               "selection"));
     connect(pasteAct, SIGNAL(triggered()), textEdit, SLOT(paste()));
 
+    cutAct->setEnabled(false);
+    copyAct->setEnabled(false);
+    connect(textEdit, SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
+    connect(textEdit, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
+
+    /* --- Help -------------------------------------------------------------------------*/
     aboutAct = new QAction(tr("&About"), this);
     aboutAct->setStatusTip(tr("Show the application's About box"));
     connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
     aboutQtAct = new QAction(tr("About &Qt"), this);
     aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
-    connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
+    connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));   
 
-    cutAct->setEnabled(false);
-    copyAct->setEnabled(false);
-    connect(textEdit, SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
-    connect(textEdit, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
-
+    /* --- Navigation -------------------------------------------------------------------*/
     gotoTopAct = new QAction( tr("&Goto top..."), this);
     gotoTopAct->setShortcut(tr("Ctrl+Home"));
     gotoTopAct->setStatusTip(tr("Goto top of file..."));
@@ -329,27 +333,30 @@ void MainWindow::createActions()
     gotoLineAct->setStatusTip(tr("Goto line X..."));
     connect(gotoLineAct, SIGNAL(triggered()), this, SLOT(actionGoto_Line()));
 
-    toggleFoldAct = new QAction(QIcon(":/images/gotoline.png"), tr("Toggle &folding..."), this);
-    toggleFoldAct->setShortcut(tr("Ctrl+f"));
-    toggleFoldAct->setStatusTip(tr("Toggle folding for whole document"));
-    connect(toggleFoldAct, SIGNAL(triggered()), this, SLOT(initializeFolding()));
-
     gotoMatchingBraceAct = new QAction(QIcon(":/images/brackets.png"), tr("Goto &matching bracket {} ... [] ... ()..."), this);
     gotoMatchingBraceAct->setShortcut(tr("Ctrl+b"));
     gotoMatchingBraceAct->setStatusTip(tr("Goto matching bracket..."));
     connect(gotoMatchingBraceAct, SIGNAL(triggered()), this, SLOT(actionGoto_matching_brace()));
 
+    /* --- View -----------------------------------------------------------------------*/
+    toggleFoldAct = new QAction(QIcon(":/images/gotoline.png"), tr("Toggle &folding..."), this);
+    toggleFoldAct->setShortcut(tr("Ctrl+f"));
+    toggleFoldAct->setStatusTip(tr("Toggle folding for whole document"));
+    connect(toggleFoldAct, SIGNAL(triggered()), this, SLOT(initializeFolding()));
+
+    /* --- Build -----------------------------------------------------------------------*/
     compileAct = new QAction(QIcon(":/images/dice.png"), tr("Comp&ile..."), this);
     compileAct->setShortcut(tr("Ctrl+r"));
     compileAct->setStatusTip(tr("Compile current file..."));
     connect(compileAct, SIGNAL(triggered()), this, SLOT(actionCompile()));
 
+    /* --- Tools -----------------------------------------------------------------------*/
     emulatorAct = new QAction(QIcon(":/images/workbench.png"), tr("Start UA&E..."), this);
     emulatorAct->setShortcut(tr("Ctrl+e"));
     emulatorAct->setStatusTip(tr("Start Amiga Emulation..."));
     connect(emulatorAct, SIGNAL(triggered()), this, SLOT(actionEmulator()));
 
-    // Lexers
+    /* --- Syntax -----------------------------------------------------------------------*/
     lexCPPAct = new QAction(tr("C/C++..."), this);
     lexCPPAct->setStatusTip(tr("highlight C/C++ syntax"));
     lexCPPAct->setCheckable(true);
@@ -630,6 +637,20 @@ void MainWindow::createMenus()
     helpMenue->addAction(aboutAct);
     helpMenue->addAction(aboutQtAct);
 }
+
+//
+// create a custom context menue
+//
+// custom context menue:
+#ifndef QT_NO_CONTEXTMENU
+void MainWindow::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu menu(this);
+    menu.addAction(includeAct);
+    menu.addAction(whileAct);
+    menu.exec(event->globalPos());
+}
+#endif
 
 //
 // Let's put some of our actions into the app's toolbar!
@@ -1357,11 +1378,11 @@ void MainWindow::initializeLexerCPP()
     textEdit->setLexer(lexer);
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
     // Make sure everything is unfolded!
-    QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
-    if (!state)
-    {
-        textEdit->foldAll(false);
-    }
+    //QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
+//    if (!state)
+//    {
+//        textEdit->foldAll(false);
+//    }
     textEdit->setFolding(QsciScintilla::BoxedTreeFoldStyle);
     initializeMargin();
     createStatusBarMessage(tr("Syntax changed to C/C++"), 0);
@@ -1379,10 +1400,10 @@ void MainWindow::initializeLexerMakefile()
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
     // Make sure everything is unfolded!
     QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
-    if (!state)
-    {
-        textEdit->foldAll(false);
-    }
+//    if (!state)
+//    {
+//        textEdit->foldAll(false);
+//    }
     textEdit->setFolding(QsciScintilla::BoxedTreeFoldStyle);
     initializeMargin();
     createStatusBarMessage(tr("Syntax changed to Makefiles"), 0);
@@ -1399,11 +1420,11 @@ void MainWindow::initializeLexerBatch()
     textEdit->setLexer(lexer);
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
     // Make sure everything is unfolded!
-    QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
-    if (!state)
-    {
-        textEdit->foldAll(false);
-    }
+    //QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
+//    if (!state)
+//    {
+//        textEdit->foldAll(false);
+//    }
     textEdit->setFolding(QsciScintilla::BoxedTreeFoldStyle);
     initializeMargin();
     createStatusBarMessage(tr("Syntax changed to Shell"), 0);
@@ -1420,11 +1441,11 @@ void MainWindow::initializeLexerFortran()
     textEdit->setLexer(lexer);
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
     // Make sure everything is unfolded!
-    QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
-    if (!state)
-    {
-        textEdit->foldAll(false);
-    }
+    //QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
+//    if (!state)
+//    {
+//        textEdit->foldAll(false);
+//    }
     textEdit->setFolding(QsciScintilla::BoxedTreeFoldStyle);
     initializeMargin();
     createStatusBarMessage(tr("Syntax changed to Amiga installer"), 0);
@@ -1441,11 +1462,11 @@ void MainWindow::initializeLexerPascal()
     textEdit->setLexer(lexer);
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
     // Make sure everything is unfolded!
-    QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
-    if (!state)
-    {
-        textEdit->foldAll(false);
-    }
+    //QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
+//    if (!state)
+//    {
+//        textEdit->foldAll(false);
+//    }
     textEdit->setFolding(QsciScintilla::BoxedTreeFoldStyle);
     initializeMargin();
     createStatusBarMessage(tr("Syntax changed to Pascal"), 0);
@@ -1620,5 +1641,21 @@ void MainWindow::popNotImplemented()
 
 }
 
+//
+// Let's talk about mouse press events...
+//
+void MainWindow::mousePressEvent(QMouseEvent *event)
 
+{
+    if (event->button() == Qt::RightButton)
+    {
+        qDebug() << "Right mousebutton pressed!";
+        this->menuWidget()->setContextMenuPolicy(Qt::CustomContextMenu);
+    }
+    if (event->button() == Qt::LeftButton)
+        qDebug() << "Left mousebutton pressed!";
+    if (event->button() == Qt::MiddleButton)
+        qDebug() << "Middle mousebutton pressed!";
+
+}
 
