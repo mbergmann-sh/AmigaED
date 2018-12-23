@@ -331,6 +331,7 @@ void MainWindow::createActions()
 
     toggleFoldAct = new QAction(QIcon(":/images/gotoline.png"), tr("Toggle &folding..."), this);
     toggleFoldAct->setShortcut(tr("Ctrl+f"));
+    toggleFoldAct->setStatusTip(tr("Toggle folding for whole document"));
     connect(toggleFoldAct, SIGNAL(triggered()), this, SLOT(initializeFolding()));
 
     gotoMatchingBraceAct = new QAction(QIcon(":/images/brackets.png"), tr("Goto &matching bracket {} ... [] ... ()..."), this);
@@ -350,43 +351,161 @@ void MainWindow::createActions()
 
     // Lexers
     lexCPPAct = new QAction(tr("C/C++..."), this);
+    lexCPPAct->setStatusTip(tr("highlight C/C++ syntax"));
     lexCPPAct->setCheckable(true);
     lexCPPAct->setChecked(true);
     connect(lexCPPAct, SIGNAL(triggered()), this, SLOT(initializeLexerCPP()));
 
     lexMakefileAct = new QAction(tr("Makefile..."), this);
+    lexMakefileAct->setStatusTip(tr("highlight Makefile syntax"));
     lexMakefileAct->setCheckable(true);
     lexMakefileAct->setChecked(false);
     connect(lexMakefileAct, SIGNAL(triggered()), this, SLOT(initializeLexerMakefile()));
 
     lexBatchAct = new QAction(tr("C/C++..."), this);
+    lexBatchAct->setStatusTip(tr("highlight AmigaShell syntax"));
     lexBatchAct->setCheckable(true);
     lexBatchAct->setChecked(false);
     connect(lexBatchAct, SIGNAL(triggered()), this, SLOT(initializeLexerBatch()));
 
     lexFortranAct = new QAction(tr("Amiga installer..."), this);
+    lexFortranAct->setStatusTip(tr("highlight Amiga Installer syntax"));
     lexFortranAct->setCheckable(true);
     lexFortranAct->setChecked(false);
     connect(lexFortranAct, SIGNAL(triggered()), this, SLOT(initializeLexerFortran()));
 
     lexPascalAct = new QAction(tr("Pascal..."), this);
+    lexPascalAct->setStatusTip(tr("highlight Pascal syntax"));
     lexPascalAct->setCheckable(true);
     lexPascalAct->setChecked(false);
     connect(lexPascalAct, SIGNAL(triggered()), this, SLOT(initializeLexerPascal()));
 
+    lexPlainTextAct = new QAction(tr("Plain Text..."), this);
+    lexPlainTextAct->setStatusTip(tr("show Plain Text only"));
+    lexPlainTextAct->setCheckable(true);
+    lexPlainTextAct->setChecked(false);
+    connect(lexPlainTextAct, SIGNAL(triggered()), this, SLOT(initializeLexerNone()));
+
     // this will put the lexers in our menue into a mutual exclusive
-    // group for automatically checking/unchecking each other!
+    // group for automatically checking/unchecking each other:
     syntaxGroup = new QActionGroup(this);
     syntaxGroup->addAction(lexCPPAct);
     syntaxGroup->addAction(lexMakefileAct);
     syntaxGroup->addAction(lexFortranAct);
     syntaxGroup->addAction(lexPascalAct);
+    syntaxGroup->addAction(lexPlainTextAct);
 
     showDebugInfoAct = new QAction(tr("Show debug output"), this);
     showDebugInfoAct->setCheckable(true);
     showDebugInfoAct->setChecked(p_mydebug);
     showDebugInfoAct->setStatusTip(tr("Toggle debug output visibility"));
     connect(showDebugInfoAct, SIGNAL(triggered()), this, SLOT(actionShowDebug()));
+
+    /*
+     * insertMenue actions:
+     */
+    includeAct = new QAction(tr("#include"), this); // inserts into insertMenue => preprocessorMenue
+    includeAct->setStatusTip(tr("insert #include <file>..."));
+    connect(includeAct, SIGNAL(triggered()), this, SLOT(actionInsertInclude()));
+
+    defineAct = new QAction(tr("#define"), this); // inserts into insertMenue => preprocessorMenue
+    defineAct->setStatusTip(tr("insert #define SOME_VALUE..."));
+    connect(defineAct, SIGNAL(triggered()), this, SLOT(actionInsertDefine()));
+
+    ifdefAct = new QAction(tr("#ifdef"), this); // inserts into insertMenue => preprocessorMenue
+    ifdefAct->setStatusTip(tr("insert #ifdef ... #endif..."));
+    connect(defineAct, SIGNAL(triggered()), this, SLOT(actionInsertIfdef()));
+
+    ifndefAct = new QAction(tr("#ifndef"), this); // inserts into insertMenue => preprocessorMenue
+    ifndefAct->setStatusTip(tr("insert #ifndef ... #endif..."));
+    connect(ifndefAct, SIGNAL(triggered()), this, SLOT(actionInsertIfndef()));
+
+    OpenLibraryAct = new QAction(tr("OpenLibrary()"), this); // inserts into insertMenue => libraryMenue
+    OpenLibraryAct->setStatusTip(tr("insert OpenLibrary()"));
+    connect(OpenLibraryAct, SIGNAL(triggered()), this, SLOT(actionInsertOpenLibrary()));
+
+    CloseLibraryAct = new QAction(tr("CloseLibrary()"), this); // inserts into insertMenue => libraryMenue
+    CloseLibraryAct->setStatusTip(tr("insert CloseLibrary()"));
+    connect(CloseLibraryAct, SIGNAL(triggered()), this, SLOT(actionInsertCloseLibrary()));
+
+    ifAct = new QAction(tr("if(..) {...}"), this); // inserts into insertMenue => conditionsMenue
+    ifAct->setStatusTip(tr("insert if(..) {...}"));
+    connect(ifAct, SIGNAL(triggered()), this, SLOT(actionInsertIf()));
+
+    if_elseAct = new QAction(tr("if(..) {...} else {...}"), this); // inserts into insertMenue => conditionsMenue
+    if_elseAct->setStatusTip(tr("insert if(..) {...} else {...}"));
+    connect(if_elseAct, SIGNAL(triggered()), this, SLOT(actionInsertIfElse()));
+
+    whileAct = new QAction(tr("while(...) {...}"), this); // inserts into insertMenue => loopsMenue
+    whileAct->setStatusTip(tr("insert while(...) {...}"));
+    connect(whileAct, SIGNAL(triggered()), this, SLOT(actionInsertWhile()));
+
+    while_doAct = new QAction(tr("while(...) {...} do"), this); // inserts into insertMenue => loopsMenue
+    while_doAct->setStatusTip(tr("insert while(...) {...} do"));
+    connect(while_doAct, SIGNAL(triggered()), this, SLOT(actionInsertWhileDo()));
+
+    do_whileAct = new QAction(tr("do...{...}while(...)"), this); // inserts into insertMenue => loopsMenue
+    do_whileAct->setStatusTip(tr("insert do...{...}while(...)"));
+    connect(do_whileAct, SIGNAL(triggered()), this, SLOT(actionInsertDoWhile()));
+
+    switchAct = new QAction(tr("do...{...}while(...)"), this); // inserts into insertMenue => loopsMenue
+    switchAct->setStatusTip(tr("insert do...{...}while(...)"));
+    connect(switchAct, SIGNAL(triggered()), this, SLOT(actionInsertSwitch()));
+
+    functionAct = new QAction(tr("enum {...}"), this); // inserts into insertMenue
+    functionAct->setStatusTip(tr("insert enum {...}"));
+    connect(functionAct, SIGNAL(triggered()), this, SLOT(actionInsertFunction()));
+
+    enumAct = new QAction(tr("enum {...}"), this); // inserts into insertMenue
+    enumAct->setStatusTip(tr("insert enum {...}"));
+    connect(enumAct, SIGNAL(triggered()), this, SLOT(actionInsertEnum()));
+
+    structAct = new QAction(tr("struct name {...}"), this); // inserts into insertMenue
+    structAct->setStatusTip(tr("insert struct name {...}"));
+    connect(structAct, SIGNAL(triggered()), this, SLOT(actionInsertEnum()));
+
+    c_classAct = new QAction(tr("C-style class..."), this); // inserts into insertMenue => classMenue
+    c_classAct->setStatusTip(tr("insert C-style class"));
+    connect(c_classAct, SIGNAL(triggered()), this, SLOT(actionInsertCClass()));
+
+    cpp_classAct = new QAction(tr("C++ style class..."), this); // inserts into insertMenue => classMenue
+    cpp_classAct->setStatusTip(tr("insert C++ style class"));
+    connect(cpp_classAct, SIGNAL(triggered()), this, SLOT(actionInsertCppClass()));
+
+    fileheaderAct = new QAction(tr("Fileheader comment..."), this); // inserts into insertMenue => commentsMenue
+    fileheaderAct->setStatusTip(tr("insert Fileheader comment"));
+    connect(fileheaderAct, SIGNAL(triggered()), this, SLOT(actionInsertFileheaderComment()));
+
+    c_singleAct = new QAction(tr("C-style single line comment..."), this); // inserts into insertMenue => commentsMenue
+    c_singleAct->setStatusTip(tr("insert C-style single line comment"));
+    connect(c_singleAct, SIGNAL(triggered()), this, SLOT(actionInsertCSingleComment()));
+
+    c_multiAct = new QAction(tr("C-style multi line comment..."), this); // inserts into insertMenue => commentsMenue
+    c_multiAct->setStatusTip(tr("insert C-style multi line comment"));
+    connect(c_multiAct, SIGNAL(triggered()), this, SLOT(actionInsertCMultiComment()));
+
+    cpp_singleAct = new QAction(tr("C++ style single line comment..."), this); // inserts into insertMenue => commentsMenue
+    cpp_singleAct->setStatusTip(tr("insert C++ style single line comment"));
+    connect(cpp_singleAct, SIGNAL(triggered()), this, SLOT(actionInsertCppSingleComment()));
+
+    snippet1Act = new QAction(tr("Snippet #1..."), this); // inserts into insertMenue => snippetsMenue
+    snippet1Act->setStatusTip(tr("insert Snippet #1"));
+    connect(snippet1Act, SIGNAL(triggered()), this, SLOT(actionInsertSnippet1()));
+
+    snippet2Act = new QAction(tr("Snippet #2..."), this); // inserts into insertMenue => snippetsMenue
+    snippet2Act->setStatusTip(tr("insert Snippet #2"));
+    connect(snippet2Act, SIGNAL(triggered()), this, SLOT(actionInsertSnippet2()));
+
+    snippet3Act = new QAction(tr("Snippet #3..."), this); // inserts into insertMenue => snippetsMenue
+    snippet3Act->setStatusTip(tr("insert Snippet #3"));
+    connect(snippet3Act, SIGNAL(triggered()), this, SLOT(actionInsertSnippet3()));
+
+    snippet4Act = new QAction(tr("Snippet #4..."), this); // inserts into insertMenue => snippetsMenue
+    snippet4Act->setStatusTip(tr("insert Snippet #4"));
+    connect(snippet4Act, SIGNAL(triggered()), this, SLOT(actionInsertSnippet4()));
+
+
+
 
 }
 
@@ -416,6 +535,44 @@ void MainWindow::createMenus()
 
     // Inserts menue
     insertMenue = menuBar()->addMenu(tr("&Inserts"));
+    preprocessorMenue = insertMenue->addMenu(tr("Preprocessor..."));
+    preprocessorMenue->addAction(includeAct);
+    preprocessorMenue->addAction(defineAct);
+    preprocessorMenue->addAction(ifdefAct);
+    preprocessorMenue->addAction(ifndefAct);
+    insertMenue->addSeparator();
+    libraryMenue = insertMenue->addMenu(tr("Libraries..."));
+    libraryMenue->addAction(OpenLibraryAct);
+    libraryMenue->addAction(CloseLibraryAct);
+    insertMenue->addSeparator();
+    conditionsMenue = insertMenue->addMenu(tr("Condition..."));
+    conditionsMenue->addAction(ifAct);
+    conditionsMenue->addAction(if_elseAct);
+    insertMenue->addSeparator();
+    loopsMenue = insertMenue->addMenu(tr("Loops..."));
+    loopsMenue->addAction(whileAct);
+    loopsMenue->addAction(while_doAct);
+    loopsMenue->addAction(do_whileAct);
+    loopsMenue->addAction(switchAct);
+    insertMenue->addSeparator();
+    insertMenue->addAction(enumAct);
+    insertMenue->addAction(structAct);
+    insertMenue->addSeparator();
+    classMenue = insertMenue->addMenu(tr("Class..."));
+    classMenue->addAction(c_classAct);
+    classMenue->addAction(cpp_classAct);
+    insertMenue->addSeparator();
+    commentsMenue = insertMenue->addMenu(tr("Comments..."));
+    commentsMenue->addAction(fileheaderAct);
+    commentsMenue->addAction(c_singleAct);
+    commentsMenue->addAction(c_multiAct);
+    commentsMenue->addAction(cpp_singleAct);
+    insertMenue->addSeparator();
+    snippetsMenue = insertMenue->addMenu(tr("Snippets..."));
+    snippetsMenue->addAction(snippet1Act);
+    snippetsMenue->addAction(snippet2Act);
+    snippetsMenue->addAction(snippet3Act);
+    snippetsMenue->addAction(snippet4Act);
 
     menuBar()->addSeparator();
 
@@ -452,6 +609,8 @@ void MainWindow::createMenus()
     syntaxMenue->addAction(lexFortranAct);
     syntaxMenue->addSeparator();
     syntaxMenue->addAction(lexPascalAct);
+    syntaxMenue->addSeparator();
+    syntaxMenue->addAction(lexPlainTextAct);
 
     menuBar()->addSeparator();
 
@@ -932,15 +1091,44 @@ void MainWindow::fitMarginLines()
 }
 
 //
+// initialize plain text "lexer" (NO syntax highlighting!)
+// e.g. KILL existing lexer...
+//
+void MainWindow::initializeLexerNone()
+{
+    // We want to get rid of the Lexer that is allready initialized!
+    textEdit->setLexer(nullptr);
+    // Now that it's gone - let's take care that everything looks like before...
+    textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
+    initializeMargin();
+    // We don't want to have the fold margin visible, since it's plain text we're displaying...
+    textEdit->setFolding(QsciScintilla::NoFoldStyle);
+    // Make sure everything is unfolded!
+    QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
+    if (!state)
+    {
+        textEdit->foldAll(false);
+    }
+    createStatusBarMessage(tr("Syntax changed to PlainText"), 0);
+}
+
+//
 // initialize C/C++ lexer bei default
 //
 void MainWindow::initializeLexerCPP()
 {
     QsciLexerCPP *lexer = new QsciLexerCPP();
     lexer->setDefaultFont(textEdit->font());
-    lexer->setFoldComments(true);
+    //lexer->setFoldComments(false);
     textEdit->setLexer(lexer);
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
+    // Make sure everything is unfolded!
+    QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
+    if (!state)
+    {
+        textEdit->foldAll(false);
+    }
+    textEdit->setFolding(QsciScintilla::BoxedTreeFoldStyle);
     initializeMargin();
     createStatusBarMessage(tr("Syntax changed to C/C++"), 0);
 }
@@ -955,6 +1143,13 @@ void MainWindow::initializeLexerMakefile()
     //lexer->setFoldComments(true);
     textEdit->setLexer(lexer);
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
+    // Make sure everything is unfolded!
+    QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
+    if (!state)
+    {
+        textEdit->foldAll(false);
+    }
+    textEdit->setFolding(QsciScintilla::BoxedTreeFoldStyle);
     initializeMargin();
     createStatusBarMessage(tr("Syntax changed to Makefiles"), 0);
 }
@@ -969,8 +1164,13 @@ void MainWindow::initializeLexerBatch()
     //lexer->setFoldComments(true);
     textEdit->setLexer(lexer);
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
-
-    // Make sure our Margins look the same as before!
+    // Make sure everything is unfolded!
+    QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
+    if (!state)
+    {
+        textEdit->foldAll(false);
+    }
+    textEdit->setFolding(QsciScintilla::BoxedTreeFoldStyle);
     initializeMargin();
     createStatusBarMessage(tr("Syntax changed to Shell"), 0);
 }
@@ -985,6 +1185,13 @@ void MainWindow::initializeLexerFortran()
     //lexer->setFoldComments(true);
     textEdit->setLexer(lexer);
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
+    // Make sure everything is unfolded!
+    QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
+    if (!state)
+    {
+        textEdit->foldAll(false);
+    }
+    textEdit->setFolding(QsciScintilla::BoxedTreeFoldStyle);
     initializeMargin();
     createStatusBarMessage(tr("Syntax changed to Amiga installer"), 0);
 }
@@ -996,9 +1203,16 @@ void MainWindow::initializeLexerPascal()
 {
     QsciLexerPascal *lexer = new QsciLexerPascal;
     lexer->setDefaultFont(textEdit->font());
-    lexer->setFoldComments(true);
+    //lexer->setFoldComments(true);
     textEdit->setLexer(lexer);
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
+    // Make sure everything is unfolded!
+    QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
+    if (!state)
+    {
+        textEdit->foldAll(false);
+    }
+    textEdit->setFolding(QsciScintilla::BoxedTreeFoldStyle);
     initializeMargin();
     createStatusBarMessage(tr("Syntax changed to Pascal"), 0);
 }
@@ -1097,7 +1311,7 @@ void MainWindow::initializeGUI()
     initializeMargin();
     initializeCaretLine();
     initializeLexerCPP();
-    initializeFolding();
+    //initializeFolding();
 
     // make editor as Amiga-compatible as possible:
     textEdit->setEolMode(QsciScintilla::EolUnix);

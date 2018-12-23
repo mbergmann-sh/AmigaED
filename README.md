@@ -25,6 +25,7 @@ This program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRA
 - goto top/bottom
 - jump to matching bracket {...} | [...] | (...)
 - C/C++ | Pascal | Makefile  syntax highlighting
+- display plain text without syntax highlighting and folding margin
 - clipboard support
 - display current cursor position
 - print current file if page not empty (could be done better - e.g. take parameters from default printer...)
@@ -64,7 +65,7 @@ you might also add this folder to your search path instead!
 - implement inserts and snippets
 - add a search/replace dialog
 - improve printing [partially done - prints text and line numbers on DIN A4 paper]
-- implement direct cross compiling to Amiga target vor vbcc and gcc cross compiler toolchain
+- implement direct cross compiling to Amiga target for vbcc and gcc cross compiler toolchain
 - startup Amiga Emulator
 - implement a prefs dialog
 - implement project manager
@@ -79,9 +80,19 @@ you might also add this folder to your search path instead!
 - MAYBE implement code creation and cross compiling for AmigaOS 4.1 PPC target... Somebody willing to donate a A1222 machine? ;)
 - MAYBE implement code creation and cross compiling for AROS native i386 target... if I can get hands on a working cross compiler running on PC
 
+# Credits
+- Matic Kucovec and Kristof Mulier for their great tutorial and website on how to use QScintilla in Python
+- Keith F. Kelly for pointing me out on how to kill an existing QsciLexer
+
+Thanks for your helping hands when I got stuck, folks. You rock!
+
+# If you like my work...
+Since there aren't to many working examples on how to write an editor in C++ using QScintilla I thought it to be a good idea to put the sources into public for free.
+Developing and enhancing this example code is kind of time intensive, though a whole lot of fun. If you like my work and want to support the developent of AmigaED with some beer or Espresso, feel free to make a donation to mb@mbergmann-sh.de via PayPal. Thanks for your support!
+
 # Usefull links for Qt5/QScintilla coders
 - Qt5 open source edition download site: https://www.qt.io/download-qt-installer?hsCtaTracking=9f6a2170-a938-42df-a8e2-a9f0b1d6cdce%7C6cb0de4f-9bb5-4778-ab02-bfb62735f3e5
 - QScintilla download site: https://www.riverbankcomputing.com/software/qscintilla/download
-- Qt5 documentation: http://doc.qt.io/qt-5/ 
+- Qt5 documentation: http://doc.qt.io/qt-5/
 - QScintilla API documentation: http://pyqt.sourceforge.net/Docs/QScintilla2/annotated.html
 - A site showing the usage of QScintilla from within Python in order to build an editor: https://qscintilla.com/ (...you might want to use this one as a starting point for understanding how QScintilla works if you are able to read and understand Python code!)

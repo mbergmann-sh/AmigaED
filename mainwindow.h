@@ -81,6 +81,7 @@ private slots:
     void initializeLexerPascal();
     void initializeLexerBatch();
     void initializeLexerFortran();
+    void initializeLexerNone();
     void initializeFolding();
     void initializeMargin();
     void initializeCaretLine();
@@ -133,6 +134,13 @@ private:
     QMenu *syntaxMenue;         // holds actions to change syntax lexers
     QMenu *toolsMenue;          // holds misc actions
     QMenu *helpMenue;           // holds help topics
+    QMenu *preprocessorMenue;   // Submenue of insertMenue, holds preprocessor inserts
+    QMenu *libraryMenue;        // Submenue of insertMenue, holds library inserts
+    QMenu *conditionsMenue;     // Submenue of insertMenue, holds C condition inserts
+    QMenu *loopsMenue;          // Submenue of insertMenue, holds C/++ loops inserts
+    QMenu *commentsMenue;       // Submenue of insertMenue, holds comment inserts
+    QMenu *classMenue;          // Submenue of insertMenue, holds C/++ class inserts
+    QMenu *snippetsMenue;       // Submenue of insertMenue, holds inserts for user-defined code snippets
 
     // Toolbars
     QToolBar *fileToolBar;          // holds file manipulating actions
@@ -144,31 +152,73 @@ private:
     // Synatxmenue mutual exclude ActionGroup
     QActionGroup *syntaxGroup;      // holds different Lexers for mutual exclusion in menue
 
-    //Actions
+    //Actions for fileMenue
     QAction *newAct;                // create new empty window
     QAction *openAct;               // open file
     QAction *saveAct;               // save file
     QAction *saveAsAct;             // save file as...
     QAction *printAct;              // print current file
     QAction *exitAct;               // quit the app
+    // Actions for editMenue
     QAction *cutAct;                // copy marked text into clipboard and delete original
     QAction *copyAct;               // copy marked text into clipboard
     QAction *pasteAct;              // paste clipboard
+    // Actions for helpMenue
     QAction *aboutAct;              // show about message
     QAction *aboutQtAct;            // show about-Qt message
+    // Actions for navigationMenue
     QAction *gotoTopAct;            // jump to line #1...
     QAction *gotoBottomAct;         // jump to line #1...
-    QAction *gotoLineAct;           // jump to line X...
-    QAction *toggleFoldAct;         // toggle text folding
+    QAction *gotoLineAct;           // jump to line X...    
     QAction *gotoMatchingBraceAct;  // jump to matching brace
+    // Actions for viewMenue
+    QAction *toggleFoldAct;         // toggle text folding
+    QAction *showDebugInfoAct;      // show or hide debugging informations
+    // Actions for buildMenue
     QAction *compileAct;            // calls compilation of current file
+    // Actions for toolsMenue
     QAction *emulatorAct;           // start UAE
+    // Actions for syntaxMenue
     QAction *lexCPPAct;             // switch lexer to C++ syntax
     QAction *lexBatchAct;           // switch lexer to Batch / Shell syntax
     QAction *lexMakefileAct;        // switch lexer to Makefile syntax
     QAction *lexFortranAct;         // switch lexer to Amiga Installer (e.g. more like LISP) syntax
     QAction *lexPascalAct;          // switch lexer to Pascal syntax
-    QAction *showDebugInfoAct;      // show or hide debugging informations
+    QAction *lexPlainTextAct;       // switch lexer to no syntax highlighting
+    // Actions for insertMenue
+    // Preprocessor
+    QAction *includeAct;            // inserts #include <file>
+    QAction *defineAct;             // inserts #define SOME_VALUE
+    QAction *ifdefAct;              // inserts #ifdef ... #endif
+    QAction *ifndefAct;             // inserts #ifndef ... #endif
+    // Library
+    QAction *OpenLibraryAct;        // inserts OpenLibrary(some.library", 0L);
+    QAction *CloseLibraryAct;       // inserts CloseLibrary(some.library);
+    // Conditions
+    QAction *ifAct;                 // inserts if(condition){..} statement
+    QAction *if_elseAct;            // inserts if(condition){...} else {...} statement
+    // Loops
+    QAction *whileAct;              // inserts while(condition) {...} loop
+    QAction *while_doAct;           // inserts while(condition) {...}do loop
+    QAction *do_whileAct;           // inserts do{...}while(condition) loop
+    QAction *switchAct;             // inserts switch(condition) select case statements
+    // Class
+    QAction *c_classAct;            // inserts a C-style class skelleton
+    QAction *cpp_classAct;          // inserts a C++-style class skelleton
+    // Comments
+    QAction *fileheaderAct;         // inserts a fileheader comment
+    QAction *c_singleAct;           // inserts a C-style single line comment
+    QAction *c_multiAct;            // inserts a C-style multi line comment
+    QAction *cpp_singleAct;         // inserts a C++-style single line comment
+    // Snippets
+    QAction *snippet1Act;           // inserts Snippet #1 from snippetfile1.snip
+    QAction *snippet2Act;           // inserts Snippet #2 from snippetfile2.snip
+    QAction *snippet3Act;           // inserts Snippet #3 from snippetfile3.snip
+    QAction *snippet4Act;           // inserts Snippet #4 from snippetfile4.snip
+    // Function, Enum, Struct...
+    QAction *functionAct;            // inserts C function skeletton
+    QAction *enumAct;                // inserts C enumeration skeletton
+    QAction *structAct;              // inserts C struct skeletton
 
     // statusbar widgets
     QLabel *statusLabelX;
