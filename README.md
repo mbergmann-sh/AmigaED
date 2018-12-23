@@ -88,7 +88,7 @@ Thanks for your helping hands when I got stuck, folks. You rock!
 
 # If you like my work...
 Since there aren't to many working examples on how to write an editor in C++ using QScintilla I thought it to be a good idea to put the sources into public for free.
-Developing and enhancing this example code is kind of time intensive, though a whole lot of fun. If you like my work and want to support the developent of AmigaED with some beer or Espresso, feel free to make a donation to mb@mbergmann-sh.de via PayPal. Thanks for your support!
+Developing and enhancing this example code is kind of time intensive, though a whole lot of fun. If you like my work and want to support the developent of AmigaED with some beer, books or Espresso, feel free to donate to mb@mbergmann-sh.de via PayPal. Thanks for your support!
 
 # Usefull links for Qt5/QScintilla coders
 - Qt5 open source edition download site: https://www.qt.io/download-qt-installer?hsCtaTracking=9f6a2170-a938-42df-a8e2-a9f0b1d6cdce%7C6cb0de4f-9bb5-4778-ab02-bfb62735f3e5

@@ -448,8 +448,8 @@ void MainWindow::createActions()
     do_whileAct->setStatusTip(tr("insert do...{...}while(...)"));
     connect(do_whileAct, SIGNAL(triggered()), this, SLOT(actionInsertDoWhile()));
 
-    switchAct = new QAction(tr("do...{...}while(...)"), this); // inserts into insertMenue => loopsMenue
-    switchAct->setStatusTip(tr("insert do...{...}while(...)"));
+    switchAct = new QAction(tr("switch(...)"), this); // inserts into insertMenue => loopsMenue
+    switchAct->setStatusTip(tr("insert switch(...)"));
     connect(switchAct, SIGNAL(triggered()), this, SLOT(actionInsertSwitch()));
 
     functionAct = new QAction(tr("enum {...}"), this); // inserts into insertMenue
