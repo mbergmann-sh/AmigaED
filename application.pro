@@ -12,8 +12,7 @@ HEADERS      = mainwindow.h \
     mainwindow.h
 SOURCES      = main.cpp mainwindow.cpp \
     main.cpp \
-    mainwindow.cpp \
-    syntax-examples/amiga_aslrequest.c
+    mainwindow.cpp
 RESOURCES    += application.qrc
 
 
