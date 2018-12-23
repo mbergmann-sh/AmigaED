@@ -99,6 +99,33 @@ private slots:
     void actionCompile();               // calls compilation of current file
     void actionEmulator();              // starts UAE
     void actionShowDebug();             // sets showing or hideing for debugging informations
+    // insertMenue and submenue actions:
+    void actionInsertInclude();
+    void actionInsertDefine();
+    void actionInsertIfdef();
+    void actionInsertIfndef();
+    void actionInsertOpenLibrary();
+    void actionInsertCloseLibrary();
+    void actionInsertIf();
+    void actionInsertIfElse();
+    void actionInsertWhile();
+    void actionInsertWhileDo();
+    void actionInsertDoWhile();
+    void actionInsertSwitch();
+    void actionInsertMain();
+    void actionInsertEnum();
+    void actionInsertStruct();
+    void actionInsertFunction();
+    void actionInsertCClass();
+    void actionInsertCppClass();
+    void actionInsertFileheaderComment();
+    void actionInsertCSingleComment();
+    void actionInsertCMultiComment();
+    void actionInsertCppSingleComment();
+    void actionInsertSnippet1();
+    void actionInsertSnippet2();
+    void actionInsertSnippet3();
+    void actionInsertSnippet4();
 
 private:
     // GUI creation...
@@ -215,7 +242,8 @@ private:
     QAction *snippet2Act;           // inserts Snippet #2 from snippetfile2.snip
     QAction *snippet3Act;           // inserts Snippet #3 from snippetfile3.snip
     QAction *snippet4Act;           // inserts Snippet #4 from snippetfile4.snip
-    // Function, Enum, Struct...
+    // main(), Function, Enum, Struct...
+    QAction *mainAct;
     QAction *functionAct;            // inserts C function skeletton
     QAction *enumAct;                // inserts C enumeration skeletton
     QAction *structAct;              // inserts C struct skeletton

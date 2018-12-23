@@ -405,6 +405,7 @@ void MainWindow::createActions()
      * insertMenue actions:
      */
     includeAct = new QAction(tr("#include"), this); // inserts into insertMenue => preprocessorMenue
+    includeAct->setShortcut(tr("Ctrl+i"));
     includeAct->setStatusTip(tr("insert #include <file>..."));
     connect(includeAct, SIGNAL(triggered()), this, SLOT(actionInsertInclude()));
 
@@ -452,8 +453,12 @@ void MainWindow::createActions()
     switchAct->setStatusTip(tr("insert switch(...)"));
     connect(switchAct, SIGNAL(triggered()), this, SLOT(actionInsertSwitch()));
 
-    functionAct = new QAction(tr("enum {...}"), this); // inserts into insertMenue
-    functionAct->setStatusTip(tr("insert enum {...}"));
+    mainAct = new QAction(tr("int main {...}"), this); // inserts into insertMenue
+    mainAct->setStatusTip(tr("insert main() {...}"));
+    connect(mainAct, SIGNAL(triggered()), this, SLOT(actionInsertMain()));
+
+    functionAct = new QAction(tr(" int function {...}"), this); // inserts into insertMenue
+    functionAct->setStatusTip(tr("insert C function definition"));
     connect(functionAct, SIGNAL(triggered()), this, SLOT(actionInsertFunction()));
 
     enumAct = new QAction(tr("enum {...}"), this); // inserts into insertMenue
@@ -504,9 +509,6 @@ void MainWindow::createActions()
     snippet4Act->setStatusTip(tr("insert Snippet #4"));
     connect(snippet4Act, SIGNAL(triggered()), this, SLOT(actionInsertSnippet4()));
 
-
-
-
 }
 
 //
@@ -555,17 +557,22 @@ void MainWindow::createMenus()
     loopsMenue->addAction(do_whileAct);
     loopsMenue->addAction(switchAct);
     insertMenue->addSeparator();
+    insertMenue->addAction(mainAct);
+    insertMenue->addAction(functionAct);
     insertMenue->addAction(enumAct);
     insertMenue->addAction(structAct);
     insertMenue->addSeparator();
     classMenue = insertMenue->addMenu(tr("Class..."));
     classMenue->addAction(c_classAct);
+    classMenue->addSeparator();
     classMenue->addAction(cpp_classAct);
     insertMenue->addSeparator();
     commentsMenue = insertMenue->addMenu(tr("Comments..."));
     commentsMenue->addAction(fileheaderAct);
+    commentsMenue->addSeparator();
     commentsMenue->addAction(c_singleAct);
     commentsMenue->addAction(c_multiAct);
+    commentsMenue->addSeparator();
     commentsMenue->addAction(cpp_singleAct);
     insertMenue->addSeparator();
     snippetsMenue = insertMenue->addMenu(tr("Snippets..."));
@@ -1014,6 +1021,233 @@ void MainWindow::actionCompile()
 }
 
 //
+// Show or hide debugging output
+// Value is stored in p_mydebug
+//
+void MainWindow::actionShowDebug()
+{
+    if(showDebugInfoAct->isChecked())
+    {
+        p_mydebug = true;
+    }
+    else
+        p_mydebug = false;
+
+    if(p_mydebug)
+        qDebug() << "p_mydebug = " << p_mydebug;
+}
+
+/* ------------ Begin insertMenue Actions -----------------*/
+//
+// Insert #include <file.h>
+//
+void MainWindow::actionInsertInclude()
+{
+    popNotImplemented();
+}
+
+//
+// Insert #define SOME_VALUE
+//
+void MainWindow::actionInsertDefine()
+{
+    popNotImplemented();
+}
+
+//
+// Insert #ifdef ... #endif
+//
+void MainWindow::actionInsertIfdef()
+{
+    popNotImplemented();
+}
+
+//
+// Insert #ifndef ... #endif
+//
+void MainWindow::actionInsertIfndef()
+{
+    popNotImplemented();
+}
+
+//
+// Insert OpenLibrary("some.library", 0L)
+//
+void MainWindow::actionInsertOpenLibrary()
+{
+    popNotImplemented();
+}
+
+//
+// Insert CloseLibrary("some.library")
+//
+void MainWindow::actionInsertCloseLibrary()
+{
+    popNotImplemented();
+}
+
+//
+// Insert if(...){...}
+//
+void MainWindow::actionInsertIf()
+{
+    popNotImplemented();
+}
+
+//
+// Insert if(...){...} else{..}
+//
+void MainWindow::actionInsertIfElse()
+{
+    popNotImplemented();
+}
+
+//
+// Insert while(...){...}
+//
+void MainWindow::actionInsertWhile()
+{
+    popNotImplemented();
+}
+
+//
+// Insert while(...){...}do
+//
+void MainWindow::actionInsertWhileDo()
+{
+    popNotImplemented();
+}
+
+//
+// Insert do{...}while(...)
+//
+void MainWindow::actionInsertDoWhile()
+{
+    popNotImplemented();
+}
+
+//
+// Insert switch(...){select case...break}
+//
+void MainWindow::actionInsertSwitch()
+{
+    popNotImplemented();
+}
+
+//
+// Insert int main(int argc, char *argv[]){...}
+//
+void MainWindow::actionInsertMain()
+{
+    popNotImplemented();
+}
+
+//
+// Insert C function skelleton
+//
+void MainWindow::actionInsertFunction()
+{
+    popNotImplemented();
+}
+
+//
+// Insert C enumeration
+//
+void MainWindow::actionInsertEnum()
+{
+    popNotImplemented();
+}
+
+//
+// Insert C custom data structure
+//
+void MainWindow::actionInsertStruct()
+{
+    popNotImplemented();
+}
+
+//
+// Insert C pseudo class: typedef struct{...}class_something
+//
+void MainWindow::actionInsertCClass()
+{
+    popNotImplemented();
+}
+
+//
+// Insert C++ class
+//
+void MainWindow::actionInsertCppClass()
+{
+    popNotImplemented();
+}
+
+//
+// Insert fileheader comment...
+//
+void MainWindow::actionInsertFileheaderComment()
+{
+    popNotImplemented();
+}
+
+//
+// Insert C-style single line comment
+//
+void MainWindow::actionInsertCSingleComment()
+{
+    popNotImplemented();
+}
+
+//
+// Insert C-style multi line comment
+//
+void MainWindow::actionInsertCMultiComment()
+{
+    popNotImplemented();
+}
+
+//
+// Insert C++style single line comment
+//
+void MainWindow::actionInsertCppSingleComment()
+{
+    popNotImplemented();
+}
+
+//
+// Insert snippet...
+//
+void MainWindow::actionInsertSnippet1()
+{
+    popNotImplemented();
+}
+
+//
+// Insert snippet...
+//
+void MainWindow::actionInsertSnippet2()
+{
+    popNotImplemented();
+}
+
+//
+// Insert snippet...
+//
+void MainWindow::actionInsertSnippet3()
+{
+    popNotImplemented();
+}
+
+//
+// Insert snippet...
+//
+void MainWindow::actionInsertSnippet4()
+{
+    popNotImplemented();
+}
+/* ------------ End insertMenue Actions -------------------*/
+
+//
 // Start UAE emulation
 // CHANGE THIS according to your installation path and UAE flavour!
 //
@@ -1386,20 +1620,5 @@ void MainWindow::popNotImplemented()
 
 }
 
-//
-// Show or hide debugging output
-// Value is stored in p_mydebug
-//
-void MainWindow::actionShowDebug()
-{
-    if(showDebugInfoAct->isChecked())
-    {
-        p_mydebug = true;
-    }
-    else
-        p_mydebug = false;
 
-    if(p_mydebug)
-        qDebug() << "p_mydebug = " << p_mydebug;
-}
 
