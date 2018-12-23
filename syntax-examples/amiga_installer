@@ -1,0 +1,37 @@
+# Simple, basic installation script
+from installer import *
+
+# These will be used for the first page (welcome) and last page (finish)
+welcomeText = "This is a welcome text, displayed at the first page"
+finishText = "This is the finish message"
+
+# Define the Welcome page
+welcomePage = NewPage(WELCOME)
+SetString(welcomePage, "message", welcomeText)
+
+# Define the License page. The user must accept this license to continue the install process.
+# The license text will be read from a text file called "license.txt" and will be displayed on the page.
+licensePage = NewPage(LICENSE)
+
+# Define a page to select the installation directory
+destinationPage = NewPage(DESTINATION)
+SetString(destinationPage, "message", "Please indicate where you want to install the files .")
+SetString(destinationPage, "destination", "SYS:")
+
+# Define a directory to be copied to the destination
+filePack = AddPackage (FILEPACKAGE,
+	name = "Full directory",
+	description = "Directory to copy as-is in the destination",
+	files = ["data"],
+	optional = False
+	)
+
+# Define a progress page that is shown during the installation
+installPage = NewPage(INSTALL)
+
+# Create a "finish" page.
+finalPage = NewPage(FINISH)
+SetString(finalPage, "message", finishText)
+
+# Finally, this runs the installation.
+RunInstaller()
