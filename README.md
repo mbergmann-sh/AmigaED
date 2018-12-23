@@ -1,5 +1,5 @@
 # AmigaED
-AmigaED is an example for writing an advanced coder's editor using the Qt5 and QScintilla frameworks in C++, containig a menu bar, toolbar, menus, an enhanced statusbar and some sophisticated editing actions. The source is based on Riverbank's original editor example, as provided with the QScintilla sources. This project was started as an entry point for learning how to use QScintilla. Though somewhat of a working editor, this project is meant for studies and as a base for own enhancements. 
+AmigaED is an example for writing an advanced coder's editor using the Qt5 and QScintilla frameworks in C++, containing a menu bar, toolbar, menus, an enhanced statusbar and some sophisticated editing actions. The source is based on Riverbank's original editor example, as provided with the QScintilla sources. This project was started as an entry point for learning how to use QScintilla. Though somewhat of a working editor, this project is meant for studies and as a base for own enhancements.
 
 # LICENSE
 Copyright (C) 2018/2019 by Michael Bergmann. Placed in the public domain with some restrictions!
@@ -62,7 +62,7 @@ you might also add this folder to your search path instead!
 
 # Roadmap - wanted features (at least hopefully planned...)
 - make the editor drag'n'drop-aware
-- implement inserts and snippets
+- implement inserts and snippets [partially done]
 - add a search/replace dialog
 - improve printing [partially done - prints text and line numbers on DIN A4 paper]
 - implement direct cross compiling to Amiga target for vbcc and gcc cross compiler toolchain
@@ -87,7 +87,7 @@ you might also add this folder to your search path instead!
 Thanks for your helping hands when I got stuck, folks. You rock!
 
 # If you like my work...
-Since there aren't to many working examples on how to write an editor in C++ using QScintilla I thought it to be a good idea to put the sources into public for free.
+Since there aren't too many working examples on how to write an editor in C++ using QScintilla I thought it to be a good idea to put the sources into public for free.
 Developing and enhancing this example code is kind of time intensive, though a whole lot of fun. If you like my work and want to support the developent of AmigaED with some beer, books or Espresso, feel free to donate to mb@mbergmann-sh.de via PayPal. Thanks for your support!
 
 # Usefull links for Qt5/QScintilla coders
