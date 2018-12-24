@@ -417,6 +417,7 @@ void MainWindow::createActions()
     connect(includeAct, SIGNAL(triggered()), this, SLOT(actionInsertInclude()));
 
     defineAct = new QAction(tr("#define"), this); // inserts into insertMenue => preprocessorMenue
+    defineAct->setShortcut(tr("Alt+d"));
     defineAct->setStatusTip(tr("insert #define SOME_VALUE..."));
     connect(defineAct, SIGNAL(triggered()), this, SLOT(actionInsertDefine()));
 
@@ -437,6 +438,7 @@ void MainWindow::createActions()
     connect(CloseLibraryAct, SIGNAL(triggered()), this, SLOT(actionInsertCloseLibrary()));
 
     ifAct = new QAction(tr("if(..) {...}"), this); // inserts into insertMenue => conditionsMenue
+    ifAct->setShortcut(tr("Ctrl+Alt+i"));
     ifAct->setStatusTip(tr("insert if(..) {...}"));
     connect(ifAct, SIGNAL(triggered()), this, SLOT(actionInsertIf()));
 
@@ -488,7 +490,7 @@ void MainWindow::createActions()
     fileheaderAct->setStatusTip(tr("insert Fileheader comment"));
     connect(fileheaderAct, SIGNAL(triggered()), this, SLOT(actionInsertFileheaderComment()));
 
-    versionStringAct = new QAction(tr("Amiga C versionstring"), this); // inserts into insertMenue => preprocessorMenue
+    versionStringAct = new QAction(tr("Amiga C version string"), this); // inserts into insertMenue => preprocessorMenue
     versionStringAct->setStatusTip(tr("insert $VER: programname version.revision (dd.mm.yyyy)"));
     connect(versionStringAct, SIGNAL(triggered()), this, SLOT(actionInsertAmigaVersionString()));
 
@@ -1071,15 +1073,30 @@ void MainWindow::actionShowDebug()
 //
 void MainWindow::actionInsertInclude()
 {
-    popNotImplemented();
+    // we need the caret's ("cursor") recent position stored as a starting point for insertion!
+    int line, index;
+    textEdit->getCursorPosition(&line, &index); // get the position...
+
+    // ...now insert our text:
+    textEdit->insert("#include    <some_header.h>");
+    // finally, move caret to next line.
+    textEdit->setCursorPosition(line, index + 13);
 }
 
 //
-// Insert #define SOME_VALUE
+// Insert #define SOME_VALUE 0
 //
 void MainWindow::actionInsertDefine()
 {
-    popNotImplemented();
+    // we need the caret's ("cursor") recent position stored as a starting point for insertion!
+    int line, index;
+    textEdit->getCursorPosition(&line, &index); // get the position...
+
+    // ...now insert our text:
+    textEdit->insert("#define\tSOME_VALUE\t0\n");
+    // finally, move caret to next line.
+    textEdit->setCursorPosition(line + 1, index);
+    qDebug() << "leaving actionInsertDefine now...";
 }
 
 //
@@ -1229,7 +1246,11 @@ void MainWindow::actionInsertFileheaderComment()
     textEdit->insertAt(" *\tDescription:\t\tCHANGE_ME\n", ++line, 0);
     textEdit->insertAt(" *\tPurpose:\t\tCHANGE_ME\n", ++line, 0);
     textEdit->insertAt(" *\n", ++line, 0);
+    textEdit->insertAt(" *\tAuthor:\t\t" + p_author + "\n", ++line, 0);
+    textEdit->insertAt(" *\tEmail:\t\t" + p_email + "\n", ++line, 0);
     textEdit->insertAt(" */\n", ++line, 0);
+
+    // finally, we set our caret to the next following empty line!
     textEdit->setCursorPosition(line + 1, index);
 }
 
@@ -1238,7 +1259,14 @@ void MainWindow::actionInsertFileheaderComment()
 //
 void MainWindow::actionInsertCSingleComment()
 {
-    popNotImplemented();
+    // we need the caret's ("cursor") recent position stored as a starting point for insertion!
+    int line, index;
+    textEdit->getCursorPosition(&line, &index); // get the position...
+
+    // ...now insert our text:
+    textEdit->insert("\t/* NOTE: */");
+    // finally, move caret to (N)OTE:
+    textEdit->setCursorPosition(line, index + 4);
 }
 
 //
@@ -1254,7 +1282,14 @@ void MainWindow::actionInsertCMultiComment()
 //
 void MainWindow::actionInsertCppSingleComment()
 {
-    popNotImplemented();
+    // we need the caret's ("cursor") recent position stored as a starting point for insertion!
+    int line, index;
+    textEdit->getCursorPosition(&line, &index); // get the position...
+
+    // ...now insert our text:
+    textEdit->insert("\t// NOTE:");
+    // finally, move caret to (N)OTE:
+    textEdit->setCursorPosition(line, index + 4);
 }
 
 //
@@ -1266,14 +1301,10 @@ void MainWindow::actionInsertCLineDevideComment()
     int line, index;
     textEdit->getCursorPosition(&line, &index); // get the position...
 
-    // ...now insert the first line of text!
+    // ...now insert our text:
     textEdit->insert("/* ------------- COMMENT --------------------------------------------- */\n");
-    textEdit->insertAt("test!\n", ++line, 0);
-    textEdit->insertAt("test 2\n", ++line, 0);
+    // finally, move caret to next line.
     textEdit->setCursorPosition(line + 1, index);
-
-
-
 }
 
 //
