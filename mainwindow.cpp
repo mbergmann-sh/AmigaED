@@ -344,6 +344,12 @@ void MainWindow::createActions()
     toggleFoldAct->setStatusTip(tr("Toggle folding for whole document"));
     connect(toggleFoldAct, SIGNAL(triggered()), this, SLOT(initializeFolding()));
 
+    showDebugInfoAct = new QAction(tr("Show debug output"), this);
+    showDebugInfoAct->setCheckable(true);
+    showDebugInfoAct->setChecked(p_mydebug);
+    showDebugInfoAct->setStatusTip(tr("Toggle debug output visibility"));
+    connect(showDebugInfoAct, SIGNAL(triggered()), this, SLOT(actionShowDebug()));
+
     /* --- Build -----------------------------------------------------------------------*/
     compileAct = new QAction(QIcon(":/images/dice.png"), tr("Comp&ile..."), this);
     compileAct->setShortcut(tr("Ctrl+r"));
@@ -402,12 +408,6 @@ void MainWindow::createActions()
     syntaxGroup->addAction(lexPascalAct);
     syntaxGroup->addAction(lexPlainTextAct);
 
-    showDebugInfoAct = new QAction(tr("Show debug output"), this);
-    showDebugInfoAct->setCheckable(true);
-    showDebugInfoAct->setChecked(p_mydebug);
-    showDebugInfoAct->setStatusTip(tr("Toggle debug output visibility"));
-    connect(showDebugInfoAct, SIGNAL(triggered()), this, SLOT(actionShowDebug()));
-
     /*
      * insertMenue actions:
      */
@@ -464,7 +464,7 @@ void MainWindow::createActions()
     mainAct->setStatusTip(tr("insert main() {...}"));
     connect(mainAct, SIGNAL(triggered()), this, SLOT(actionInsertMain()));
 
-    functionAct = new QAction(tr(" int function {...}"), this); // inserts into insertMenue
+    functionAct = new QAction(tr("int function {...}"), this); // inserts into insertMenue
     functionAct->setStatusTip(tr("insert C function definition"));
     connect(functionAct, SIGNAL(triggered()), this, SLOT(actionInsertFunction()));
 
@@ -488,6 +488,10 @@ void MainWindow::createActions()
     fileheaderAct->setStatusTip(tr("insert Fileheader comment"));
     connect(fileheaderAct, SIGNAL(triggered()), this, SLOT(actionInsertFileheaderComment()));
 
+    versionStringAct = new QAction(tr("Amiga C versionstring"), this); // inserts into insertMenue => preprocessorMenue
+    versionStringAct->setStatusTip(tr("insert $VER: programname version.revision (dd.mm.yyyy)"));
+    connect(versionStringAct, SIGNAL(triggered()), this, SLOT(actionInsertAmigaVersionString()));
+
     c_singleAct = new QAction(tr("C-style single line comment..."), this); // inserts into insertMenue => commentsMenue
     c_singleAct->setStatusTip(tr("insert C-style single line comment"));
     connect(c_singleAct, SIGNAL(triggered()), this, SLOT(actionInsertCSingleComment()));
@@ -499,6 +503,10 @@ void MainWindow::createActions()
     cpp_singleAct = new QAction(tr("C++ style single line comment..."), this); // inserts into insertMenue => commentsMenue
     cpp_singleAct->setStatusTip(tr("insert C++ style single line comment"));
     connect(cpp_singleAct, SIGNAL(triggered()), this, SLOT(actionInsertCppSingleComment()));
+
+    lineDevideCommentAct = new QAction(tr("C-style single line code dividing comment..."), this); // inserts into insertMenue => commentsMenue
+    lineDevideCommentAct->setStatusTip(tr("insert code dividing comment: /* --- COMMENT -------*/"));
+    connect(lineDevideCommentAct, SIGNAL(triggered()), this, SLOT(actionInsertCLineDevideComment()));
 
     snippet1Act = new QAction(tr("Snippet #1..."), this); // inserts into insertMenue => snippetsMenue
     snippet1Act->setStatusTip(tr("insert Snippet #1"));
@@ -515,7 +523,6 @@ void MainWindow::createActions()
     snippet4Act = new QAction(tr("Snippet #4..."), this); // inserts into insertMenue => snippetsMenue
     snippet4Act->setStatusTip(tr("insert Snippet #4"));
     connect(snippet4Act, SIGNAL(triggered()), this, SLOT(actionInsertSnippet4()));
-
 }
 
 //
@@ -642,15 +649,15 @@ void MainWindow::createMenus()
 // create a custom context menue
 //
 // custom context menue:
-#ifndef QT_NO_CONTEXTMENU
-void MainWindow::contextMenuEvent(QContextMenuEvent *event)
-{
-    QMenu menu(this);
-    menu.addAction(includeAct);
-    menu.addAction(whileAct);
-    menu.exec(event->globalPos());
-}
-#endif
+//#ifndef QT_NO_CONTEXTMENU
+//void MainWindow::contextMenuEvent(QContextMenuEvent *event)
+//{
+//    QMenu menu(this);
+//    menu.addAction(includeAct);
+//    menu.addAction(whileAct);
+//    menu.exec(event->globalPos());
+//}
+//#endif
 
 //
 // Let's put some of our actions into the app's toolbar!
@@ -1236,9 +1243,25 @@ void MainWindow::actionInsertCppSingleComment()
 }
 
 //
+// Insert C++style single line comment
+//
+void MainWindow::actionInsertCLineDevideComment()
+{
+    popNotImplemented();
+}
+
+//
 // Insert snippet...
 //
 void MainWindow::actionInsertSnippet1()
+{
+    popNotImplemented();
+}
+
+//
+// Insert Amiga Version String...
+//
+void MainWindow::actionInsertAmigaVersionString()
 {
     popNotImplemented();
 }
@@ -1377,6 +1400,10 @@ void MainWindow::initializeLexerCPP()
     //lexer->setFoldComments(false);
     textEdit->setLexer(lexer);
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
+
+//    // implement a custom context menue for textEdit:
+//    textEdit->setContextMenuPolicy(Qt::CustomContextMenu);
+//    connect(textEdit, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showCustomContextMenue(QPoint &)));
     // Make sure everything is unfolded!
     //QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
 //    if (!state)
@@ -1399,7 +1426,7 @@ void MainWindow::initializeLexerMakefile()
     textEdit->setLexer(lexer);
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
     // Make sure everything is unfolded!
-    QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
+    //QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
 //    if (!state)
 //    {
 //        textEdit->foldAll(false);
@@ -1561,6 +1588,10 @@ void MainWindow::initializeGUI()
         this->setStyleSheet(QString::fromUtf8("background-color: rgb(175, 175, 175);"));
     #endif
 
+    // implement a custom context menue for textEdit:
+    textEdit->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(textEdit, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(showCustomContextMenue(const QPoint &)));
+
     // initialize textEdit's most needed attributes:
     initializeFont();
     initializeMargin();
@@ -1644,18 +1675,68 @@ void MainWindow::popNotImplemented()
 //
 // Let's talk about mouse press events...
 //
-void MainWindow::mousePressEvent(QMouseEvent *event)
+//void MainWindow::mousePressEvent(QMouseEvent *event)
 
+//{
+//    if (event->button() == Qt::RightButton)
+//    {
+//        qDebug() << "Right mousebutton pressed!";
+//        this->menuWidget()->setContextMenuPolicy(Qt::CustomContextMenu);
+//    }
+//    if (event->button() == Qt::LeftButton)
+//        qDebug() << "Left mousebutton pressed!";
+//    if (event->button() == Qt::MiddleButton)
+//        qDebug() << "Middle mousebutton pressed!";
+
+//}
+
+//
+// Let's implement a custom right-click context menu for QScintilla textEdit
+//
+void MainWindow::showCustomContextMenue(const QPoint &pos)
 {
-    if (event->button() == Qt::RightButton)
-    {
-        qDebug() << "Right mousebutton pressed!";
-        this->menuWidget()->setContextMenuPolicy(Qt::CustomContextMenu);
-    }
-    if (event->button() == Qt::LeftButton)
-        qDebug() << "Left mousebutton pressed!";
-    if (event->button() == Qt::MiddleButton)
-        qDebug() << "Middle mousebutton pressed!";
+    // name the context menue
+    QMenu contextMenu(tr("Inserts"), this);
+
+    // define a pseudo action to show some kind of menue title
+    QAction pseudo_action(tr("What to insert?"), this);
+    pseudo_action.setStatusTip(tr("Select an item to be inserted into current text!"));
+    //connect(&pseudo_action, &QAction::triggered, this, []{qDebug() << "action 1 click!";});
+
+    // add all those predefined actions that we want to show...
+    contextMenu.addAction(&pseudo_action);
+    contextMenu.addSeparator();
+    contextMenu.addAction(fileheaderAct);
+    contextMenu.addSeparator();
+    contextMenu.addAction(includeAct);
+    contextMenu.addSeparator();
+    contextMenu.addAction(versionStringAct);
+    contextMenu.addSeparator();
+    contextMenu.addAction(mainAct);
+    contextMenu.addSeparator();
+    contextMenu.addAction(functionAct);
+    contextMenu.addSeparator();
+    contextMenu.addAction(structAct);
+    contextMenu.addSeparator();
+    contextMenu.addAction(OpenLibraryAct);
+    contextMenu.addSeparator();
+    contextMenu.addAction(CloseLibraryAct);
+    contextMenu.addSeparator();
+    contextMenu.addAction(ifAct);
+    contextMenu.addSeparator();
+    contextMenu.addAction(if_elseAct);
+    contextMenu.addSeparator();
+    contextMenu.addAction(whileAct);
+    contextMenu.addSeparator();
+    contextMenu.addAction(do_whileAct);
+    contextMenu.addSeparator();
+    contextMenu.addAction(c_singleAct);
+    contextMenu.addSeparator();
+    contextMenu.addAction(c_multiAct);
+    contextMenu.addSeparator();
+    contextMenu.addAction(lineDevideCommentAct);
+
+    contextMenu.exec(mapToGlobal(pos));
 
 }
 

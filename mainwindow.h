@@ -48,6 +48,7 @@
 #include <QAction>
 #include <QActionGroup>
 #include <QActionEvent>
+#include <QPoint>
 
 #include <QDebug>
 
@@ -64,6 +65,10 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QString cmdFileName);
 
+public slots:
+    // Custom context menue:
+    void showCustomContextMenue(const QPoint &pos); // implements custom context menu for QScintilla
+
 private slots:
     void popNotImplemented();       // shows "not implemented" MessageBox
     void newFile();                 // sets editor into new file mode
@@ -71,6 +76,7 @@ private slots:
     bool save();                    // saves current file
     bool saveAs();                  // saves current file as...
     void about();                   // pops up "about" MessageBox
+
     // GUI creation...
     void initializeGUI();
     void initializeLexerCPP();
@@ -113,16 +119,19 @@ private slots:
     void actionInsertEnum();
     void actionInsertStruct();
     void actionInsertFunction();
+    void actionInsertAmigaVersionString();
     void actionInsertCClass();
     void actionInsertCppClass();
     void actionInsertFileheaderComment();
     void actionInsertCSingleComment();
     void actionInsertCMultiComment();
     void actionInsertCppSingleComment();
+    void actionInsertCLineDevideComment();
     void actionInsertSnippet1();
     void actionInsertSnippet2();
     void actionInsertSnippet3();
     void actionInsertSnippet4();
+
 
 private:
     // GUI creation...
@@ -211,7 +220,6 @@ private:
     QAction *tabWith4Act;               // to be used in submenu tabwithMenue, sets tab with to 4 (default)
     QAction *tabWith6Act;               // to be used in submenu tabwithMenue, sets tab with to 6
     QAction *tabWith8Act;               // to be used in submenu tabwithMenue, sets tab with to 8
-
     // Actions for buildMenue
     QAction *compileAct;            // calls compilation of current file
     // Actions for toolsMenue
@@ -248,16 +256,19 @@ private:
     QAction *c_singleAct;           // inserts a C-style single line comment
     QAction *c_multiAct;            // inserts a C-style multi line comment
     QAction *cpp_singleAct;         // inserts a C++-style single line comment
+    QAction *lineDevideCommentAct;  // inserts a C-style comment line devider
     // Snippets
     QAction *snippet1Act;           // inserts Snippet #1 from snippetfile1.snip
     QAction *snippet2Act;           // inserts Snippet #2 from snippetfile2.snip
     QAction *snippet3Act;           // inserts Snippet #3 from snippetfile3.snip
     QAction *snippet4Act;           // inserts Snippet #4 from snippetfile4.snip
-    // main(), Function, Enum, Struct...
+    // main(), Function, Enum,
+    // Struct, Amiga version string...
     QAction *mainAct;
     QAction *functionAct;            // inserts C function skeletton
     QAction *enumAct;                // inserts C enumeration skeletton
     QAction *structAct;              // inserts C struct skeletton
+    QAction *versionStringAct;       // inserts Amiga C version string
 
     // statusbar widgets
     QLabel *statusLabelX;
@@ -284,10 +295,10 @@ private:
 
 protected:
     void closeEvent(QCloseEvent *event);        // catch close() event
-    void mousePressEvent(QMouseEvent *event);   // catch mouse press event
-#ifndef QT_NO_CONTEXTMENU
-    void contextMenuEvent(QContextMenuEvent *event) override;
-#endif
+    //void mousePressEvent(QMouseEvent *event);   // catch mouse press event
+//#ifndef QT_NO_CONTEXTMENU
+//    void contextMenuEvent(QContextMenuEvent *event) override;
+//#endif
 
 };
 

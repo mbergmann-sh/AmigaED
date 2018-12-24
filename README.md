@@ -29,6 +29,7 @@ This program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRA
 - clipboard support
 - display current cursor position
 - print current file if page not empty (could be done better - e.g. take parameters from default printer...)
+- custom QScintilla context menue to do insertions by right-clicking the mouse
 
 more to come...
 
@@ -84,6 +85,8 @@ you might also add this folder to your search path instead!
 - Matic Kucovec and Kristof Mulier for their great tutorial and website on how to use QScintilla in Python
 - Keith F. Kelly for pointing me out on how to kill an existing QsciLexer
 
+
+...and last, but not least all those not personally mentioned people out on stackoverflow.com for beeing patiently helpfull.
 Thanks for your helping hands when I got stuck, folks. You rock!
 
 # If you like my work...
