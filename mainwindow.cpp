@@ -1215,7 +1215,22 @@ void MainWindow::actionInsertCppClass()
 //
 void MainWindow::actionInsertFileheaderComment()
 {
-    popNotImplemented();
+    // we need the caret's ("cursor") recent position stored as a starting point for insertion!
+    int line, index;
+    textEdit->getCursorPosition(&line, &index); // get the position...
+
+    // ...now insert the first line of text!
+    textEdit->insert("/*\n");
+    // next, we need to continue printing at a certain location:
+    textEdit->insertAt(" *\tFile:\t\t " + strippedName(curFile)+ "\n", ++line, 0);
+    textEdit->insertAt(" *\tVersion:\t\t1.0\n", ++line, 0);
+    textEdit->insertAt(" *\tRevision:\t\t0\n", ++line, 0);
+    textEdit->insertAt(" *\n", ++line, 0);
+    textEdit->insertAt(" *\tDescription:\t\tCHANGE_ME\n", ++line, 0);
+    textEdit->insertAt(" *\tPurpose:\t\tCHANGE_ME\n", ++line, 0);
+    textEdit->insertAt(" *\n", ++line, 0);
+    textEdit->insertAt(" */\n", ++line, 0);
+    textEdit->setCursorPosition(line + 1, index);
 }
 
 //
@@ -1247,7 +1262,18 @@ void MainWindow::actionInsertCppSingleComment()
 //
 void MainWindow::actionInsertCLineDevideComment()
 {
-    popNotImplemented();
+    // we need the caret's ("cursor") recent position stored as a starting point for insertion!
+    int line, index;
+    textEdit->getCursorPosition(&line, &index); // get the position...
+
+    // ...now insert the first line of text!
+    textEdit->insert("/* ------------- COMMENT --------------------------------------------- */\n");
+    textEdit->insertAt("test!\n", ++line, 0);
+    textEdit->insertAt("test 2\n", ++line, 0);
+    textEdit->setCursorPosition(line + 1, index);
+
+
+
 }
 
 //
@@ -1387,6 +1413,8 @@ void MainWindow::initializeLexerNone()
     {
         textEdit->foldAll(false);
     }
+
+    qDebug() << "Faltstatus: " << state;
     createStatusBarMessage(tr("Syntax changed to PlainText"), 0);
 }
 
