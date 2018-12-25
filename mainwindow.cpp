@@ -148,6 +148,7 @@ void MainWindow::newFile()
     }
     // Let's asume our new file is C/C++
     initializeLexerCPP();
+    p_main_set = false;
 }
 
 //
@@ -166,6 +167,7 @@ void MainWindow::open()
 
         if (!fileName.isEmpty())
             loadFile(fileName);
+        p_main_set = false;
     }
 }
 
@@ -423,7 +425,7 @@ void MainWindow::createActions()
 
     ifdefAct = new QAction(tr("#ifdef"), this); // inserts into insertMenue => preprocessorMenue
     ifdefAct->setStatusTip(tr("insert #ifdef ... #endif..."));
-    connect(defineAct, SIGNAL(triggered()), this, SLOT(actionInsertIfdef()));
+    connect(ifdefAct, SIGNAL(triggered()), this, SLOT(actionInsertIfdef()));
 
     ifndefAct = new QAction(tr("#ifndef"), this); // inserts into insertMenue => preprocessorMenue
     ifndefAct->setStatusTip(tr("insert #ifndef ... #endif..."));
@@ -646,20 +648,6 @@ void MainWindow::createMenus()
     helpMenue->addAction(aboutAct);
     helpMenue->addAction(aboutQtAct);
 }
-
-//
-// create a custom context menue
-//
-// custom context menue:
-//#ifndef QT_NO_CONTEXTMENU
-//void MainWindow::contextMenuEvent(QContextMenuEvent *event)
-//{
-//    QMenu menu(this);
-//    menu.addAction(includeAct);
-//    menu.addAction(whileAct);
-//    menu.exec(event->globalPos());
-//}
-//#endif
 
 //
 // Let's put some of our actions into the app's toolbar!
@@ -1104,6 +1092,7 @@ void MainWindow::actionInsertDefine()
 //
 void MainWindow::actionInsertIfdef()
 {
+    qDebug() << "in ifdef";
     popNotImplemented();
 }
 
@@ -1112,6 +1101,7 @@ void MainWindow::actionInsertIfdef()
 //
 void MainWindow::actionInsertIfndef()
 {
+    qDebug() << "in ifndef";
     popNotImplemented();
 }
 
@@ -1120,6 +1110,7 @@ void MainWindow::actionInsertIfndef()
 //
 void MainWindow::actionInsertOpenLibrary()
 {
+    qDebug() << "in OpenLibrary";
     popNotImplemented();
 }
 
@@ -1128,6 +1119,7 @@ void MainWindow::actionInsertOpenLibrary()
 //
 void MainWindow::actionInsertCloseLibrary()
 {
+    qDebug() << "in CloseLibrary";
     popNotImplemented();
 }
 
@@ -1136,7 +1128,21 @@ void MainWindow::actionInsertCloseLibrary()
 //
 void MainWindow::actionInsertIf()
 {
-    popNotImplemented();
+    // we need the caret's ("cursor") recent position stored as a starting point for insertion!
+    int line, index;
+    textEdit->getCursorPosition(&line, &index); // get the position...
+
+    // ...now insert the first line of text!
+    textEdit->insert("\n");
+    // next, we need to continue printing at a certain location:
+    textEdit->insertAt("if( condition )\n", ++line, 0);
+    textEdit->insertAt("{\n", ++line, 0);
+    textEdit->insertAt("\t/* some_action */\n", ++line, 0);
+    textEdit->insertAt("\t\n", ++line, 0);
+    textEdit->insertAt("}\n", ++line, 0);
+
+    // finally, we set our caret to the next following empty line!
+    textEdit->setCursorPosition(line + 1, index);
 }
 
 //
@@ -1144,7 +1150,26 @@ void MainWindow::actionInsertIf()
 //
 void MainWindow::actionInsertIfElse()
 {
-    popNotImplemented();
+    // we need the caret's ("cursor") recent position stored as a starting point for insertion!
+    int line, index;
+    textEdit->getCursorPosition(&line, &index); // get the position...
+
+    // ...now insert the first line of text!
+    textEdit->insert("\n");
+    // next, we need to continue printing at a certain location:
+    textEdit->insertAt("if( condition )\n", ++line, 0);
+    textEdit->insertAt("{\n", ++line, 0);
+    textEdit->insertAt("\t/* some_action */\n", ++line, 0);
+    textEdit->insertAt("\t\n", ++line, 0);
+    textEdit->insertAt("}\n", ++line, 0);
+    textEdit->insertAt("else\n", ++line, 0);
+    textEdit->insertAt("{\n", ++line, 0);
+    textEdit->insertAt("\t/* some_other_action */\n", ++line, 0);
+    textEdit->insertAt("\t\n", ++line, 0);
+    textEdit->insertAt("}\n", ++line, 0);
+
+    // finally, we set our caret to the next following empty line!
+    textEdit->setCursorPosition(line + 1, index);
 }
 
 //
@@ -1152,7 +1177,22 @@ void MainWindow::actionInsertIfElse()
 //
 void MainWindow::actionInsertWhile()
 {
-    popNotImplemented();
+    // we need the caret's ("cursor") recent position stored as a starting point for insertion!
+    int line, index;
+    textEdit->getCursorPosition(&line, &index); // get the position...
+
+    // ...now insert the first line of text!
+    textEdit->insert("\n");
+    // next, we need to continue printing at a certain location:
+    textEdit->insertAt("int var = 0;\n", ++line, 0);
+    textEdit->insertAt("while( condition )\n", ++line, 0);
+    textEdit->insertAt("{\n", ++line, 0);
+    textEdit->insertAt("\t/* some_action */\n", ++line, 0);
+    textEdit->insertAt("\t\n", ++line, 0);
+    textEdit->insertAt("}\n", ++line, 0);
+
+    // finally, we set our caret to the next following empty line!
+    textEdit->setCursorPosition(line + 1, index);
 }
 
 //
@@ -1160,6 +1200,7 @@ void MainWindow::actionInsertWhile()
 //
 void MainWindow::actionInsertWhileDo()
 {
+    qDebug() << "in while do";
     popNotImplemented();
 }
 
@@ -1168,7 +1209,22 @@ void MainWindow::actionInsertWhileDo()
 //
 void MainWindow::actionInsertDoWhile()
 {
-    popNotImplemented();
+    // we need the caret's ("cursor") recent position stored as a starting point for insertion!
+    int line, index;
+    textEdit->getCursorPosition(&line, &index); // get the position...
+
+    // ...now insert the first line of text!
+    textEdit->insertAt("\n", line, index);
+    // next, we need to continue printing at a certain location:
+    textEdit->insertAt("int var = 0;\r", ++line, index);
+    textEdit->insertAt("do\r", ++line, index);
+    textEdit->insertAt("{\r", ++line, index);
+    textEdit->insertAt("\t/* some_action */\n", ++line, index);
+    textEdit->insertAt("\t\n", ++line, index);
+    textEdit->insertAt("} while( condition );\n", ++line, index);
+
+    // finally, we set our caret to the next following empty line!
+    textEdit->setCursorPosition(line + 1, index);
 }
 
 //
@@ -1176,6 +1232,7 @@ void MainWindow::actionInsertDoWhile()
 //
 void MainWindow::actionInsertSwitch()
 {
+    qDebug() << "in switch";
     popNotImplemented();
 }
 
@@ -1184,7 +1241,38 @@ void MainWindow::actionInsertSwitch()
 //
 void MainWindow::actionInsertMain()
 {
-    popNotImplemented();
+    // is there allready a main() function in this file?
+    if(!(p_main_set))
+    {
+    // we need the caret's ("cursor") recent position stored as a starting point for insertion!
+    int line, index;
+    textEdit->getCursorPosition(&line, &index); // get the position...
+
+    // ...now insert the first line of text!
+    textEdit->insert("\n");
+    // next, we need to continue printing at a certain location:
+    textEdit->insertAt("/*************************\n", ++line, 0);
+    textEdit->insertAt(" **	main() function    **\n", ++line, 0);
+    textEdit->insertAt(" ************************/\n", ++line, 0);
+    textEdit->insertAt("int main(int argc, char* argv[])\n", ++line, 0);
+    textEdit->insertAt("{\n", ++line, 0);
+    textEdit->insertAt("\t/* TODO: Write your code! */\n", ++line, 0);
+    textEdit->insertAt("\n\n\treturn(0);\n}\n", ++line, 0);
+
+    // finally, we set our caret to the place where editing might start
+    textEdit->setCursorPosition(line - 1, index + 2);
+    p_main_set = true;
+    }
+    else
+    {
+        (void)QMessageBox::information(this,
+                       "Amiga Cross Editor", "It seems there is allready a <i><b>main() </b>function</i> in this document!<br> "
+                        "It makes absolutely <b>no sense</b> to add another one."
+                        "<br>Insertion will be cancelled, ya know?!",
+                        QMessageBox::Ok);
+
+    }
+
 }
 
 //
@@ -1192,6 +1280,7 @@ void MainWindow::actionInsertMain()
 //
 void MainWindow::actionInsertFunction()
 {
+    qDebug() << "in Function";
     popNotImplemented();
 }
 
@@ -1200,6 +1289,7 @@ void MainWindow::actionInsertFunction()
 //
 void MainWindow::actionInsertEnum()
 {
+    qDebug() << "in Enum";
     popNotImplemented();
 }
 
@@ -1208,6 +1298,7 @@ void MainWindow::actionInsertEnum()
 //
 void MainWindow::actionInsertStruct()
 {
+    qDebug() << "in Struct";
     popNotImplemented();
 }
 
@@ -1216,6 +1307,7 @@ void MainWindow::actionInsertStruct()
 //
 void MainWindow::actionInsertCClass()
 {
+    qDebug() << "in CClass";
     popNotImplemented();
 }
 
@@ -1224,6 +1316,7 @@ void MainWindow::actionInsertCClass()
 //
 void MainWindow::actionInsertCppClass()
 {
+    qDebug() << "in CppClass";
     popNotImplemented();
 }
 
@@ -1274,7 +1367,18 @@ void MainWindow::actionInsertCSingleComment()
 //
 void MainWindow::actionInsertCMultiComment()
 {
-    popNotImplemented();
+    // we need the caret's ("cursor") recent position stored as a starting point for insertion!
+    int line, index;
+    textEdit->getCursorPosition(&line, &index); // get the position...
+
+    // ...now insert the first line of text!
+    textEdit->insert("/*\n");
+    // next, we need to continue printing at a certain location:
+    textEdit->insertAt(" *\tComment:\n", ++line, 0);
+    textEdit->insertAt(" */", ++line, 0);
+
+    // finally, we set our caret to the next following empty line!
+    textEdit->setCursorPosition(line - 1, index + 3);
 }
 
 //
@@ -1312,6 +1416,7 @@ void MainWindow::actionInsertCLineDevideComment()
 //
 void MainWindow::actionInsertSnippet1()
 {
+    qDebug() << "in Snippet1";
     popNotImplemented();
 }
 
@@ -1320,7 +1425,18 @@ void MainWindow::actionInsertSnippet1()
 //
 void MainWindow::actionInsertAmigaVersionString()
 {
-    popNotImplemented();
+    QString my_versionstring = "char *ver = \"\\0$VER: my_program 1.0 (31.12.2019)\"";
+    // we need the caret's ("cursor") recent position stored as a starting point for insertion!
+    int line, index;
+    textEdit->getCursorPosition(&line, &index); // get the position...
+
+    // ...now insert the first line of text!
+    textEdit->insert("\n");
+    // next, we need to continue printing at a certain location:
+    textEdit->insertAt(my_versionstring + "\n", ++line, 0);
+
+    // finally, we set our caret to the next following empty line!
+    textEdit->setCursorPosition(line + 1, index);
 }
 
 //
@@ -1328,6 +1444,7 @@ void MainWindow::actionInsertAmigaVersionString()
 //
 void MainWindow::actionInsertSnippet2()
 {
+    qDebug() << "in Snippet2";
     popNotImplemented();
 }
 
@@ -1336,6 +1453,7 @@ void MainWindow::actionInsertSnippet2()
 //
 void MainWindow::actionInsertSnippet3()
 {
+    qDebug() << "in Snippet3";
     popNotImplemented();
 }
 
@@ -1344,6 +1462,7 @@ void MainWindow::actionInsertSnippet3()
 //
 void MainWindow::actionInsertSnippet4()
 {
+    qDebug() << "in Snippet4";
     popNotImplemented();
 }
 /* ------------ End insertMenue Actions -------------------*/
@@ -1354,6 +1473,7 @@ void MainWindow::actionInsertSnippet4()
 //
 void MainWindow::actionEmulator()
 {
+    qDebug() << "in Emulator";
     popNotImplemented();
 
     bool ok;

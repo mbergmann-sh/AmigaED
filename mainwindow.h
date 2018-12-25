@@ -292,6 +292,8 @@ private:
 
     // show or hide debugging informations
     bool p_mydebug = true;
+    // check if there is allready a main() function in a file
+    bool p_main_set = false;
 
 protected:
     void closeEvent(QCloseEvent *event);        // catch close() event
