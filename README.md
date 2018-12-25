@@ -36,6 +36,7 @@ This program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRA
 - display current cursor position
 - print current file if page not empty (could be done better - e.g. take parameters from default printer...)
 - custom QScintilla context menue to do insertions by right-clicking the mouse
+- code insertion via menue, shortcuts and custom context menue [partially]
 
 more to come...
 
