@@ -452,9 +452,9 @@ void MainWindow::createActions()
     whileAct->setStatusTip(tr("insert while(...) {...}"));
     connect(whileAct, SIGNAL(triggered()), this, SLOT(actionInsertWhile()));
 
-    while_doAct = new QAction(tr("while(...) {...} do"), this); // inserts into insertMenue => loopsMenue
-    while_doAct->setStatusTip(tr("insert while(...) {...} do"));
-    connect(while_doAct, SIGNAL(triggered()), this, SLOT(actionInsertWhileDo()));
+    forAct = new QAction(tr("for(...) {...}"), this); // inserts into insertMenue => loopsMenue
+    forAct->setStatusTip(tr("insert for(...) {...}"));
+    connect(forAct, SIGNAL(triggered()), this, SLOT(actionInsertForLoop()));
 
     do_whileAct = new QAction(tr("do...{...}while(...)"), this); // inserts into insertMenue => loopsMenue
     do_whileAct->setStatusTip(tr("insert do...{...}while(...)"));
@@ -478,7 +478,7 @@ void MainWindow::createActions()
 
     structAct = new QAction(tr("struct name {...}"), this); // inserts into insertMenue
     structAct->setStatusTip(tr("insert struct name {...}"));
-    connect(structAct, SIGNAL(triggered()), this, SLOT(actionInsertEnum()));
+    connect(structAct, SIGNAL(triggered()), this, SLOT(actionInsertStruct()));
 
     c_classAct = new QAction(tr("C-style class..."), this); // inserts into insertMenue => classMenue
     c_classAct->setStatusTip(tr("insert C-style class"));
@@ -571,7 +571,7 @@ void MainWindow::createMenus()
     insertMenue->addSeparator();
     loopsMenue = insertMenue->addMenu(tr("Loops..."));
     loopsMenue->addAction(whileAct);
-    loopsMenue->addAction(while_doAct);
+    loopsMenue->addAction(forAct);
     loopsMenue->addAction(do_whileAct);
     loopsMenue->addAction(switchAct);
     insertMenue->addSeparator();
@@ -1027,6 +1027,10 @@ void MainWindow::actionGoto_matching_brace()
 //
 void MainWindow::actionCompile()
 {
+    for(int i = 0; i < p_Compilers.size(); ++i)
+    {
+        qDebug() << i << ". Compiler: " << p_Compilers.at(i).toLocal8Bit().constData();
+    }
     QString text = p_compiler_call;
     popNotImplemented();
     bool ok;
@@ -1108,7 +1112,7 @@ void MainWindow::actionInsertIfdef()
     // ...now insert the first line of text!
     textEdit->insert("\n");
     // next, we need to continue printing at a certain location:
-    textEdit->insertAt("#ifdef __CONDITION__\n", ++line, 0);
+    textEdit->insertAt("#ifdef __SOME_DEFINITION__\n", ++line, 0);
     textEdit->insertAt("\t/* some_action */\n", ++line, 0);
     textEdit->insertAt("\t\n", ++line, 0);
     textEdit->insertAt("#endif\n", ++line, 0);
@@ -1129,7 +1133,7 @@ void MainWindow::actionInsertIfndef()
     // ...now insert the first line of text!
     textEdit->insert("\n");
     // next, we need to continue printing at a certain location:
-    textEdit->insertAt("#ifndef __CONDITION__\n", ++line, 0);
+    textEdit->insertAt("#ifndef __SOME_DEFINITION__\n", ++line, 0);
     textEdit->insertAt("\t/* some_action */\n", ++line, 0);
     textEdit->insertAt("\t\n", ++line, 0);
     textEdit->insertAt("#endif\n", ++line, 0);
@@ -1229,12 +1233,27 @@ void MainWindow::actionInsertWhile()
 }
 
 //
-// Insert while(...){...}do
+// Insert for(...){...} loop
 //
-void MainWindow::actionInsertWhileDo()
+void MainWindow::actionInsertForLoop()
 {
     qDebug() << "in while do";
-    popNotImplemented();
+    // we need the caret's ("cursor") recent position stored as a starting point for insertion!
+    int line, index;
+    textEdit->getCursorPosition(&line, &index); // get the position...
+
+    // ...now insert the first line of text!
+    textEdit->insert("\n");
+    // next, we need to continue printing at a certain location:
+    textEdit->insertAt("int var = 0;\n", ++line, 0);
+    textEdit->insertAt("for( var = 0; var < 5; var++ )\n", ++line, 0);
+    textEdit->insertAt("{\n", ++line, 0);
+    textEdit->insertAt("\t/* some_action */\n", ++line, 0);
+    textEdit->insertAt("\t\n", ++line, 0);
+    textEdit->insertAt("}\n", ++line, 0);
+
+    // finally, we set our caret to the next following empty line!
+    textEdit->setCursorPosition(line + 1, index);
 }
 
 //
@@ -1315,7 +1334,35 @@ void MainWindow::actionInsertMain()
 void MainWindow::actionInsertFunction()
 {
     qDebug() << "in Function";
-    popNotImplemented();
+
+    // we need the caret's ("cursor") recent position stored as a starting point for insertion!
+    int line, index;
+    textEdit->getCursorPosition(&line, &index); // get the position...
+
+    // ...now insert the first line of text!
+    textEdit->insert("\n");
+    // next, we need to continue printing at a certain location:
+
+    // first, let's define a function prototype:
+    textEdit->insertAt("/*\n", ++line, 0);
+    textEdit->insertAt(" * -- Function prototype --\n", ++line, 0);
+    textEdit->insertAt(" * EDIT, then cut & paste BEFORE main() !\n", ++line, 0);
+    textEdit->insertAt(" */\n", ++line, 0);
+    textEdit->insertAt("int some_function(int arg1, int arg2);\n", ++line, 0);
+    textEdit->insertAt("\n", ++line, 0);
+    // now let's create the function...
+    textEdit->insertAt("/*\n", ++line, 0);
+    textEdit->insertAt(" *\tName:\tint some_function(int arg1, int arg2)\n", ++line, 0);
+    textEdit->insertAt(" *\tPurpose:\tdo something usefull...\n", ++line, 0);
+    textEdit->insertAt(" */\n", ++line, 0);
+    textEdit->insertAt("int some_function(int arg1, int arg2)\n", ++line, 0);
+    textEdit->insertAt("{\n", ++line, 0);
+    textEdit->insertAt("\t/* TODO: Write your code! */\n", ++line, 0);
+    textEdit->insertAt("\tprintf(\"Now let your function do some work...\\n\");\n", ++line, 0);
+    textEdit->insertAt("\n\treturn(0);\n}\n", ++line, 0);
+
+    // finally, we set our caret to the place where editing might start
+    textEdit->setCursorPosition(line - 1, index + 1);
 }
 
 //
@@ -1942,6 +1989,8 @@ void MainWindow::showCustomContextMenue(const QPoint &pos)
     contextMenu.addAction(whileAct);
     contextMenu.addSeparator();
     contextMenu.addAction(do_whileAct);
+    contextMenu.addSeparator();
+    contextMenu.addAction(forAct);
     contextMenu.addSeparator();
     contextMenu.addAction(c_singleAct);
     contextMenu.addSeparator();

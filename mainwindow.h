@@ -112,7 +112,7 @@ private slots:
     void actionInsertIf();
     void actionInsertIfElse();
     void actionInsertWhile();
-    void actionInsertWhileDo();
+    void actionInsertForLoop();
     void actionInsertDoWhile();
     void actionInsertSwitch();
     void actionInsertMain();
@@ -245,7 +245,7 @@ private:
     QAction *if_elseAct;            // inserts if(condition){...} else {...} statement
     // Loops
     QAction *whileAct;              // inserts while(condition) {...} loop
-    QAction *while_doAct;           // inserts while(condition) {...}do loop
+    QAction *forAct;           // inserts while(condition) {...}do loop
     QAction *do_whileAct;           // inserts do{...}while(condition) loop
     QAction *switchAct;             // inserts switch(condition) select case statements
     // Class
@@ -291,10 +291,11 @@ private:
     const QString p_description = "CHANGE_ME";
 
     // show or hide debugging informations
-    bool p_mydebug = true;
+    bool p_mydebug = false;
     // check if there is allready a main() function in a file
     bool p_main_set = false;
     QString p_compiler_call;
+    QStringList p_Compilers = { "GCC", "VBCC", "SAS/C", "StormC4" };
 
 protected:
     void closeEvent(QCloseEvent *event);        // catch close() event
