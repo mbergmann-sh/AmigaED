@@ -294,6 +294,7 @@ private:
     bool p_mydebug = true;
     // check if there is allready a main() function in a file
     bool p_main_set = false;
+    QString p_compiler_call;
 
 protected:
     void closeEvent(QCloseEvent *event);        // catch close() event

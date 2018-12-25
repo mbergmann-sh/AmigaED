@@ -1027,15 +1027,24 @@ void MainWindow::actionGoto_matching_brace()
 //
 void MainWindow::actionCompile()
 {
+    QString text = p_compiler_call;
     popNotImplemented();
     bool ok;
-          QString text = QInputDialog::getText(this, tr("Compile!"),
-                                               tr("Compiler Options:"), QLineEdit::Normal,
-                                               "vc +aos68k -v -lmiee -lamiga -lauto -O3 -size -cpu=68020 ", &ok);
-          if (ok && !text.isEmpty())
-          {
-              ;
-          }
+
+    text = QInputDialog::getText(this, tr("Compile!"),
+                                       tr("Compiler Options:"), QLineEdit::Normal,
+                                       p_compiler_call, &ok);
+    if (ok && !text.isEmpty())
+    {
+      qDebug() << "Text not empty: " << text;
+      p_compiler_call = text + curFile;
+    }
+    else
+    {
+      p_compiler_call = text;
+      qDebug() << "Text: " << text;
+      qDebug() << "Compiler call: " << p_compiler_call;
+    }
 }
 
 //
@@ -1092,8 +1101,20 @@ void MainWindow::actionInsertDefine()
 //
 void MainWindow::actionInsertIfdef()
 {
-    qDebug() << "in ifdef";
-    popNotImplemented();
+    // we need the caret's ("cursor") recent position stored as a starting point for insertion!
+    int line, index;
+    textEdit->getCursorPosition(&line, &index); // get the position...
+
+    // ...now insert the first line of text!
+    textEdit->insert("\n");
+    // next, we need to continue printing at a certain location:
+    textEdit->insertAt("#ifdef __CONDITION__\n", ++line, 0);
+    textEdit->insertAt("\t/* some_action */\n", ++line, 0);
+    textEdit->insertAt("\t\n", ++line, 0);
+    textEdit->insertAt("#endif\n", ++line, 0);
+
+    // finally, we set our caret to the next following empty line!
+    textEdit->setCursorPosition(line + 1, index);
 }
 
 //
@@ -1101,8 +1122,20 @@ void MainWindow::actionInsertIfdef()
 //
 void MainWindow::actionInsertIfndef()
 {
-    qDebug() << "in ifndef";
-    popNotImplemented();
+    // we need the caret's ("cursor") recent position stored as a starting point for insertion!
+    int line, index;
+    textEdit->getCursorPosition(&line, &index); // get the position...
+
+    // ...now insert the first line of text!
+    textEdit->insert("\n");
+    // next, we need to continue printing at a certain location:
+    textEdit->insertAt("#ifndef __CONDITION__\n", ++line, 0);
+    textEdit->insertAt("\t/* some_action */\n", ++line, 0);
+    textEdit->insertAt("\t\n", ++line, 0);
+    textEdit->insertAt("#endif\n", ++line, 0);
+
+    // finally, we set our caret to the next following empty line!
+    textEdit->setCursorPosition(line + 1, index);
 }
 
 //
@@ -1257,6 +1290,7 @@ void MainWindow::actionInsertMain()
     textEdit->insertAt("int main(int argc, char* argv[])\n", ++line, 0);
     textEdit->insertAt("{\n", ++line, 0);
     textEdit->insertAt("\t/* TODO: Write your code! */\n", ++line, 0);
+    textEdit->insertAt("\tprintf(\"Now produce something usefull!\\n\");\n", ++line, 0);
     textEdit->insertAt("\n\n\treturn(0);\n}\n", ++line, 0);
 
     // finally, we set our caret to the place where editing might start
@@ -1425,7 +1459,7 @@ void MainWindow::actionInsertSnippet1()
 //
 void MainWindow::actionInsertAmigaVersionString()
 {
-    QString my_versionstring = "char *ver = \"\\0$VER: my_program 1.0 (31.12.2019)\"";
+    QString my_versionstring = "const char *ver = \"\\0$VER: my_program 1.0 (31.12.2019)\";";
     // we need the caret's ("cursor") recent position stored as a starting point for insertion!
     int line, index;
     textEdit->getCursorPosition(&line, &index); // get the position...
