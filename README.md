@@ -1,13 +1,6 @@
 # AmigaED
 AmigaED is an example for writing an advanced coder's editor using the Qt5 and QScintilla frameworks in C++, containing a menu bar, toolbars, menus, a custom context menue, an enhanced statusbar and some sophisticated editing actions. The source is based on Riverbank's original editor example, as provided with the QScintilla sources. This project was started as an entry point for learning how to use QScintilla. Though somewhat of a working editor, this project is meant for studies and as a base for own enhancements.
 
-# Screenshots
-![acrossedit_linux](https://user-images.githubusercontent.com/23148422/50418994-bdf55300-082e-11e9-988d-c91130b71946.png)
-![acrossedit_osx](https://user-images.githubusercontent.com/23148422/50419007-ca79ab80-082e-11e9-964e-945d7b04968e.png)
-![acrossedit_w10_insertsmenu](https://user-images.githubusercontent.com/23148422/50419014-d6fe0400-082e-11e9-8386-0a12e1908cb3.png)
-![acrossedit_w10_contextmenu](https://user-images.githubusercontent.com/23148422/50419018-db2a2180-082e-11e9-9c10-5f5ff82f0733.png)
-![amiged_shell-tmplate](https://user-images.githubusercontent.com/23148422/50439937-2bb78280-08f4-11e9-9fc0-c0201770fabd.png)
-
 # LICENSE
 Copyright (C) 2018/2019 by Michael Bergmann. Placed in the public domain with some restrictions!
 
@@ -38,6 +31,7 @@ This program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRA
 - print current file if page not empty (could be done better - e.g. take parameters from default printer...)
 - custom QScintilla context menue to do insertions by right-clicking the mouse
 - code insertion via menue, shortcuts and custom context menue [partially]
+- app template creation [AmigaShell app ATM]
 
 more to come...
 
@@ -100,6 +94,13 @@ Thanks for your helping hands when I got stuck, folks. You rock!
 # If you like my work...
 Since there aren't too many working examples on how to write an advanced editor in C++ using QScintilla I thought it to be a good idea to put the sources into public for free.
 Developing and enhancing this example code is kind of time intensive, though a whole lot of fun. If you like my work and want to support the developent of AmigaED with some beer, books or Espresso, feel free to donate to mb@mbergmann-sh.de via PayPal. Thanks for your support!
+
+# Screenshots
+![acrossedit_linux](https://user-images.githubusercontent.com/23148422/50418994-bdf55300-082e-11e9-988d-c91130b71946.png)
+![acrossedit_osx](https://user-images.githubusercontent.com/23148422/50419007-ca79ab80-082e-11e9-964e-945d7b04968e.png)
+![acrossedit_w10_insertsmenu](https://user-images.githubusercontent.com/23148422/50419014-d6fe0400-082e-11e9-8386-0a12e1908cb3.png)
+![acrossedit_w10_contextmenu](https://user-images.githubusercontent.com/23148422/50419018-db2a2180-082e-11e9-9c10-5f5ff82f0733.png)
+![amiged_shell-tmplate](https://user-images.githubusercontent.com/23148422/50439937-2bb78280-08f4-11e9-9fc0-c0201770fabd.png)
 
 # Usefull links for Qt5/QScintilla coders
 - Qt5 open source edition download site: https://www.qt.io/download-qt-installer?hsCtaTracking=9f6a2170-a938-42df-a8e2-a9f0b1d6cdce%7C6cb0de4f-9bb5-4778-ab02-bfb62735f3e5
