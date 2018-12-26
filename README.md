@@ -6,6 +6,7 @@ AmigaED is an example for writing an advanced coder's editor using the Qt5 and Q
 ![acrossedit_osx](https://user-images.githubusercontent.com/23148422/50419007-ca79ab80-082e-11e9-964e-945d7b04968e.png)
 ![acrossedit_w10_insertsmenu](https://user-images.githubusercontent.com/23148422/50419014-d6fe0400-082e-11e9-8386-0a12e1908cb3.png)
 ![acrossedit_w10_contextmenu](https://user-images.githubusercontent.com/23148422/50419018-db2a2180-082e-11e9-9c10-5f5ff82f0733.png)
+![amiged_shell-tmplate](https://user-images.githubusercontent.com/23148422/50439937-2bb78280-08f4-11e9-9fc0-c0201770fabd.png)
 
 # LICENSE
 Copyright (C) 2018/2019 by Michael Bergmann. Placed in the public domain with some restrictions!
