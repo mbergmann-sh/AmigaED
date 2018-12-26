@@ -420,6 +420,16 @@ void MainWindow::createActions()
     shellAppAct->setStatusTip(tr("Create a new file containing a complete AmigaShell app template"));
     connect(shellAppAct, SIGNAL(triggered()), this, SLOT(actionInsertShellAppSkeletton()));
 
+    stdCAppAct = new QAction(tr("ANSI C application template"), this); // inserts into insertMenue => preprocessorMenue
+    stdCAppAct->setShortcut(tr("Ctrl+Alt+a"));
+    stdCAppAct->setStatusTip(tr("Create a new file containing a complete ANSI C app template"));
+    connect(stdCAppAct, SIGNAL(triggered()), this, SLOT(actionInsertCAppSkeletton()));
+
+    stdCppAppAct = new QAction(tr("C++ application template"), this); // inserts into insertMenue => preprocessorMenue
+    stdCppAppAct->setShortcut(tr("Ctrl+Alt++"));
+    stdCppAppAct->setStatusTip(tr("Create a new file containing a complete C++ app template"));
+    connect(stdCppAppAct, SIGNAL(triggered()), this, SLOT(actionInsertCppAppSkeletton()));
+
     includeAct = new QAction(tr("#include"), this); // inserts into insertMenue => preprocessorMenue
     includeAct->setShortcut(tr("Ctrl+i"));
     includeAct->setStatusTip(tr("insert #include <file>..."));
@@ -562,7 +572,12 @@ void MainWindow::createMenus()
 
     // Inserts menue
     insertMenue = menuBar()->addMenu(tr("&Inserts"));
-    insertMenue->addAction(shellAppAct);
+    templatesMenue = insertMenue->addMenu(tr("Application templates..."));
+    templatesMenue->addAction(stdCAppAct);
+    templatesMenue->addSeparator();
+    templatesMenue->addAction(stdCppAppAct);
+    templatesMenue->addSeparator();
+    templatesMenue->addAction(shellAppAct);
     insertMenue->addSeparator();
     preprocessorMenue = insertMenue->addMenu(tr("Preprocessor..."));
     preprocessorMenue->addAction(includeAct);
@@ -1452,6 +1467,9 @@ void MainWindow::actionInsertShellAppSkeletton()
         textEdit->insertAt("\tprintf(\"%s\\n\", VersionTag);\n", ++line, 0);
         textEdit->insertAt("\n\n\treturn(0);\n}\n", ++line, 0);
 
+        // we're gonna save our freshly created file with its automated changes now...
+        saveFile(curFile);
+
         // we're gona give the user some information on how to edit the template
         (void)QMessageBox::information(this,
                            "Amiga Cross Editor", "You have successfully created a <i><b>AmigaShell </b>app template!</i><br> "
@@ -1471,40 +1489,185 @@ void MainWindow::actionInsertShellAppSkeletton()
     {
         //return 1;
     }
+}
 
-    // is there allready a main() function in this file?
-//    if(!(p_main_set))
-//    {
-//    // we need the caret's ("cursor") recent position stored as a starting point for insertion!
-//    int line, index;
-//    textEdit->getCursorPosition(&line, &index); // get the position...
+//
+// Insert a partially functional C App skeletton
+// with Fileheader, #includes and main() function
+//
+void MainWindow::actionInsertCAppSkeletton()
+{
+    int ret = QMessageBox::warning(this, tr("Amiga Cross Editor"),
+                 tr("<b>WARNING:</b> This will abandon your current document and "
+                    "create a new file containing an <i>standard console ANSI C app template!</i>\n"
+                    "<br>You will be asked to save your file under a new name first.</br>\n"
+                    "<br><br>Do you want to continue?</br></br>"),
+                 QMessageBox::Yes | QMessageBox::Default,
+                 QMessageBox::No | QMessageBox::Escape);
+    if (ret == QMessageBox::Yes)
+    {
+        qDebug() << "text in editor: " << textEdit->text().isEmpty();
 
-//    // ...now insert the first line of text!
-//    textEdit->insert("\n");
-//    // next, we need to continue printing at a certain location:
-//    textEdit->insertAt("/*************************\n", ++line, 0);
-//    textEdit->insertAt(" **	main() function    **\n", ++line, 0);
-//    textEdit->insertAt(" ************************/\n", ++line, 0);
-//    textEdit->insertAt("int main(int argc, char* argv[])\n", ++line, 0);
-//    textEdit->insertAt("{\n", ++line, 0);
-//    textEdit->insertAt("\t/* TODO: Write your code! */\n", ++line, 0);
-//    textEdit->insertAt("\tprintf(\"Now produce something usefull!\\n\");\n", ++line, 0);
-//    textEdit->insertAt("\n\n\treturn(0);\n}\n", ++line, 0);
+        // if document allready contains text...
+        if(!(textEdit->text().isEmpty()))
+        {
+            qDebug() << "Text not empty!";
+            // ...empty it!
+            textEdit->setText("");
+        }
 
-//    // finally, we set our caret to the place where editing might start
-//    textEdit->setCursorPosition(line - 1, index + 2);
-//    p_main_set = true;
-//    }
-//    else
-//    {
-//        (void)QMessageBox::information(this,
-//                       "Amiga Cross Editor", "It seems there is allready a <i><b>main() </b>function</i> in this document!<br> "
-//                        "It makes absolutely <b>no sense</b> to add another one."
-//                        "<br>Insertion will be cancelled, ya know?!",
-//                        QMessageBox::Ok);
+        // Let's save our template with a new name first!
+        saveAs();
+        qDebug() << "Filename after creation: " << curFile;
 
-//    }
+        // Now let's build a fileheader containing some information
+        int line, index;
+        textEdit->getCursorPosition(&line, &index); // get the position...
 
+        // ...now insert the first line of text!
+        textEdit->insert("/*\n");
+        // next, we need to continue printing at a certain location:
+        textEdit->insertAt(" *\tFile:\t\t " + strippedName(curFile)+ "\n", ++line, 0);
+        textEdit->insertAt(" *\tVersion:\t\t1.0\n", ++line, 0);
+        textEdit->insertAt(" *\tRevision:\t\t0\n", ++line, 0);
+        textEdit->insertAt(" *\n", ++line, 0);
+        textEdit->insertAt(" *\tDescription:\t\tCHANGE_ME\n", ++line, 0);
+        textEdit->insertAt(" *\tPurpose:\t\tCHANGE_ME\n", ++line, 0);
+        textEdit->insertAt(" *\n", ++line, 0);
+        textEdit->insertAt(" *\tAuthor:\t\t" + p_author + "\n", ++line, 0);
+        textEdit->insertAt(" *\tEmail:\t\t" + p_email + "\n", ++line, 0);
+        textEdit->insertAt(" */\n", ++line, 0);
+        textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+
+        // we need some #includes, though...
+        textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+        textEdit->insertAt("/* ------------- INCLUDE FILES ----------------------------------------------- */\n", ++line, 0);
+        textEdit->insertAt("#include\t<stdio.h>\n", ++line, 0);
+
+
+        // it's good style to provide function prototypes...
+        textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+        textEdit->insertAt("/* ------------- FUNCTION PROTOS -------------------------------------- */\n", ++line, 0);
+        textEdit->insertAt("int main(int argc, char* argv[]);\n", ++line, 0);
+
+        // ...finally, we need a main() function!
+        textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+        textEdit->insertAt("/*************************\n", ++line, 0);
+        textEdit->insertAt(" **	main() function    **\n", ++line, 0);
+        textEdit->insertAt(" ************************/\n", ++line, 0);
+        textEdit->insertAt("int main(int argc, char* argv[])\n", ++line, 0);
+        textEdit->insertAt("{\n", ++line, 0);
+        textEdit->insertAt("\t/* TODO: Write your code! */\n", ++line, 0);
+        textEdit->insertAt("\tprintf(\"\\nI am an ANSI C console program!\\n\");\n", ++line, 0);
+        textEdit->insertAt("\n\treturn(0);\n}\n", ++line, 0);
+
+        // we're gonna save our freshly created file with its automated changes now...
+        saveFile(curFile);
+
+        // we're gona give the user some information on how to edit the template
+        (void)QMessageBox::information(this,
+                           "Amiga Cross Editor", "You have successfully created a <i><b>ANSI C </b>app template!</i><br> "
+                            "Now you may edit the file according to your needs.",
+                            QMessageBox::Ok);
+
+
+        // now let's hump to the top of the document, so the user can revise and edit his template.
+        actionGotoTop();
+
+
+    }
+    else if (ret == QMessageBox::Cancel)
+    {
+        //return 1;
+    }
+}
+
+//
+// Insert a partially functional C++ App skeletton
+// with Fileheader, #includes and main() function
+//
+void MainWindow::actionInsertCppAppSkeletton()
+{
+    int ret = QMessageBox::warning(this, tr("Amiga Cross Editor"),
+                 tr("<b>WARNING:</b> This will abandon your current document and "
+                    "create a new file containing an <i>standard console C++ app template!</i>\n"
+                    "<br>You will be asked to save your file under a new name first.</br>\n"
+                    "<br><br>Do you want to continue?</br></br>"),
+                 QMessageBox::Yes | QMessageBox::Default,
+                 QMessageBox::No | QMessageBox::Escape);
+    if (ret == QMessageBox::Yes)
+    {
+        qDebug() << "text in editor: " << textEdit->text().isEmpty();
+
+        // if document allready contains text...
+        if(!(textEdit->text().isEmpty()))
+        {
+            qDebug() << "Text not empty!";
+            // ...empty it!
+            textEdit->setText("");
+        }
+
+        // Let's save our template with a new name first!
+        saveAs();
+        qDebug() << "Filename after creation: " << curFile;
+
+        // Now let's build a fileheader containing some information
+        int line, index;
+        textEdit->getCursorPosition(&line, &index); // get the position...
+
+        // ...now insert the first line of text!
+        textEdit->insert("/*\n");
+        // next, we need to continue printing at a certain location:
+        textEdit->insertAt(" *\tFile:\t\t " + strippedName(curFile)+ "\n", ++line, 0);
+        textEdit->insertAt(" *\tVersion:\t\t1.0\n", ++line, 0);
+        textEdit->insertAt(" *\tRevision:\t\t0\n", ++line, 0);
+        textEdit->insertAt(" *\n", ++line, 0);
+        textEdit->insertAt(" *\tDescription:\t\tCHANGE_ME\n", ++line, 0);
+        textEdit->insertAt(" *\tPurpose:\t\tCHANGE_ME\n", ++line, 0);
+        textEdit->insertAt(" *\n", ++line, 0);
+        textEdit->insertAt(" *\tAuthor:\t\t" + p_author + "\n", ++line, 0);
+        textEdit->insertAt(" *\tEmail:\t\t" + p_email + "\n", ++line, 0);
+        textEdit->insertAt(" */\n", ++line, 0);
+        textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+
+        // we need some #includes, though...
+        textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+        textEdit->insertAt("/* ------------- INCLUDE FILES ----------------------------------------------- */\n", ++line, 0);
+        textEdit->insertAt("#include\t<iostream>\n", ++line, 0);
+
+        // we are in namespace <std>
+        textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+        textEdit->insertAt("using namespace std;\n", ++line, 0);
+
+        // ...finally, we need a main() function!
+        textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+        textEdit->insertAt("/*************************\n", ++line, 0);
+        textEdit->insertAt(" **	main() function    **\n", ++line, 0);
+        textEdit->insertAt(" ************************/\n", ++line, 0);
+        textEdit->insertAt("int main(int argc, char* argv[])\n", ++line, 0);
+        textEdit->insertAt("{\n", ++line, 0);
+        textEdit->insertAt("\t/* TODO: Write your code! */\n", ++line, 0);
+        textEdit->insertAt("\tcout << \"\\nI am an standard C++ console program!\\n\" << endl;\n", ++line, 0);
+        textEdit->insertAt("\n\treturn(0);\n}\n", ++line, 0);
+
+        // we're gonna save our freshly created file with its automated changes now...
+        saveFile(curFile);
+
+        // we're gona give the user some information on how to edit the template
+        (void)QMessageBox::information(this,
+                           "Amiga Cross Editor", "You have successfully created a <i><b>C++ </b>app template!</i><br> "
+                            "Now you may edit the file according to your needs.",
+                            QMessageBox::Ok);
+
+
+        // now let's hump to the top of the document, so the user can revise and edit his template.
+        actionGotoTop();
+
+    }
+    else if (ret == QMessageBox::Cancel)
+    {
+        //return 1;
+    }
 }
 
 //

@@ -104,6 +104,8 @@ private slots:
     void actionShowDebug();             // sets showing or hideing for debugging informations
     // insertMenue and submenue actions:
     void actionInsertShellAppSkeletton();
+    void actionInsertCAppSkeletton();
+    void actionInsertCppAppSkeletton();
     void actionInsertInclude();
     void actionInsertDefine();
     void actionInsertIfdef();
@@ -176,6 +178,7 @@ private:
     QMenu *commentsMenue;       // Submenue of insertMenue, holds comment inserts
     QMenu *classMenue;          // Submenue of insertMenue, holds C/++ class inserts
     QMenu *snippetsMenue;       // Submenue of insertMenue, holds inserts for user-defined code snippets
+    QMenu *templatesMenue;      // Submenue of insertMenue, holds inserts for application templates
 
     // Toolbars
     QToolBar *fileToolBar;          // holds file manipulating actions
@@ -234,7 +237,9 @@ private:
     QAction *lexPlainTextAct;       // switch lexer to no syntax highlighting
     // Actions for insertMenue
     // Shell App skelleton
-    QAction *shellAppAct;           // abandons all the previous work and inserts a brand new file with complete app skelleton
+    QAction *shellAppAct;           // abandons all the previous work and inserts a brand new file with complete AmigaShell app skelleton
+    QAction *stdCAppAct;            // abandons all the previous work and inserts a brand new file with complete std. C app skelleton
+    QAction *stdCppAppAct;          // abandons all the previous work and inserts a brand new file with complete std. C++app skelleton
     // Preprocessor
     QAction *includeAct;            // inserts #include <file>
     QAction *defineAct;             // inserts #define SOME_VALUE
