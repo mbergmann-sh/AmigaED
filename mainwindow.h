@@ -103,6 +103,7 @@ private slots:
     void actionEmulator();              // starts UAE
     void actionShowDebug();             // sets showing or hideing for debugging informations
     // insertMenue and submenue actions:
+    void actionInsertShellAppSkeletton();
     void actionInsertInclude();
     void actionInsertDefine();
     void actionInsertIfdef();
@@ -232,6 +233,8 @@ private:
     QAction *lexPascalAct;          // switch lexer to Pascal syntax
     QAction *lexPlainTextAct;       // switch lexer to no syntax highlighting
     // Actions for insertMenue
+    // Shell App skelleton
+    QAction *shellAppAct;           // abandons all the previous work and inserts a brand new file with complete app skelleton
     // Preprocessor
     QAction *includeAct;            // inserts #include <file>
     QAction *defineAct;             // inserts #define SOME_VALUE
@@ -294,8 +297,9 @@ private:
     bool p_mydebug = false;
     // check if there is allready a main() function in a file
     bool p_main_set = false;
+    bool p_versionstring_set = false;
     QString p_compiler_call;
-    QStringList p_Compilers = { "GCC", "VBCC", "SAS/C", "StormC4" };
+    QStringList p_Compilers = { "GCC", "VBCC", "SAS/C", "StormC4", "DICE" };
 
 protected:
     void closeEvent(QCloseEvent *event);        // catch close() event

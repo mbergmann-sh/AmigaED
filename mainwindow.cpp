@@ -149,6 +149,7 @@ void MainWindow::newFile()
     // Let's asume our new file is C/C++
     initializeLexerCPP();
     p_main_set = false;
+    p_versionstring_set = false;
 }
 
 //
@@ -168,6 +169,7 @@ void MainWindow::open()
         if (!fileName.isEmpty())
             loadFile(fileName);
         p_main_set = false;
+        p_versionstring_set = false;
     }
 }
 
@@ -413,6 +415,11 @@ void MainWindow::createActions()
     /*
      * insertMenue actions:
      */
+    shellAppAct = new QAction(tr("Shell application template"), this); // inserts into insertMenue => preprocessorMenue
+    shellAppAct->setShortcut(tr("Ctrl+Alt+n"));
+    shellAppAct->setStatusTip(tr("Create a new file containing a complete AmigaShell app template"));
+    connect(shellAppAct, SIGNAL(triggered()), this, SLOT(actionInsertShellAppSkeletton()));
+
     includeAct = new QAction(tr("#include"), this); // inserts into insertMenue => preprocessorMenue
     includeAct->setShortcut(tr("Ctrl+i"));
     includeAct->setStatusTip(tr("insert #include <file>..."));
@@ -555,6 +562,8 @@ void MainWindow::createMenus()
 
     // Inserts menue
     insertMenue = menuBar()->addMenu(tr("&Inserts"));
+    insertMenue->addAction(shellAppAct);
+    insertMenue->addSeparator();
     preprocessorMenue = insertMenue->addMenu(tr("Preprocessor..."));
     preprocessorMenue->addAction(includeAct);
     preprocessorMenue->addAction(defineAct);
@@ -1329,6 +1338,176 @@ void MainWindow::actionInsertMain()
 }
 
 //
+// Insert a partially functional App skeletton
+// with Fileheader, #includes, versionstring and main() function
+//
+void MainWindow::actionInsertShellAppSkeletton()
+{
+    int ret = QMessageBox::warning(this, tr("Amiga Cross Editor"),
+                 tr("<b>WARNING:</b> This will abandon your current document and "
+                    "create a new file containing an <i>AmigaShell app template!</i>\n"
+                    "<br>You will be asked to save your file under a new name first.</br>\n"
+                    "<br><br>Do you want to continue?</br></br>"),
+                 QMessageBox::Yes | QMessageBox::Default,
+                 QMessageBox::No | QMessageBox::Escape);
+    if (ret == QMessageBox::Yes)
+    {
+        qDebug() << "text in editor: " << textEdit->text().isEmpty();
+
+        // if document allready contains text...
+        if(!(textEdit->text().isEmpty()))
+        {
+            qDebug() << "Text not empty!";
+            // ...empty it!
+            textEdit->setText("");
+        }
+
+        // Let's save our template with a new name first!
+        saveAs();
+        qDebug() << "Filename after creation: " << curFile;
+
+        // Now let's build a fileheader containing some information
+        int line, index;
+        textEdit->getCursorPosition(&line, &index); // get the position...
+
+        // ...now insert the first line of text!
+        textEdit->insert("/*\n");
+        // next, we need to continue printing at a certain location:
+        textEdit->insertAt(" *\tFile:\t\t " + strippedName(curFile)+ "\n", ++line, 0);
+        textEdit->insertAt(" *\tVersion:\t\t1.0\n", ++line, 0);
+        textEdit->insertAt(" *\tRevision:\t\t0\n", ++line, 0);
+        textEdit->insertAt(" *\n", ++line, 0);
+        textEdit->insertAt(" *\tDescription:\t\tCHANGE_ME\n", ++line, 0);
+        textEdit->insertAt(" *\tPurpose:\t\tCHANGE_ME\n", ++line, 0);
+        textEdit->insertAt(" *\n", ++line, 0);
+        textEdit->insertAt(" *\tAuthor:\t\t" + p_author + "\n", ++line, 0);
+        textEdit->insertAt(" *\tEmail:\t\t" + p_email + "\n", ++line, 0);
+        textEdit->insertAt(" */\n", ++line, 0);
+        textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+
+        // Let's do some versioning...
+        textEdit->insertAt("/* ------------- PROGNAME & VERSION ---------------------------------- */\n", ++line, 0);
+        textEdit->insertAt("#define PROGRAMNAME\t\t\"my_app\"\n", ++line, 0);
+        textEdit->insertAt("#define VERSION\t\t\t\t1\n", ++line, 0);
+        textEdit->insertAt("#define REVISION\t\t\t\t0\n", ++line, 0);
+        textEdit->insertAt("#define VERSIONSTRING\t\t\"1.0\"\n", ++line, 0);
+
+
+        textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+
+        // we need some #includes, though...
+        textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+        textEdit->insertAt("/* ------------- INCLUDE FILES ----------------------------------------------- */\n", ++line, 0);
+        textEdit->insertAt("#include\t<exec/exec.h>\n", ++line, 0);
+        textEdit->insertAt("#include\t<dos/dos.h>\n", ++line, 0);
+        textEdit->insertAt("#include\t<dos/dostags.h>\n", ++line, 0);
+        textEdit->insertAt("#include\t<dos/datetime.h>\n", ++line, 0);
+        textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+        textEdit->insertAt("#include\t<intuition/intuition.h>\n", ++line, 0);
+        textEdit->insertAt("#include\t<intuition/intuitionbase.h>\n", ++line, 0);
+        textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+        textEdit->insertAt("#include\t<libraries/asl.h>\n", ++line, 0);
+        textEdit->insertAt("#include\t<libraries/locale.h>\n", ++line, 0);
+        textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+        textEdit->insertAt("/* --- protos ----------------- */\n", ++line, 0);
+        textEdit->insertAt("#include\t<proto/asl.h>\n", ++line, 0);
+        textEdit->insertAt("#include\t<proto/dos.h>\n", ++line, 0);
+        textEdit->insertAt("#include\t<proto/exec.h>\n", ++line, 0);
+        textEdit->insertAt("#include\t<proto/intuition.h>\n", ++line, 0);
+        textEdit->insertAt("#include\t<proto/locale.h>\n", ++line, 0);
+        textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+        textEdit->insertAt("/* --- console output --- */\n", ++line, 0);
+        textEdit->insertAt("#include\t<stdio.h>\n", ++line, 0);
+
+
+        // it's good style to provide function prototypes...
+        textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+        textEdit->insertAt("/* ------------- FUNCTION PROTOS -------------------------------------- */\n", ++line, 0);
+        textEdit->insertAt("int main(int argc, char* argv[]);\n", ++line, 0);
+
+        // ok - let's build an Amiga-style version tag:
+        QString sas_versionstring = "\tconst UBYTE VersionTag[] = \"$VER: \" PROGRAMNAME \" \" VERSIONSTRING \" \" __AMIGADATE__ \"\\n\\0\";";
+        QString dice_versionstring = "\tconst UBYTE VersionTag[] = \"$VER: \" PROGRAMNAME \" \" VERSIONSTRING \" (\" __COMMODORE_DATE__ \")\\n\\0\";";
+        QString other_versionstring = "\tconst UBYTE VersionTag[] = \"$VER: \" PROGRAMNAME \" \" VERSIONSTRING \" (\" __DATE__ \")\\n\\0\";";
+
+        textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+        textEdit->insertAt("/* ------------- VERSION TAG -------------------------------------- */\n", ++line, 0);
+        textEdit->insertAt("#if defined(__SASC)\n", ++line, 0);
+        textEdit->insertAt(sas_versionstring + "\n", ++line, 0);
+        textEdit->insertAt("#elif defined(_DCC)\n", ++line, 0);
+        textEdit->insertAt(dice_versionstring + "\n", ++line, 0);
+        textEdit->insertAt("#else\n", ++line, 0);
+        textEdit->insertAt(other_versionstring + "\n", ++line, 0);
+        textEdit->insertAt("#endif\n", ++line, 0);
+
+        // ...finally, we need a main() function!
+        textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+        textEdit->insertAt("/*************************\n", ++line, 0);
+        textEdit->insertAt(" **	main() function    **\n", ++line, 0);
+        textEdit->insertAt(" ************************/\n", ++line, 0);
+        textEdit->insertAt("int main(int argc, char* argv[])\n", ++line, 0);
+        textEdit->insertAt("{\n", ++line, 0);
+        textEdit->insertAt("\t/* TODO: Write your code! */\n", ++line, 0);
+        textEdit->insertAt("\tprintf(\"\\nI am an AmigaShell program!\\n\");\n", ++line, 0);
+        textEdit->insertAt("\tprintf(\"%s\\n\", VersionTag);\n", ++line, 0);
+        textEdit->insertAt("\n\n\treturn(0);\n}\n", ++line, 0);
+
+        // we're gona give the user some information on how to edit the template
+        (void)QMessageBox::information(this,
+                           "Amiga Cross Editor", "You have successfully created a <i><b>AmigaShell </b>app template!</i><br> "
+                            "Now you may edit the file according to your needs."
+                            "<br>A good starting point would be to change your application's PROGRAMNAME, VERSION, REVISION and VERSIONSTRING definitions!",
+                            QMessageBox::Ok);
+
+
+
+
+        // now let's hump to the top of the document, so the user can revise and edit his template.
+        actionGotoTop();
+
+
+    }
+    else if (ret == QMessageBox::Cancel)
+    {
+        //return 1;
+    }
+
+    // is there allready a main() function in this file?
+//    if(!(p_main_set))
+//    {
+//    // we need the caret's ("cursor") recent position stored as a starting point for insertion!
+//    int line, index;
+//    textEdit->getCursorPosition(&line, &index); // get the position...
+
+//    // ...now insert the first line of text!
+//    textEdit->insert("\n");
+//    // next, we need to continue printing at a certain location:
+//    textEdit->insertAt("/*************************\n", ++line, 0);
+//    textEdit->insertAt(" **	main() function    **\n", ++line, 0);
+//    textEdit->insertAt(" ************************/\n", ++line, 0);
+//    textEdit->insertAt("int main(int argc, char* argv[])\n", ++line, 0);
+//    textEdit->insertAt("{\n", ++line, 0);
+//    textEdit->insertAt("\t/* TODO: Write your code! */\n", ++line, 0);
+//    textEdit->insertAt("\tprintf(\"Now produce something usefull!\\n\");\n", ++line, 0);
+//    textEdit->insertAt("\n\n\treturn(0);\n}\n", ++line, 0);
+
+//    // finally, we set our caret to the place where editing might start
+//    textEdit->setCursorPosition(line - 1, index + 2);
+//    p_main_set = true;
+//    }
+//    else
+//    {
+//        (void)QMessageBox::information(this,
+//                       "Amiga Cross Editor", "It seems there is allready a <i><b>main() </b>function</i> in this document!<br> "
+//                        "It makes absolutely <b>no sense</b> to add another one."
+//                        "<br>Insertion will be cancelled, ya know?!",
+//                        QMessageBox::Ok);
+
+//    }
+
+}
+
+//
 // Insert C function skelleton
 //
 void MainWindow::actionInsertFunction()
@@ -1506,18 +1685,32 @@ void MainWindow::actionInsertSnippet1()
 //
 void MainWindow::actionInsertAmigaVersionString()
 {
-    QString my_versionstring = "const char *ver = \"\\0$VER: my_program 1.0 (31.12.2019)\";";
-    // we need the caret's ("cursor") recent position stored as a starting point for insertion!
-    int line, index;
-    textEdit->getCursorPosition(&line, &index); // get the position...
+    if(!(p_versionstring_set))
+    {
+        QString my_versionstring = "const char *ver = \"\\0$VER: my_program 1.0 (31.12.2019)\";";
+        // we need the caret's ("cursor") recent position stored as a starting point for insertion!
+        int line, index;
+        textEdit->getCursorPosition(&line, &index); // get the position...
 
-    // ...now insert the first line of text!
-    textEdit->insert("\n");
-    // next, we need to continue printing at a certain location:
-    textEdit->insertAt(my_versionstring + "\n", ++line, 0);
+        // ...now insert the first line of text!
+        textEdit->insert("\n");
+        // next, we need to continue printing at a certain location:
+        textEdit->insertAt(my_versionstring + "\n", ++line, 0);
 
-    // finally, we set our caret to the next following empty line!
-    textEdit->setCursorPosition(line + 1, index);
+        // finally, we set our caret to the next following empty line!
+        textEdit->setCursorPosition(line + 1, index);
+
+        p_versionstring_set = true;
+    }
+    else
+    {
+        (void)QMessageBox::information(this,
+                       "Amiga Cross Editor", "It seems there is allready a <i><b>version string</b></i> in this document!"
+                        "How many of them do you want?"
+                        "<br>Insertion will be cancelled, ya know?!",
+                        QMessageBox::Ok);
+
+    }
 }
 
 //
@@ -1965,6 +2158,8 @@ void MainWindow::showCustomContextMenue(const QPoint &pos)
 
     // add all those predefined actions that we want to show...
     contextMenu.addAction(&pseudo_action);
+    contextMenu.addSeparator();
+    contextMenu.addAction(shellAppAct);
     contextMenu.addSeparator();
     contextMenu.addAction(fileheaderAct);
     contextMenu.addSeparator();
