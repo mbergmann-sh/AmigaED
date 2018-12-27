@@ -1278,6 +1278,9 @@ void MainWindow::actionInsertIfdefinedCompiler()
     textEdit->insertAt("#elif defined(__STORMGCC__)\n", ++line, 0);
     textEdit->insertAt("\t/* Compiler is StormGCC4 */\n", ++line, 0);
     textEdit->insertAt("\tprintf(\"\\nCompiler in use: GNU gcc, StormC4 flavour.\\n\");\n", ++line, 0);
+    textEdit->insertAt("#elif defined(__MAXON__)\n", ++line, 0);
+    textEdit->insertAt("\t/* Compiler is Maxon/HiSoft C++ */\n", ++line, 0);
+    textEdit->insertAt("\tprintf(\"\\nCompiler in use: Maxon/HiSoft C++.\\n\");\n", ++line, 0);
     textEdit->insertAt("#elif defined(__GNUC__)\n", ++line, 0);
     textEdit->insertAt("\t/* Compiler is gcc */\n", ++line, 0);
     textEdit->insertAt("\tprintf(\"\\nCompiler in use: GNU gcc v%d.%d Patchlevel %d.\\n\", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);\n", ++line, 0);
@@ -1287,6 +1290,9 @@ void MainWindow::actionInsertIfdefinedCompiler()
     textEdit->insertAt("#elif defined(__SASC)\n", ++line, 0);
     textEdit->insertAt("\t/* Compiler is SAS/C */\n", ++line, 0);
     textEdit->insertAt("\tprintf(\"\\nCompiler in use: SAS/C.\\n\");\n", ++line, 0);
+    textEdit->insertAt("#elif defined(LATTICE)\n", ++line, 0);
+    textEdit->insertAt("\t/* Compiler is Lattice C */\n", ++line, 0);
+    textEdit->insertAt("\tprintf(\"\\nCompiler in use: Lattice C.\\n\");\n", ++line, 0);
     textEdit->insertAt("#elif defined(_DCC)\n", ++line, 0);
     textEdit->insertAt("\t/* Compiler is dice */\n", ++line, 0);
     textEdit->insertAt("\tprintf(\"\\nCompiler in use: dice.\\n\");\n", ++line, 0);
@@ -1592,7 +1598,7 @@ void MainWindow::actionInsertShellAppSkeletton()
         // it's good style to provide function prototypes...
         textEdit->insertAt("\n", ++line, 0);  // insert empty line!
         textEdit->insertAt("/* ------------- FUNCTION PROTOS -------------------------------------- */\n", ++line, 0);
-        textEdit->insertAt("int main(int argc, char* argv[]);\n", ++line, 0);
+        textEdit->insertAt("extern int main(int argc, char* argv[]);\n", ++line, 0);
 
         // ok - let's build an Amiga-style version tag:
         QString sas_versionstring = "\tconst UBYTE VersionTag[] = \"$VER: \" PROGRAMNAME \" \" VERSIONSTRING \" \" __AMIGADATE__ \"\\n\\0\";";
@@ -1703,7 +1709,7 @@ void MainWindow::actionInsertCAppSkeletton()
         // it's good style to provide function prototypes...
         textEdit->insertAt("\n", ++line, 0);  // insert empty line!
         textEdit->insertAt("/* ------------- FUNCTION PROTOS -------------------------------------- */\n", ++line, 0);
-        textEdit->insertAt("int main(int argc, char* argv[]);\n", ++line, 0);
+        textEdit->insertAt("extern int main(int argc, char* argv[]);\n", ++line, 0);
 
         // ...finally, we need a main() function!
         textEdit->insertAt("\n", ++line, 0);  // insert empty line!
