@@ -448,11 +448,11 @@ void MainWindow::createActions()
     ifdefAct->setStatusTip(tr("insert #ifdef ... #endif..."));
     connect(ifdefAct, SIGNAL(triggered()), this, SLOT(actionInsertIfdef()));
 
-    ifdefinedAct = new QAction(tr("#if defined(_SOMETHING_"), this); // inserts into insertMenue => preprocessorMenue
+    ifdefinedAct = new QAction(tr("#if defined(...)"), this); // inserts into insertMenue => preprocessorMenue
     ifdefinedAct->setStatusTip(tr("insert #if defined(...) ... #endif..."));
     connect(ifdefinedAct, SIGNAL(triggered()), this, SLOT(actionInsertIfdefined()));
 
-    ifdefinedCompilerAct = new QAction(tr("identify compiler"), this); // inserts into insertMenue => preprocessorMenue
+    ifdefinedCompilerAct = new QAction(tr("Identify Amiga compiler"), this); // inserts into insertMenue => preprocessorMenue
     ifdefinedCompilerAct->setStatusTip(tr("identify compiler in use..."));
     connect(ifdefinedCompilerAct, SIGNAL(triggered()), this, SLOT(actionInsertIfdefinedCompiler()));
 
@@ -1272,9 +1272,15 @@ void MainWindow::actionInsertIfdefinedCompiler()
     // ...now insert the first line of text!
     textEdit->insert("\n");
     // next, we need to continue printing at a certain location:
-    textEdit->insertAt("#if defined(__GNUC__)\n", ++line, 0);
+    textEdit->insertAt("#if defined(__STORM__)\n", ++line, 0);
+    textEdit->insertAt("\t/* Compiler is StormC3 */\n", ++line, 0);
+    textEdit->insertAt("\tprintf(\"\\nCompiler in use: StormC3.\\n\");\n", ++line, 0);
+    textEdit->insertAt("#elif defined(__STORMGCC__)\n", ++line, 0);
+    textEdit->insertAt("\t/* Compiler is StormGCC4 */\n", ++line, 0);
+    textEdit->insertAt("\tprintf(\"\\nCompiler in use: GNU gcc, StormC4 flavour.\\n\");\n", ++line, 0);
+    textEdit->insertAt("#elif defined(__GNUC__)\n", ++line, 0);
     textEdit->insertAt("\t/* Compiler is gcc */\n", ++line, 0);
-    textEdit->insertAt("\tprintf(\"\\nCompiler in use: GNU gcc.\\n\");\n", ++line, 0);
+    textEdit->insertAt("\tprintf(\"\\nCompiler in use: GNU gcc v%d.%d Patchlevel %d.\\n\", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);\n", ++line, 0);
     textEdit->insertAt("#elif defined(__VBCC__)\n", ++line, 0);
     textEdit->insertAt("\t/* Compiler is vbcc */\n", ++line, 0);
     textEdit->insertAt("\tprintf(\"\\nCompiler in use: vbcc.\\n\");\n", ++line, 0);
@@ -1287,7 +1293,6 @@ void MainWindow::actionInsertIfdefinedCompiler()
     textEdit->insertAt("#else\n", ++line, 0);
     textEdit->insertAt("\t/* Compiler not identified */\n", ++line, 0);
     textEdit->insertAt("\tprintf(\"\\nCompiler was not identified.\\n\");\n", ++line, 0);
-    textEdit->insertAt("\t\n", ++line, 0);
     textEdit->insertAt("#endif\n", ++line, 0);
 
     // finally, we set our caret to the next following empty line!
