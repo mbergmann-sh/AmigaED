@@ -107,8 +107,11 @@ private slots:
     void actionInsertCAppSkeletton();
     void actionInsertCppAppSkeletton();
     void actionInsertInclude();
+    void actionInsertAmigaIncludes();
     void actionInsertDefine();
     void actionInsertIfdef();
+    void actionInsertIfdefined();
+    void actionInsertIfdefinedCompiler();
     void actionInsertIfndef();
     void actionInsertOpenLibrary();
     void actionInsertCloseLibrary();
@@ -242,8 +245,11 @@ private:
     QAction *stdCppAppAct;          // abandons all the previous work and inserts a brand new file with complete std. C++app skelleton
     // Preprocessor
     QAction *includeAct;            // inserts #include <file>
+    QAction *amigaIncludesAct;      // inserts the most common Amiga #include files
     QAction *defineAct;             // inserts #define SOME_VALUE
     QAction *ifdefAct;              // inserts #ifdef ... #endif
+    QAction *ifdefinedAct;          // inserts #if defined(SOMETHING) ... #elif defined(SOME_OTHER_THING) ... #endif
+    QAction *ifdefinedCompilerAct;  // inserts compiler identification via macro
     QAction *ifndefAct;             // inserts #ifndef ... #endif
     // Library
     QAction *OpenLibraryAct;        // inserts OpenLibrary(some.library", 0L);

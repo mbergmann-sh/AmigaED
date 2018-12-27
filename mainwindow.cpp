@@ -426,7 +426,7 @@ void MainWindow::createActions()
     connect(stdCAppAct, SIGNAL(triggered()), this, SLOT(actionInsertCAppSkeletton()));
 
     stdCppAppAct = new QAction(tr("C++ application template"), this); // inserts into insertMenue => preprocessorMenue
-    stdCppAppAct->setShortcut(tr("Ctrl+Alt++"));
+    stdCppAppAct->setShortcut(tr("Ctrl+Alt+p"));
     stdCppAppAct->setStatusTip(tr("Create a new file containing a complete C++ app template"));
     connect(stdCppAppAct, SIGNAL(triggered()), this, SLOT(actionInsertCppAppSkeletton()));
 
@@ -434,6 +434,10 @@ void MainWindow::createActions()
     includeAct->setShortcut(tr("Ctrl+i"));
     includeAct->setStatusTip(tr("insert #include <file>..."));
     connect(includeAct, SIGNAL(triggered()), this, SLOT(actionInsertInclude()));
+
+    amigaIncludesAct = new QAction(tr("Amiga #include files"), this); // inserts into insertMenue => preprocessorMenue
+    amigaIncludesAct->setStatusTip(tr("insert most commonly used Amiga #include files..."));
+    connect(amigaIncludesAct, SIGNAL(triggered()), this, SLOT(actionInsertAmigaIncludes()));
 
     defineAct = new QAction(tr("#define"), this); // inserts into insertMenue => preprocessorMenue
     defineAct->setShortcut(tr("Alt+d"));
@@ -443,6 +447,14 @@ void MainWindow::createActions()
     ifdefAct = new QAction(tr("#ifdef"), this); // inserts into insertMenue => preprocessorMenue
     ifdefAct->setStatusTip(tr("insert #ifdef ... #endif..."));
     connect(ifdefAct, SIGNAL(triggered()), this, SLOT(actionInsertIfdef()));
+
+    ifdefinedAct = new QAction(tr("#if defined(_SOMETHING_"), this); // inserts into insertMenue => preprocessorMenue
+    ifdefinedAct->setStatusTip(tr("insert #if defined(...) ... #endif..."));
+    connect(ifdefinedAct, SIGNAL(triggered()), this, SLOT(actionInsertIfdefined()));
+
+    ifdefinedCompilerAct = new QAction(tr("identify compiler"), this); // inserts into insertMenue => preprocessorMenue
+    ifdefinedCompilerAct->setStatusTip(tr("identify compiler in use..."));
+    connect(ifdefinedCompilerAct, SIGNAL(triggered()), this, SLOT(actionInsertIfdefinedCompiler()));
 
     ifndefAct = new QAction(tr("#ifndef"), this); // inserts into insertMenue => preprocessorMenue
     ifndefAct->setStatusTip(tr("insert #ifndef ... #endif..."));
@@ -584,6 +596,11 @@ void MainWindow::createMenus()
     preprocessorMenue->addAction(defineAct);
     preprocessorMenue->addAction(ifdefAct);
     preprocessorMenue->addAction(ifndefAct);
+    preprocessorMenue->addAction(ifdefinedAct);
+    preprocessorMenue->addSeparator();
+    preprocessorMenue->addAction(amigaIncludesAct);
+    preprocessorMenue->addSeparator();
+    preprocessorMenue->addAction(ifdefinedCompilerAct);
     insertMenue->addSeparator();
     libraryMenue = insertMenue->addMenu(tr("Libraries..."));
     libraryMenue->addAction(OpenLibraryAct);
@@ -1109,6 +1126,79 @@ void MainWindow::actionInsertInclude()
 }
 
 //
+// this will insert some of the #includes mostly used for Amiga app development
+//
+void MainWindow::actionInsertAmigaIncludes()
+{
+    // we need the caret's ("cursor") recent position stored as a starting point for insertion!
+    int line, index;
+    textEdit->getCursorPosition(&line, &index); // get the position...
+
+    // we need some #includes, so let's insert them:
+    textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+    textEdit->insertAt("/* ------------- OS 3.x  INCLUDE FILES ---------------------------------- */\n", ++line, 0);
+    textEdit->insertAt("/* --- typical standard headers --- */\n", ++line, 0);
+    textEdit->insertAt("#include\t<stdio.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<stdlib.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<string.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<ctype.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<stdarg.h>\n", ++line, 0);
+    textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+    textEdit->insertAt("/* --- Amiga stuff ---------------- */\n", ++line, 0);
+    textEdit->insertAt("#include\t<exec/exec.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<dos/dos.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<dos/dostags.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<dos/dosextens.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<dos/datetime.h>\n", ++line, 0);
+    textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+    textEdit->insertAt("#include\t<graphics/gfx.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<graphics/gfxmacros.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<graphics/layers.h>\n", ++line, 0);
+    textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+    textEdit->insertAt("#include\t<intuition/intuition.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<intuition/intuitionbase.h>\n", ++line, 0);
+    textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+    textEdit->insertAt("#include\t<workbench/workbench.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<workbench/startup.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<workbench/icon.h>\n", ++line, 0);
+    textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+    textEdit->insertAt("#include\t<datatypes/pictureclass.h>\n", ++line, 0);
+    textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+    textEdit->insertAt("#include\t<libraries/asl.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<libraries/commodities.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<libraries/gadtools.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<libraries/iffparse.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<libraries/locale.h>\n", ++line, 0);
+    textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+    textEdit->insertAt("#include\t<rexx/rxslib.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<rexx/storage.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<rexx/errors.h>\n", ++line, 0);
+    textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+    textEdit->insertAt("#include\t<utility/hooks.h>\n", ++line, 0);
+    textEdit->insertAt("\n", ++line, 0);  // insert empty line!
+    textEdit->insertAt("/* --- protos ----------------- */\n", ++line, 0);
+    textEdit->insertAt("#include\t<proto/asl.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<proto/commodities.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<proto/datatypes.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<proto/diskfont.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<proto/dos.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<proto/exec.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<proto/gadtools.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<proto/graphics.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<proto/icon.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<proto/iffparse.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<proto/intuition.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<proto/layers.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<proto/locale.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<proto/rexxsyslib.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<proto/utility.h>\n", ++line, 0);
+    textEdit->insertAt("#include\t<proto/wb.h>\n", ++line, 0);
+
+    // finally, move caret to next line.
+    textEdit->setCursorPosition(line, index);
+}
+
+//
 // Insert #define SOME_VALUE 0
 //
 void MainWindow::actionInsertDefine()
@@ -1138,6 +1228,65 @@ void MainWindow::actionInsertIfdef()
     // next, we need to continue printing at a certain location:
     textEdit->insertAt("#ifdef __SOME_DEFINITION__\n", ++line, 0);
     textEdit->insertAt("\t/* some_action */\n", ++line, 0);
+    textEdit->insertAt("\t\n", ++line, 0);
+    textEdit->insertAt("#endif\n", ++line, 0);
+
+    // finally, we set our caret to the next following empty line!
+    textEdit->setCursorPosition(line + 1, index);
+}
+
+//
+// Insert #if defined(..) ... #elif defined(...) ... #endif
+//
+void MainWindow::actionInsertIfdefined()
+{
+    // we need the caret's ("cursor") recent position stored as a starting point for insertion!
+    int line, index;
+    textEdit->getCursorPosition(&line, &index); // get the position...
+
+    // ...now insert the first line of text!
+    textEdit->insert("\n");
+    // next, we need to continue printing at a certain location:
+    textEdit->insertAt("#if defined(__SOME_DEFINITION__)\n", ++line, 0);
+    textEdit->insertAt("\t/* some_action */\n", ++line, 0);
+    textEdit->insertAt("#elif defined(__SOME_OTHER_DEFINITION__)\n", ++line, 0);
+    textEdit->insertAt("\t/* some_other_action */\n", ++line, 0);
+    textEdit->insertAt("#else\n", ++line, 0);
+    textEdit->insertAt("\t/* nothing matched... */\n", ++line, 0);
+    textEdit->insertAt("\t\n", ++line, 0);
+    textEdit->insertAt("#endif\n", ++line, 0);
+
+    // finally, we set our caret to the next following empty line!
+    textEdit->setCursorPosition(line + 1, index);
+}
+
+//
+// Inserts a compiler check via #if defined(..) ... #elif defined(...) ...#else(...) ... #endif
+//
+void MainWindow::actionInsertIfdefinedCompiler()
+{
+    // we need the caret's ("cursor") recent position stored as a starting point for insertion!
+    int line, index;
+    textEdit->getCursorPosition(&line, &index); // get the position...
+
+    // ...now insert the first line of text!
+    textEdit->insert("\n");
+    // next, we need to continue printing at a certain location:
+    textEdit->insertAt("#if defined(__GNUC__)\n", ++line, 0);
+    textEdit->insertAt("\t/* Compiler is gcc */\n", ++line, 0);
+    textEdit->insertAt("\tprintf(\"\\nCompiler in use: GNU gcc.\\n\");\n", ++line, 0);
+    textEdit->insertAt("#elif defined(__VBCC__)\n", ++line, 0);
+    textEdit->insertAt("\t/* Compiler is vbcc */\n", ++line, 0);
+    textEdit->insertAt("\tprintf(\"\\nCompiler in use: vbcc.\\n\");\n", ++line, 0);
+    textEdit->insertAt("#elif defined(__SASC)\n", ++line, 0);
+    textEdit->insertAt("\t/* Compiler is SAS/C */\n", ++line, 0);
+    textEdit->insertAt("\tprintf(\"\\nCompiler in use: SAS/C.\\n\");\n", ++line, 0);
+    textEdit->insertAt("#elif defined(_DCC)\n", ++line, 0);
+    textEdit->insertAt("\t/* Compiler is dice */\n", ++line, 0);
+    textEdit->insertAt("\tprintf(\"\\nCompiler in use: dice.\\n\");\n", ++line, 0);
+    textEdit->insertAt("#else\n", ++line, 0);
+    textEdit->insertAt("\t/* Compiler not identified */\n", ++line, 0);
+    textEdit->insertAt("\tprintf(\"\\nCompiler was not identified.\\n\");\n", ++line, 0);
     textEdit->insertAt("\t\n", ++line, 0);
     textEdit->insertAt("#endif\n", ++line, 0);
 
@@ -1470,15 +1619,16 @@ void MainWindow::actionInsertShellAppSkeletton()
         // we're gonna save our freshly created file with its automated changes now...
         saveFile(curFile);
 
+        // disable insertion of main() and versionstring
+        p_main_set = true;
+        p_versionstring_set = true;
+
         // we're gona give the user some information on how to edit the template
         (void)QMessageBox::information(this,
                            "Amiga Cross Editor", "You have successfully created a <i><b>AmigaShell </b>app template!</i><br> "
                             "Now you may edit the file according to your needs."
                             "<br>A good starting point would be to change your application's PROGRAMNAME, VERSION, REVISION and VERSIONSTRING definitions!",
                             QMessageBox::Ok);
-
-
-
 
         // now let's hump to the top of the document, so the user can revise and edit his template.
         actionGotoTop();
@@ -1569,7 +1719,6 @@ void MainWindow::actionInsertCAppSkeletton()
                            "Amiga Cross Editor", "You have successfully created a <i><b>ANSI C </b>app template!</i><br> "
                             "Now you may edit the file according to your needs.",
                             QMessageBox::Ok);
-
 
         // now let's hump to the top of the document, so the user can revise and edit his template.
         actionGotoTop();
@@ -2325,6 +2474,10 @@ void MainWindow::showCustomContextMenue(const QPoint &pos)
     contextMenu.addAction(shellAppAct);
     contextMenu.addSeparator();
     contextMenu.addAction(fileheaderAct);
+    contextMenu.addSeparator();
+    contextMenu.addAction(ifdefinedAct);
+    contextMenu.addSeparator();
+    contextMenu.addAction(ifdefinedCompilerAct);
     contextMenu.addSeparator();
     contextMenu.addAction(includeAct);
     contextMenu.addSeparator();
