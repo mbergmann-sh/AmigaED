@@ -1293,7 +1293,7 @@ void MainWindow::actionInsertIfdefinedCompiler()
     textEdit->insertAt("#elif defined(LATTICE)\n", ++line, 0);
     textEdit->insertAt("\t/* Compiler is Lattice C */\n", ++line, 0);
     textEdit->insertAt("\tprintf(\"\\nCompiler in use: Lattice C.\\n\");\n", ++line, 0);
-    textEdit->insertAt("#elif defined(AZTEC)\n", ++line, 0);
+    textEdit->insertAt("#elif defined(AZTEC_C)\n", ++line, 0);
     textEdit->insertAt("\t/* Compiler is Aztec C */\n", ++line, 0);
     textEdit->insertAt("\tprintf(\"\\nCompiler in use: Manx Aztec C.\\n\");\n", ++line, 0);
     textEdit->insertAt("#elif defined(_DCC)\n", ++line, 0);
