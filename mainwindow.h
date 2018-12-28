@@ -49,6 +49,7 @@
 #include <QActionGroup>
 #include <QActionEvent>
 #include <QPoint>
+#include <QProcess>
 
 #include <QDebug>
 
@@ -68,14 +69,25 @@ public:
 public slots:
     // Custom context menue:
     void showCustomContextMenue(const QPoint &pos); // implements custom context menu for QScintilla
+    // methods for launching a compiler
+    void error(QProcess::ProcessError error);
+    void finished(int exitCode, QProcess::ExitStatus exitStatus);
+    void readyReadStandardError();
+    void readyReadStandardOutput();
+    void started();
+    void emu_finished(int exitCode, QProcess::ExitStatus exitStatus);
+    void emu_readyReadStandardOutput();
+    void compiler_readyReadStandardOutput();
 
 private slots:
-    void popNotImplemented();       // shows "not implemented" MessageBox
-    void newFile();                 // sets editor into new file mode
-    void open();                    // loads a file
-    bool save();                    // saves current file
-    bool saveAs();                  // saves current file as...
-    void about();                   // pops up "about" MessageBox
+    int startProc(QString command, QString out); // starts a process (f.e. Compiler, Emulator)
+    int startCompiler();
+    void popNotImplemented();                       // shows "not implemented" MessageBox
+    void newFile();                                 // sets editor into new file mode
+    void open();                                    // loads a file
+    bool save();                                    // saves current file
+    bool saveAs();                                  // saves current file as...
+    void about();                                   // pops up "about" MessageBox
 
     // GUI creation...
     void initializeGUI();
@@ -140,6 +152,9 @@ private slots:
 
 
 private:
+    QProcess proc;
+    QProcess myProcess;                                                 // we need a QProcess to run a compiler...
+    QProcess myEmulator;
     // GUI creation...
     void createActions();                                               // defines actions for menues and toolbars
     void createMenus();                                                 // creates menues from actions
@@ -309,16 +324,15 @@ private:
     // check if there is allready a main() function in a file
     bool p_main_set = false;
     bool p_versionstring_set = false;
-    QString p_compiler_call;
-    QStringList p_Compilers = { "GCC", "VBCC", "SAS/C", "StormC4", "DICE" };
+    QString p_compiler = "/opt/amiga/bin/m68k-amigaos-gcc";                    // C-Compiler to call...
+    QString p_compiler_call = "-Wall -O2 -s -noixemul -lamiga ";                // Arguments for compilation..
+    QFileInfo p_stripped_name;
+    QString s_projectdir;
+    QStringList p_Compilers = { "GCC", "VBCC", "SAS/C", "StormC4", "DICE" };    // unused ATM...
 
 protected:
     void closeEvent(QCloseEvent *event);        // catch close() event
     //void mousePressEvent(QMouseEvent *event);   // catch mouse press event
-//#ifndef QT_NO_CONTEXTMENU
-//    void contextMenuEvent(QContextMenuEvent *event) override;
-//#endif
-
 };
 
 #endif

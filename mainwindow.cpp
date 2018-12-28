@@ -60,6 +60,10 @@
 // allways get your defaults!
 #include "mainwindow.h"
 
+// Processes to start:
+static QProcess myProcess;      // the process for running the compiler
+static QProcess myEmulator;     // the process for running the emulator
+
 // Open MainWindow with given filename...
 MainWindow::MainWindow(QString cmdFileName)
 {
@@ -1068,27 +1072,50 @@ void MainWindow::actionGoto_matching_brace()
 //
 void MainWindow::actionCompile()
 {
-    for(int i = 0; i < p_Compilers.size(); ++i)
-    {
-        qDebug() << i << ". Compiler: " << p_Compilers.at(i).toLocal8Bit().constData();
-    }
+    QString temp_compiler_call;
+
+//    for(int i = 0; i < p_Compilers.size(); ++i)
+//    {
+//        qDebug() << i << ". Compiler: " << p_Compilers.at(i).toLocal8Bit().constData();
+//    }
+
     QString text = p_compiler_call;
-    popNotImplemented();
     bool ok;
 
-    text = QInputDialog::getText(this, tr("Compile!"),
+    text = QInputDialog::getText(this, tr("m68k-amigaos-gcc"),
                                        tr("Compiler Options:"), QLineEdit::Normal,
                                        p_compiler_call, &ok);
     if (ok && !text.isEmpty())
     {
-      qDebug() << "Text not empty: " << text;
-      p_compiler_call = text + curFile;
+        save();
+        QString outName = QFileInfo(curFile).baseName();
+        QString outPath = QFileInfo(curFile).absolutePath();
+
+        qDebug() << "Basename: " << outName << "\nPath: " << outPath;
+        temp_compiler_call = p_compiler_call;                                         // store compiler parameters temporarily
+        text.append(curFile + " -o " + outPath + QDir::separator() + outName);        // add output file name
+        qDebug() << "Text not empty: " << text;
+        p_compiler_call = text;
+
+        //
+        // put REAL compiler start HERE!
+        // (uses p_compiler and p_compiler_call in mainwindow.h has default options)
+        //
+        startCompiler();
+
+        // afterwards, reset everything to its defaults!
+        text.clear();
+        p_compiler_call.clear();
+        p_compiler_call = temp_compiler_call;
     }
     else
     {
+      text.append(curFile);
       p_compiler_call = text;
+
       qDebug() << "Text: " << text;
       qDebug() << "Compiler call: " << p_compiler_call;
+      text.clear();
     }
 }
 
@@ -2390,6 +2417,8 @@ void MainWindow::initializeGUI()
     createMenus();
     createToolBars();
     createStatusBarMessage(tr("Ready"), 0);
+
+    //connect(&proc, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(ProcBeendet(int, QProcess::ExitStatus)));
 }
 
 //
@@ -2526,4 +2555,168 @@ void MainWindow::showCustomContextMenue(const QPoint &pos)
     contextMenu.exec(mapToGlobal(pos));
 
 }
+
+/**************************************
+ * Stuff for launching a Compiler... **
+ **************************************/
+int MainWindow::startProc(QString infile, QString outfile)
+{
+    //debugVars();
+    QString command = p_compiler;
+    QStringList arguments;
+    arguments << p_compiler_call.split(" ");
+
+    createStatusBarMessage(tr("Compilerlauf gestartet."),0);
+
+    myProcess.start(command, arguments);
+
+    QObject::connect(&myProcess, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(finished(int,QProcess::ExitStatus)));
+    QObject::connect(&myProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(compiler_readyReadStandardOutput()));
+    QObject::connect(&myProcess, SIGNAL(started()), this, SLOT(started()));
+
+//    QObject::connect(&myProcess, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(finished(int,QProcess::ExitStatus)));
+//    QObject::connect(&myProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(readyReadStandardOutput()));
+//    QObject::connect(&myProcess, SIGNAL(started()), this, SLOT(started()));
+
+    //qDebug() << myProcess.command;
+    qDebug() << myProcess.arguments();
+
+    return 0;
+}
+
+int MainWindow::startCompiler()
+{
+    //debugVars();
+    QString command = p_compiler;
+    QStringList arguments;
+    arguments << p_compiler_call.split(" ");
+
+    createStatusBarMessage(tr("Compilerlauf gestartet."),0);
+
+    myProcess.start(command, arguments);
+
+    QObject::connect(&myProcess, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(finished(int,QProcess::ExitStatus)));
+    QObject::connect(&myProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(compiler_readyReadStandardOutput()));
+    QObject::connect(&myProcess, SIGNAL(started()), this, SLOT(started()));
+
+    qDebug() << "\nCommand: " << command;
+    qDebug() << "Argumets: " << myProcess.arguments();
+
+    return 0;
+}
+
+void MainWindow::error(QProcess::ProcessError error)
+{
+  qDebug() << "Error: " << error;
+}
+
+void MainWindow::finished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    if(exitCode == 0)
+    {
+//        ui->actionStart_im_Emulator->setEnabled(true);
+//        ui->btnStart->setEnabled(true);
+//        ui->actionCompilieren->setDisabled(true);
+//        ui->btnCompile->setDisabled(true);
+//        ui->leSource->clear();
+//        ui->leTarget->clear();
+    }
+    else
+    {
+//        ui->actionStart_im_Emulator->setDisabled(true);
+//        ui->btnStart->setDisabled(true);
+//        ui->actionCompilieren->setDisabled(true);
+//        ui->btnCompile->setDisabled(true);
+
+    }
+  qDebug() << "Finished: " << exitCode;
+  //qApp->exit();
+
+  if (exitStatus==QProcess::CrashExit || exitCode!=0)
+  {
+      createStatusBarMessage("Compiler error!", 0);
+      QMessageBox::critical(this, tr("Amiga Cross Editor"),
+      tr("Error during compilation - process has crashed!"
+      "Possibly missing right or wrong paths?"),
+      QMessageBox::Ok);
+  }
+  else
+  {
+      createStatusBarMessage("Compiler run finished.", 0);
+      //ui->actionStart_im_Emulator->setEnabled(true);
+
+      (void)QMessageBox::information(this, tr("Amiga Cross Editor"),
+      tr("Successfully compiled.\n"
+      "Merry schnupp-di-doodle!"),
+      QMessageBox::Ok);
+  }
+}
+
+void MainWindow::readyReadStandardError()
+{
+  qDebug() << "ReadyError";
+}
+
+void MainWindow::readyReadStandardOutput()
+{
+  qDebug() << "readyOut";
+  QProcess *myProcess = (QProcess *)sender();
+  QByteArray buf = myProcess->readAllStandardOutput();
+
+  QFile data(s_projectdir + QDir::separator() + "compiler_out.txt");
+  if (data.open(QFile::WriteOnly | QFile::Truncate))
+  {
+      //ui->textBrowser->clear();
+      QTextStream out(&data);
+      out << buf;
+      //ui->textBrowser->append(buf);
+  }
+}
+
+void MainWindow::started()
+{
+  qDebug() << "Proc Started";
+}
+
+void MainWindow::emu_finished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    if(exitCode == 0)
+    {
+        qDebug() << "Emulator normal beendet.";
+    }
+    else
+    {
+        qDebug() << "Emulator NICHT normal beendet.";
+    }
+  qDebug() << "Finished: " << exitCode;
+
+  if (exitStatus==QProcess::CrashExit || exitCode!=0)
+  {
+     createStatusBarMessage("CrashExit - Problem mit dem Emulator!!", 0);
+  }
+  else
+  {
+      createStatusBarMessage("Emulator normal beendet.", 0);
+  }
+}
+
+void MainWindow::emu_readyReadStandardOutput()
+{
+  qDebug() << "readyOut";
+  QProcess *myEmulator = (QProcess *)sender();
+  QByteArray buf = myEmulator->readAllStandardOutput();
+
+  qDebug() << buf;
+}
+
+void MainWindow::compiler_readyReadStandardOutput()
+{
+  qDebug() << "readyOut";
+  QProcess *myProcess = (QProcess *)sender();
+  QByteArray buf = myProcess->readAllStandardOutput();
+
+  qDebug() << buf;
+}
+
+
 
