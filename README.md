@@ -32,6 +32,7 @@ This program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRA
 - custom QScintilla context menue to do insertions by right-clicking the mouse
 - code insertion via menue, shortcuts and custom context menue [partially]
 - app template creation [AmigaShell, ANSI C, C++ app ATM]
+- select cross compiler to use: vbcc, gcc or g++
 
 more to come...
 
@@ -65,7 +66,7 @@ you might also add this folder to your search path instead!
 
 # Roadmap - wanted features (at least hopefully planned...)
 - make the editor drag'n'drop-aware
-- implement inserts and snippets [partially done]
+- implement inserts and snippets [mostly done]
 - add a search/replace dialog
 - improve printing [partially done - prints text and line numbers on DIN A4 paper]
 - implement direct cross compiling to Amiga target for vbcc and gcc cross compiler toolchain
@@ -73,7 +74,7 @@ you might also add this folder to your search path instead!
 - implement a prefs dialog
 - implement project manager
 - implement makefile generator
-- implement compiler settings for vbcc, gcc, SAS/C
+- implement compiler settings for vbcc, gcc, SAS/C [can allready be done via textinput by now]
 - locale support (at least for german language)
 - implement custom lexers for Amiga C and libraries, AmigaE
 - implement custom code beautifier
