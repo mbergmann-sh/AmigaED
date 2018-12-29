@@ -360,6 +360,31 @@ void MainWindow::createActions()
     connect(showDebugInfoAct, SIGNAL(triggered()), this, SLOT(actionShowDebug()));
 
     /* --- Build -----------------------------------------------------------------------*/
+    selectCompilerVBCCAct = new QAction(tr("VBCC vc (C mode only)..."), this);
+    selectCompilerVBCCAct->setStatusTip(tr("Set Compiler to VBCC (C mode only)..."));
+    selectCompilerVBCCAct->setCheckable(true);
+    selectCompilerVBCCAct->setChecked(false);
+    connect(selectCompilerVBCCAct, SIGNAL(triggered()), this, SLOT(actionSelectCompilerVBCC()));
+
+    selectCompilerGCCAct = new QAction(tr("GNU gcc (C mode)..."), this);
+    selectCompilerGCCAct->setStatusTip(tr("Set Compiler to GNU gcc (C mode)..."));
+    selectCompilerGCCAct->setCheckable(true);
+    selectCompilerGCCAct->setChecked(false);
+    connect(selectCompilerGCCAct, SIGNAL(triggered()), this, SLOT(actionSelectCompilerGCC()));
+
+    selectCompilerGPPAct = new QAction(tr("GNU g++ (C++ mode)..."), this);
+    selectCompilerGPPAct->setStatusTip(tr("Set Compiler to GNU g++ (C++ mode)..."));
+    selectCompilerGPPAct->setCheckable(true);
+    selectCompilerGPPAct->setChecked(false);
+    connect(selectCompilerGPPAct, SIGNAL(triggered()), this, SLOT(actionSelectCompilerGPP()));
+
+    // this will put the compilers in our menue into a mutual exclusive
+    // group for automatically checking/unchecking each other:
+    compilerGroup = new QActionGroup(this);
+    compilerGroup->addAction(selectCompilerVBCCAct);
+    compilerGroup->addAction(selectCompilerGCCAct);
+    compilerGroup->addAction(selectCompilerGPPAct);
+
     compileAct = new QAction(QIcon(":/images/dice.png"), tr("Comp&ile..."), this);
     compileAct->setShortcut(tr("Ctrl+r"));
     compileAct->setStatusTip(tr("Compile current file..."));
@@ -649,6 +674,13 @@ void MainWindow::createMenus()
 
     // Build menue
     buildMenue = menuBar()->addMenu(tr("&Build"));
+    compilerMenue = buildMenue->addMenu(tr("Select Compiler..."));
+    compilerMenue->addAction(selectCompilerVBCCAct);
+    compilerMenue->addSeparator();
+    compilerMenue->addAction(selectCompilerGCCAct);
+    compilerMenue->addSeparator();
+    compilerMenue->addAction(selectCompilerGPPAct);
+    buildMenue->addSeparator();
     buildMenue->addAction(compileAct);
 
     menuBar()->addSeparator();
@@ -1068,6 +1100,69 @@ void MainWindow::actionGoto_matching_brace()
 }
 
 //
+// select a compiler to use: VBCC
+//
+void MainWindow::actionSelectCompilerVBCC()
+{
+    qDebug() << "VBCC selection called.";
+    compilerCombo->setCurrentIndex(0);
+    SelectCompiler(0);
+}
+
+//
+// select a compiler to use: gcc
+//
+void MainWindow::actionSelectCompilerGCC()
+{
+    qDebug() << "GCC selection called.";
+    compilerCombo->setCurrentIndex(1);
+    SelectCompiler(1);
+}
+
+//
+// select a compiler to use: VBCC
+//
+void MainWindow::actionSelectCompilerGPP()
+{
+    qDebug() << "g++ selection called.";
+    compilerCombo->setCurrentIndex(2);
+    SelectCompiler(2);
+}
+
+//
+// select a compiler to use (vbcc, gcc, g++)
+//
+void MainWindow::SelectCompiler(int index)
+{
+    qDebug() << "Compiler selection called.";
+    qDebug() << "Value: " << index;
+    switch(index)
+    {
+    case 0:
+        p_selected_compiler = p_compiler_vc;
+        p_selected_compiler_args = p_compiler_vc_call;
+        p_compiledFileSuffix = "_vc";
+        // check selected menu item, uncheck others
+        selectCompilerVBCCAct->setChecked(true);
+        break;
+    case 1:
+        p_selected_compiler = p_compiler_gcc;
+        p_selected_compiler_args = p_compiler_gcc_call;
+        p_compiledFileSuffix = "_gcc";
+        // check selected menu item, uncheck others
+        selectCompilerGCCAct->setChecked(true);
+        break;
+    case 2:
+        p_selected_compiler = p_compiler_gpp;
+        p_selected_compiler_args = p_compiler_gcc_call;
+        p_compiledFileSuffix = "_gpp";
+        // check selected menu item, uncheck others
+        selectCompilerGPPAct->setChecked(true);
+        break;
+    }
+}
+
+//
 // Compile current file
 // CHANGE THIS according to your compiler and opts!
 //
@@ -1081,13 +1176,13 @@ void MainWindow::actionCompile()
 //        qDebug() << i << ". Compiler: " << p_Compilers.at(i).toLocal8Bit().constData();
 //    }
 
-    QString text = p_compiler_call;
+    QString text = p_selected_compiler_args;
     bool ok;
     qDebug() << "START: Proc started " << p_proc_is_started << " times.";
 
     text = QInputDialog::getText(this, tr("m68k-amigaos-gcc"),
                                        tr("Compiler Options:"), QLineEdit::Normal,
-                                       p_compiler_call, &ok);
+                                       p_selected_compiler_args, &ok);
     if (ok && !text.isEmpty())
     {
         save();
@@ -1095,13 +1190,13 @@ void MainWindow::actionCompile()
         QString outPath = QFileInfo(curFile).absolutePath();
 
         // construct path and name of compiled file for file checking:
-        p_compiledFile = outPath + QDir::separator() + outName;
+        p_compiledFile = outPath + QDir::separator() + outName + p_compiledFileSuffix;
         qDebug() << "compiled file: " << p_compiledFile;
 
-        temp_compiler_call = p_compiler_call;                                         // store compiler parameters temporarily
-        text.append(curFile + " -o " + outPath + QDir::separator() + outName);        // add output file name
+        temp_compiler_call = p_selected_compiler_args;                                                       // store compiler parameters temporarily
+        text.append(curFile + " -o " + outPath + QDir::separator() + outName + p_compiledFileSuffix);        // add output file name
         qDebug() << "Text not empty: " << text;
-        p_compiler_call = text;
+        p_selected_compiler_args = text;
 
         //
         // put REAL compiler start HERE!
@@ -1111,8 +1206,8 @@ void MainWindow::actionCompile()
 
         // afterwards, reset everything to its defaults!
         text.clear();
-        p_compiler_call.clear();
-        p_compiler_call = temp_compiler_call;
+        p_selected_compiler_args.clear();
+        p_selected_compiler_args = temp_compiler_call;
         //p_compiledFile.clear();
     }
     else
@@ -2376,6 +2471,8 @@ void MainWindow::initializeGUI()
     this->setMinimumSize(600, 450);
 
     // prepare and initialize statusbar items:
+    this->compilerLabel = new QLabel(this);
+    this->compilerCombo = new QComboBox(this);
     this->statusLabelX = new QLabel(this);
 
     this->statusLCD_X = new QLCDNumber(this);
@@ -2387,6 +2484,11 @@ void MainWindow::initializeGUI()
     this->statusLCD_Y->display(0);
 
     // permanently add the controls to the status bar
+    statusBar()->addPermanentWidget(compilerLabel);
+    compilerLabel->setText("Compiler:");
+    statusBar()->addPermanentWidget(compilerCombo);
+    compilerCombo->addItems(p_Compilers);
+    compilerCombo->setCurrentIndex(1);
     statusBar()->addPermanentWidget(statusLabelX);
     statusLabelX->setText(tr("Line:"));
     statusBar()->addPermanentWidget(statusLCD_X);
@@ -2425,6 +2527,15 @@ void MainWindow::initializeGUI()
     createMenus();
     createToolBars();
     createStatusBarMessage(tr("Ready"), 0);
+
+    // Set default Compiler
+    p_selected_compiler = p_compiler_gcc;
+    p_selected_compiler_args = p_compiler_gcc_call;
+    compilerCombo->setCurrentIndex(1);
+    selectCompilerGCCAct->setChecked(true);
+    p_compiledFileSuffix = "_gcc";
+
+    connect(compilerCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SelectCompiler(int)));
 
     //connect(&proc, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(ProcBeendet(int, QProcess::ExitStatus)));
     QObject::connect(&myProcess, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(finished(int,QProcess::ExitStatus)));
@@ -2591,9 +2702,9 @@ int MainWindow::startProc(QString infile, QString outfile)
 {
     qDebug() << "startProc() called.";
      //debugVars();
-    QString command = p_compiler;
+    QString command = p_selected_compiler;
     QStringList arguments;
-    arguments << p_compiler_call.split(" ");
+    arguments << p_selected_compiler_args.split(" ");
 
     createStatusBarMessage(tr("Compiler run has been started."),0);
 
@@ -2612,13 +2723,13 @@ int MainWindow::startProc(QString infile, QString outfile)
 int MainWindow::startCompiler()
 {
     //debugVars();
-    QString command = p_compiler;
+    QString command = p_selected_compiler;
     QStringList arguments;
     // IMPORTANT! 'arguments' must be a QStringList, NOT a QString, else the compiler call will not work!
     // Therefore, we'll have to put each argument separately.
     // Each argument in our string is separated by a whitespace.
     // We use the split() function to isolate them, giving each argument separately to our QStringList.
-    arguments << p_compiler_call.split(" ");
+    arguments << p_selected_compiler_args.split(" ");
 
     createStatusBarMessage(tr("Compiler run has been started."),0);
 

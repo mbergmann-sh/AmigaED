@@ -39,6 +39,7 @@
 #include <QStatusBar>
 #include <QLabel>
 #include <QLCDNumber>
+#include <QComboBox>
 #include <QStatusTipEvent>
 #include <QCloseEvent>
 #include <QMouseEvent>
@@ -56,6 +57,8 @@
 class QAction;
 class QActionGroup;
 class QMenu;
+class QLabel;
+class QComboBox;
 class QsciScintilla;
 
 class MainWindow : public QMainWindow
@@ -79,6 +82,7 @@ public slots:
     void emu_finished(int exitCode, QProcess::ExitStatus exitStatus);
     void emu_readyReadStandardOutput();
     void compiler_readyReadStandardOutput();
+    void SelectCompiler(int index);
 
 private slots:
     int startProc(QString command, QString out); // starts a process (f.e. Compiler, Emulator)
@@ -150,6 +154,9 @@ private slots:
     void actionInsertSnippet2();
     void actionInsertSnippet3();
     void actionInsertSnippet4();
+    void actionSelectCompilerVBCC();
+    void actionSelectCompilerGCC();
+    void actionSelectCompilerGPP();
 
 
 private:
@@ -163,6 +170,7 @@ private:
     void createStatusBarMessage(QString statusmessage, int timeout);    // sets up the statusbar with a custom message
     // GUI methods...
     void SetLexerAtFileExtension(QString fileName);     // Helper to set approbiate Lexer according to a file's .ext
+    void actionSelectCompiler(int index);               // Helper for selcting a compiler to use
     void readSettings();                                // read app settings
     void writeSettings();                               // write app settings
     bool maybeSave();                                   // will be called if user quits while text has changed
@@ -198,6 +206,7 @@ private:
     QMenu *classMenue;          // Submenue of insertMenue, holds C/++ class inserts
     QMenu *snippetsMenue;       // Submenue of insertMenue, holds inserts for user-defined code snippets
     QMenu *templatesMenue;      // Submenue of insertMenue, holds inserts for application templates
+    QMenu *compilerMenue;      // Submenue of buildMenue, holds entries for selecting a certain compiler
 
     // Toolbars
     QToolBar *fileToolBar;          // holds file manipulating actions
@@ -209,6 +218,7 @@ private:
     // synatxMenue/tabwithMenue mutual exclude ActionGroups
     QActionGroup *syntaxGroup;      // holds different Lexers for mutual exclusion in menue
     QActionGroup *tabwidthGroup;     // holds different values for tab with
+    QActionGroup *compilerGroup;     // holds different values for compiler to use: 0 = vc, 1 = gcc, 2 = g++
 
     //Actions for fileMenue
     QAction *newAct;                // create new empty window
@@ -244,7 +254,11 @@ private:
     QAction *tabWith6Act;               // to be used in submenu tabwithMenue, sets tab with to 6
     QAction *tabWith8Act;               // to be used in submenu tabwithMenue, sets tab with to 8
     // Actions for buildMenue
-    QAction *compileAct;            // calls compilation of current file
+    QAction *selectCompilerAct;          // select the compiler to use (vbcc, gcc, g++)
+    QAction *selectCompilerVBCCAct;      // select the compiler to use (vbcc, gcc, g++)
+    QAction *selectCompilerGCCAct;       // select the compiler to use (vbcc, gcc, g++)
+    QAction *selectCompilerGPPAct;       // select the compiler to use (vbcc, gcc, g++)
+    QAction *compileAct;                // calls compilation of current file
     // Actions for toolsMenue
     QAction *emulatorAct;           // start UAE
     // Actions for syntaxMenue
@@ -303,8 +317,10 @@ private:
     // statusbar widgets
     QLabel *statusLabelX;
     QLabel *statusLabelY;
+    QLabel *compilerLabel;
     QLCDNumber  *statusLCD_X;       // shows cursor's line coordinate
     QLCDNumber  *statusLCD_Y;       // shows cursor's column coordinate
+    QComboBox *compilerCombo;       // puts a Compobox for compiler selection into statusbar
 
     // Font in use
     QFont myfont;
@@ -327,11 +343,19 @@ private:
     bool p_versionstring_set = false;
     int p_proc_is_started = 0;
     QString p_compiler = "/opt/amiga/bin/m68k-amigaos-gcc";                     // C-Compiler to call...
-    QString p_compiler_call = "-Wall -O2 -s -noixemul -lamiga ";                // Arguments for compilation..
+    QString p_compiler_call = "-Wall -O2 -s -noixemul -lamiga ";
+    QString p_compiler_gcc = "/opt/amiga/bin/m68k-amigaos-gcc";
+    QString p_compiler_gpp = "/opt/amiga/bin/m68k-amigaos-g++";
+    QString p_compiler_vc = "/opt/amiga/bin/vc";
+    QString p_compiler_gcc_call = "-Wall -O2 -s -noixemul -lamiga ";                // Arguments for compilation..
+    QString p_compiler_vc_call = "-v -O2 -size -lamiga ";
+    QString p_selected_compiler;
+    QString p_selected_compiler_args;
     QString p_compiledFile;                                                     // keep the currently compiled file for file checking
+    QString p_compiledFileSuffix;                                               // keep filename suffix for compiled output
     QFileInfo p_stripped_name;
     QString s_projectdir;
-    QStringList p_Compilers = { "GCC", "VBCC", "SAS/C", "StormC4", "DICE", "MaxonC++", "Manx Aztec C" };    // unused ATM...
+    QStringList p_Compilers = {"VBCC (C mode only)", "GNU gcc (C mode)", "GNU g++ (C++ mode)"};    // unused ATM...
 
 protected:
     void closeEvent(QCloseEvent *event);        // catch close() event
