@@ -2224,20 +2224,15 @@ void MainWindow::initializeFont()
 {
     // set a readable default font for Linux and Windows:
     #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-    QFont font("Courier New", 10);
-    #elif defined(__APPLE__)
-    QFont font("SF Mono Regular", 11);
-    if(p_mydebug)
-    {
+        QFont font("Courier New", 10);
+        #elif defined(__APPLE__)
+        QFont font("SF Mono Regular", 11);
         qDebug() << "Running on Mac. Font is SF Mono Regular now!";
-    }
-    #else
-    QFont font("Source Code Pro", 10);
-    if(p_mydebug)
-    {
+    #elif defined(__unix__)
+        QFont font("Source Code Pro", 9);
         qDebug() << "Linux detected. Setting font to Source Code Pro";
-    }
     #endif
+
     myfont = font;
     myfont.setFixedPitch(true);
     textEdit->setFont(myfont);
@@ -2305,22 +2300,9 @@ void MainWindow::initializeLexerNone()
 void MainWindow::initializeLexerCPP()
 {
     QsciLexerCPP *lexer = new QsciLexerCPP();
-    lexer->setDefaultFont(textEdit->font());
-    //lexer->setFoldComments(false);
     textEdit->setLexer(lexer);
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
-
-//    // implement a custom context menue for textEdit:
-//    textEdit->setContextMenuPolicy(Qt::CustomContextMenu);
-//    connect(textEdit, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(showCustomContextMenue(QPoint &)));
-    // Make sure everything is unfolded!
-    //QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
-//    if (!state)
-//    {
-//        textEdit->foldAll(false);
-//    }
     textEdit->setFolding(QsciScintilla::BoxedTreeFoldStyle);
-    initializeMargin();
     createStatusBarMessage(tr("Syntax changed to C/C++"), 0);
 }
 
@@ -2330,16 +2312,11 @@ void MainWindow::initializeLexerCPP()
 void MainWindow::initializeLexerMakefile()
 {
     QsciLexerMakefile *lexer = new QsciLexerMakefile;
-    lexer->setDefaultFont(textEdit->font());
+    //lexer->setDefaultFont(textEdit->font());
     //lexer->setFoldComments(true);
     textEdit->setLexer(lexer);
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
-    // Make sure everything is unfolded!
-    //QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
-//    if (!state)
-//    {
-//        textEdit->foldAll(false);
-//    }
+
     textEdit->setFolding(QsciScintilla::BoxedTreeFoldStyle);
     initializeMargin();
     createStatusBarMessage(tr("Syntax changed to Makefiles"), 0);
@@ -2351,16 +2328,10 @@ void MainWindow::initializeLexerMakefile()
 void MainWindow::initializeLexerBatch()
 {
     QsciLexerBatch *lexer = new QsciLexerBatch;
-    lexer->setDefaultFont(textEdit->font());
     //lexer->setFoldComments(true);
     textEdit->setLexer(lexer);
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
-    // Make sure everything is unfolded!
-    //QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
-//    if (!state)
-//    {
-//        textEdit->foldAll(false);
-//    }
+
     textEdit->setFolding(QsciScintilla::BoxedTreeFoldStyle);
     initializeMargin();
     createStatusBarMessage(tr("Syntax changed to Shell"), 0);
@@ -2372,16 +2343,10 @@ void MainWindow::initializeLexerBatch()
 void MainWindow::initializeLexerFortran()
 {
     QsciLexerFortran *lexer = new QsciLexerFortran;
-    lexer->setDefaultFont(textEdit->font());
     //lexer->setFoldComments(true);
     textEdit->setLexer(lexer);
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
-    // Make sure everything is unfolded!
-    //QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
-//    if (!state)
-//    {
-//        textEdit->foldAll(false);
-//    }
+
     textEdit->setFolding(QsciScintilla::BoxedTreeFoldStyle);
     initializeMargin();
     createStatusBarMessage(tr("Syntax changed to Amiga installer"), 0);
@@ -2393,16 +2358,10 @@ void MainWindow::initializeLexerFortran()
 void MainWindow::initializeLexerPascal()
 {
     QsciLexerPascal *lexer = new QsciLexerPascal;
-    lexer->setDefaultFont(textEdit->font());
     //lexer->setFoldComments(true);
     textEdit->setLexer(lexer);
     textEdit->SendScintilla(textEdit->QsciScintilla::SCI_STYLESETCHARACTERSET, 1, QsciScintilla::SC_CHARSET_8859_15);
-    // Make sure everything is unfolded!
-    //QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
-//    if (!state)
-//    {
-//        textEdit->foldAll(false);
-//    }
+
     textEdit->setFolding(QsciScintilla::BoxedTreeFoldStyle);
     initializeMargin();
     createStatusBarMessage(tr("Syntax changed to Pascal"), 0);
