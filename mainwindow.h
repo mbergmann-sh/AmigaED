@@ -65,6 +65,7 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QString cmdFileName);
+    bool fileExists(QString path);
 
 public slots:
     // Custom context menue:
@@ -324,11 +325,13 @@ private:
     // check if there is allready a main() function in a file
     bool p_main_set = false;
     bool p_versionstring_set = false;
-    QString p_compiler = "/opt/amiga/bin/m68k-amigaos-gcc";                    // C-Compiler to call...
+    int p_proc_is_started = 0;
+    QString p_compiler = "/opt/amiga/bin/m68k-amigaos-gcc";                     // C-Compiler to call...
     QString p_compiler_call = "-Wall -O2 -s -noixemul -lamiga ";                // Arguments for compilation..
+    QString p_compiledFile;                                                     // keep the currently compiled file for file checking
     QFileInfo p_stripped_name;
     QString s_projectdir;
-    QStringList p_Compilers = { "GCC", "VBCC", "SAS/C", "StormC4", "DICE" };    // unused ATM...
+    QStringList p_Compilers = { "GCC", "VBCC", "SAS/C", "StormC4", "DICE", "MaxonC++", "Manx Aztec C" };    // unused ATM...
 
 protected:
     void closeEvent(QCloseEvent *event);        // catch close() event
