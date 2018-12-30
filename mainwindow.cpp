@@ -49,6 +49,7 @@
 #include <QToolBar>
 
 #include <Qsci/qsciscintilla.h>
+#include <Qsci/qsciscintillabase.h>
 #include <Qsci/qscilexercpp.h>
 #include <Qsci/qscilexermakefile.h>
 #include <Qsci/qscilexerbatch.h>
@@ -317,6 +318,11 @@ void MainWindow::createActions()
     connect(textEdit, SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
     connect(textEdit, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));  
 
+    searchAct = new QAction(QIcon(":/images/search.png"), tr("Sea&rch..."), this);
+    searchAct->setShortcut(tr("Alt+r"));
+    searchAct->setStatusTip(tr("Search text in document"));
+    connect(searchAct, SIGNAL(triggered()), this, SLOT(actionSearch()));
+
     /* --- Navigation -------------------------------------------------------------------*/
     gotoTopAct = new QAction( tr("&Goto top..."), this);
     gotoTopAct->setShortcut(tr("Ctrl+Home"));
@@ -367,14 +373,20 @@ void MainWindow::createActions()
     showEOLAct = new QAction(tr("Show EOL character"), this);
     showEOLAct->setCheckable(true);
     showEOLAct->setChecked(false);
-    showEOLAct->setStatusTip(tr("Toggle debug output visibility"));
+    showEOLAct->setStatusTip(tr("Toggle EOL visibility"));
     connect(showEOLAct, SIGNAL(triggered()), this, SLOT(actionShowEOL()));
 
     showUnprintableAct = new QAction(tr("Show unprintable characters"), this);
     showUnprintableAct->setCheckable(true);
     showUnprintableAct->setChecked(false);
-    showUnprintableAct->setStatusTip(tr("Toggle debug output visibility"));
+    showUnprintableAct->setStatusTip(tr("Toggle unprintable characters visibility"));
     connect(showUnprintableAct, SIGNAL(triggered()), this, SLOT(actionShowUnprintable()));
+
+    showIndentationGuidesAct = new QAction(tr("Show indentation guides"), this);
+    showIndentationGuidesAct->setCheckable(true);
+    showIndentationGuidesAct->setChecked(false);
+    showIndentationGuidesAct->setStatusTip(tr("Toggle indentation guides visibility"));
+    connect(showIndentationGuidesAct, SIGNAL(triggered()), this, SLOT(actionShowIndentationGuides()));
 
     /* --- Build -----------------------------------------------------------------------*/
     selectCompilerVBCCAct = new QAction(tr("VBCC vc (C mode only)..."), this);
@@ -635,6 +647,8 @@ void MainWindow::createMenus()
     editMenue->addAction(cutAct);
     editMenue->addAction(copyAct);
     editMenue->addAction(pasteAct);
+    editMenue->addSeparator();
+    editMenue->addAction(searchAct);
 
     menuBar()->addSeparator();
 
@@ -727,6 +741,8 @@ void MainWindow::createMenus()
     viewMenue->addSeparator();
     viewMenue->addAction(showCaretLineAct);
     viewMenue->addSeparator();
+    viewMenue->addAction(showIndentationGuidesAct);
+    viewMenue->addSeparator();
     viewMenue->addAction(toggleFoldAct);
     viewMenue->addSeparator();
     charMenue = viewMenue->addMenu(tr("Special characters..."));
@@ -781,6 +797,9 @@ void MainWindow::createToolBars()
     editToolBar->addAction(cutAct);
     editToolBar->addAction(copyAct);
     editToolBar->addAction(pasteAct);
+
+    searchToolBar = addToolBar(tr("File"));
+    searchToolBar->addAction(searchAct);
 
     navigationToolBar = addToolBar(tr("Navigation"));
     navigationToolBar->addAction(gotoLineAct);
@@ -1203,19 +1222,22 @@ void MainWindow::SelectCompiler(int index)
 //
 void MainWindow::actionCompile()
 {
-    //CompilerDialog *cdialog = new CompilerDialog;
-    QString temp_compiler_call;
+    QString temp_compiler_call, mbox_title;
 
-//    for(int i = 0; i < p_Compilers.size(); ++i)
-//    {
-//        qDebug() << i << ". Compiler: " << p_Compilers.at(i).toLocal8Bit().constData();
-//    }
+    // set approbriate title for QInputDialog:
+    if(selectCompilerVBCCAct->isChecked())
+        mbox_title = "vbcc";
+    if(selectCompilerGCCAct->isChecked())
+        mbox_title = "m68k-amigaos-gcc";
+    if(selectCompilerGPPAct->isChecked())
+        mbox_title = "m68k-amigaos-g++";
+
 
     QString text = p_selected_compiler_args;
     bool ok;
     qDebug() << "START: Proc started " << p_proc_is_started << " times.";
 
-    text = QInputDialog::getText(this, tr("m68k-amigaos-gcc"),
+    text = QInputDialog::getText(this, mbox_title,
                                        tr("Compiler Options:"), QLineEdit::Normal,
                                        p_selected_compiler_args, &ok);
     if (ok && !text.isEmpty())
@@ -1243,7 +1265,6 @@ void MainWindow::actionCompile()
         text.clear();
         p_selected_compiler_args.clear();
         p_selected_compiler_args = temp_compiler_call;
-        //p_compiledFile.clear();
     }
     else
     {
@@ -1254,7 +1275,6 @@ void MainWindow::actionCompile()
       qDebug() << "Compiler call: " << p_compiler_call;
       text.clear();
     }
-    //cdialog->exec();
 }
 
 //
@@ -1272,6 +1292,21 @@ void MainWindow::actionShowDebug()
 
     if(p_mydebug)
         qDebug() << "p_mydebug = " << p_mydebug;
+}
+
+//
+// Show or hide indentaation guides
+//
+void MainWindow::actionShowIndentationGuides()
+{
+    if(showIndentationGuidesAct->isChecked())
+    {
+        textEdit->setIndentationGuides(true);
+    }
+    else
+    {
+        textEdit->setIndentationGuides(false);
+    }
 }
 
 /* ------------ Begin insertMenue Actions -----------------*/
@@ -2297,16 +2332,16 @@ void MainWindow::actionShowLineNumbers()
 //
 void MainWindow::actionShowUnprintable()
 {
-    qDebug() << "in unprintable";
     if(showUnprintableAct->isChecked())
     {
-        qDebug() << "in unprintable: checked";
         // show unprintable characters
         textEdit->setEolVisibility(true);
         textEdit->setIndentationGuides(true);
         textEdit->setWhitespaceVisibility(QsciScintilla::WsVisible);
         this->showEOLAct->setChecked(true);
         this->showEOLAct->setEnabled(false);
+        this->showIndentationGuidesAct->setChecked(true);
+        this->showIndentationGuidesAct->setEnabled(false);
     }
     else
     {
@@ -2316,6 +2351,8 @@ void MainWindow::actionShowUnprintable()
         textEdit->setWhitespaceVisibility(QsciScintilla::WsInvisible);
         this->showEOLAct->setChecked(false);
         this->showEOLAct->setEnabled(true);
+        this->showIndentationGuidesAct->setChecked(false);
+        this->showIndentationGuidesAct->setEnabled(true);
     }
 }
 
@@ -2333,6 +2370,43 @@ void MainWindow::actionShowEOL()
     {
         // don't show EOL character
         textEdit->setEolVisibility(true);
+    }
+}
+
+//
+// Toggle visibility of caret line
+//
+void MainWindow::actionSearch()
+{
+    bool ok;
+    qDebug() << "in search";
+    QInputDialog *searchDialog = new QInputDialog(this);
+
+
+    QString text = searchDialog->getText(this, tr("Amiga Cross Editor - Search"),
+                                       tr("Search text:"), QLineEdit::Normal,
+                                       nullptr, &ok);
+    searchDialog->setOkButtonText("Search!");
+
+    if (ok && !text.isEmpty())
+    {
+        qDebug() << text;
+        textEdit->SendScintilla(QsciScintillaBase::SCI_INDICSETSTYLE,0, 7);
+
+        QString docText = textEdit->text();
+        int end = docText.lastIndexOf(text);
+        int cur = -1;
+
+        if(end != -1)
+        {
+            while(cur != end)
+            {
+                cur = docText.indexOf(text,cur+1);
+                textEdit->SendScintilla(QsciScintillaBase::SCI_INDICATORFILLRANGE,cur,
+                    text.length());
+            }
+        }
+
     }
 }
 

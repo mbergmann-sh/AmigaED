@@ -61,6 +61,7 @@ class QLabel;
 class QComboBox;
 class QsciScintilla;
 
+
 class MainWindow : public QMainWindow
 {
     // give the meta compiler a chance!
@@ -118,12 +119,14 @@ private slots:
     void actionGoto_matching_brace();   // jumps to matching brace
     void actionCompile();               // calls compilation of current file
     void actionEmulator();              // starts UAE
+    void actionSearch();                // opens a search dialog
     // viewMenue and submenue actions
     void actionShowLineNumbers();         // show or hide line numbers
     void actionShowCaretLine();           // show or hide caret line
     void actionShowDebug();               // sets showing or hideing for debugging informations
     void actionShowEOL();                 // show or hide EOL character
     void actionShowUnprintable();         // show or hide unprintable characters
+    void actionShowIndentationGuides();   // show or hide indentation guides
     // insertMenue and submenue actions:
     void actionInsertShellAppSkeletton();
     void actionInsertCAppSkeletton();
@@ -220,6 +223,7 @@ private:
     QToolBar *navigationToolBar;    // holds actions to move around in text
     QToolBar *buildToolBar;         // holds compiler / build actions
     QToolBar *toolsToolBar;         // holds misc actions
+    QToolBar *searchToolBar;        // holds search/replace
 
     // synatxMenue/tabwithMenue mutual exclude ActionGroups
     QActionGroup *syntaxGroup;      // holds different Lexers for mutual exclusion in menue
@@ -237,6 +241,7 @@ private:
     QAction *cutAct;                // copy marked text into clipboard and delete original
     QAction *copyAct;               // copy marked text into clipboard
     QAction *pasteAct;              // paste clipboard
+    QAction *searchAct;             // search for text
     // Actions for helpMenue
     QAction *aboutAct;              // show about message
     QAction *aboutQtAct;            // show about-Qt message
@@ -247,9 +252,9 @@ private:
     QAction *gotoMatchingBraceAct;  // jump to matching brace
     // Actions for viewMenue
     QAction *showLineNumbersAct;        // toggle visibility of Line numbers
-    QAction *showCaretLineAct;         // toggle caret line
+    QAction *showCaretLineAct;          // toggle caret line
     QAction *toggleFoldAct;             // toggle text folding
-    QAction *showIndentationLineAct;    // toggle visibility of indentation lines
+    QAction *showIndentationGuidesAct;  // toggle visibility of indentation lines
     QAction *showDebugInfoAct;          // show or hide debugging informations
     QAction *showEOLAct;                // toggle visbility of EOL
     QAction *showUnprintableAct;        // toggle visibility of unprintable characters
