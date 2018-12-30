@@ -118,7 +118,12 @@ private slots:
     void actionGoto_matching_brace();   // jumps to matching brace
     void actionCompile();               // calls compilation of current file
     void actionEmulator();              // starts UAE
-    void actionShowDebug();             // sets showing or hideing for debugging informations
+    // viewMenue and submenue actions
+    void actionShowLineNumbers();         // show or hide line numbers
+    void actionShowCaretLine();           // show or hide caret line
+    void actionShowDebug();               // sets showing or hideing for debugging informations
+    void actionShowEOL();                 // show or hide EOL character
+    void actionShowUnprintable();         // show or hide unprintable characters
     // insertMenue and submenue actions:
     void actionInsertShellAppSkeletton();
     void actionInsertCAppSkeletton();
@@ -206,7 +211,8 @@ private:
     QMenu *classMenue;          // Submenue of insertMenue, holds C/++ class inserts
     QMenu *snippetsMenue;       // Submenue of insertMenue, holds inserts for user-defined code snippets
     QMenu *templatesMenue;      // Submenue of insertMenue, holds inserts for application templates
-    QMenu *compilerMenue;      // Submenue of buildMenue, holds entries for selecting a certain compiler
+    QMenu *compilerMenue;       // Submenue of buildMenue, holds entries for selecting a certain compiler
+    QMenu *charMenue;           // Submenue of viewMenue, holds entries for EOL and unprintable characters
 
     // Toolbars
     QToolBar *fileToolBar;          // holds file manipulating actions
@@ -241,7 +247,7 @@ private:
     QAction *gotoMatchingBraceAct;  // jump to matching brace
     // Actions for viewMenue
     QAction *showLineNumbersAct;        // toggle visibility of Line numbers
-    QAction *showCarretlineAct;         // toggle caret line
+    QAction *showCaretLineAct;         // toggle caret line
     QAction *toggleFoldAct;             // toggle text folding
     QAction *showIndentationLineAct;    // toggle visibility of indentation lines
     QAction *showDebugInfoAct;          // show or hide debugging informations

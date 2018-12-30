@@ -315,16 +315,7 @@ void MainWindow::createActions()
     cutAct->setEnabled(false);
     copyAct->setEnabled(false);
     connect(textEdit, SIGNAL(copyAvailable(bool)), cutAct, SLOT(setEnabled(bool)));
-    connect(textEdit, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));
-
-    /* --- Help -------------------------------------------------------------------------*/
-    aboutAct = new QAction(tr("&About"), this);
-    aboutAct->setStatusTip(tr("Show the application's About box"));
-    connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
-
-    aboutQtAct = new QAction(tr("About &Qt"), this);
-    aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
-    connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));   
+    connect(textEdit, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));  
 
     /* --- Navigation -------------------------------------------------------------------*/
     gotoTopAct = new QAction( tr("&Goto top..."), this);
@@ -348,16 +339,42 @@ void MainWindow::createActions()
     connect(gotoMatchingBraceAct, SIGNAL(triggered()), this, SLOT(actionGoto_matching_brace()));
 
     /* --- View -----------------------------------------------------------------------*/
-    toggleFoldAct = new QAction(QIcon(":/images/gotoline.png"), tr("Toggle &folding..."), this);
+    toggleFoldAct = new QAction(tr("&Fold all..."), this);
     toggleFoldAct->setShortcut(tr("Ctrl+f"));
+    toggleFoldAct->setCheckable(true);
+    toggleFoldAct->setChecked(false);
     toggleFoldAct->setStatusTip(tr("Toggle folding for whole document"));
     connect(toggleFoldAct, SIGNAL(triggered()), this, SLOT(initializeFolding()));
+
+    showLineNumbersAct = new QAction(tr("Show line numbers..."), this);
+    showLineNumbersAct->setCheckable(true);
+    showLineNumbersAct->setChecked(true);
+    showLineNumbersAct->setStatusTip(tr("Show or hide line numbers"));
+    connect(showLineNumbersAct, SIGNAL(triggered()), this, SLOT(actionShowLineNumbers()));
+
+    showCaretLineAct = new QAction(tr("Show caret line..."), this);
+    showCaretLineAct->setCheckable(true);
+    showCaretLineAct->setChecked(false);
+    showCaretLineAct->setStatusTip(tr("Show or hide caret line"));
+    connect(showCaretLineAct, SIGNAL(triggered()), this, SLOT(actionShowCaretLine()));
 
     showDebugInfoAct = new QAction(tr("Show debug output"), this);
     showDebugInfoAct->setCheckable(true);
     showDebugInfoAct->setChecked(p_mydebug);
     showDebugInfoAct->setStatusTip(tr("Toggle debug output visibility"));
     connect(showDebugInfoAct, SIGNAL(triggered()), this, SLOT(actionShowDebug()));
+
+    showEOLAct = new QAction(tr("Show EOL character"), this);
+    showEOLAct->setCheckable(true);
+    showEOLAct->setChecked(false);
+    showEOLAct->setStatusTip(tr("Toggle debug output visibility"));
+    connect(showEOLAct, SIGNAL(triggered()), this, SLOT(actionShowEOL()));
+
+    showUnprintableAct = new QAction(tr("Show unprintable characters"), this);
+    showUnprintableAct->setCheckable(true);
+    showUnprintableAct->setChecked(false);
+    showUnprintableAct->setStatusTip(tr("Toggle debug output visibility"));
+    connect(showUnprintableAct, SIGNAL(triggered()), this, SLOT(actionShowUnprintable()));
 
     /* --- Build -----------------------------------------------------------------------*/
     selectCompilerVBCCAct = new QAction(tr("VBCC vc (C mode only)..."), this);
@@ -586,6 +603,15 @@ void MainWindow::createActions()
     snippet4Act = new QAction(tr("Snippet #4..."), this); // inserts into insertMenue => snippetsMenue
     snippet4Act->setStatusTip(tr("insert Snippet #4"));
     connect(snippet4Act, SIGNAL(triggered()), this, SLOT(actionInsertSnippet4()));
+
+    /* --- Help -------------------------------------------------------------------------*/
+    aboutAct = new QAction(tr("&About"), this);
+    aboutAct->setStatusTip(tr("Show the application's About box"));
+    connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
+
+    aboutQtAct = new QAction(tr("About &Qt"), this);
+    aboutQtAct->setStatusTip(tr("Show the Qt library's About box"));
+    connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 }
 
 //
@@ -697,8 +723,16 @@ void MainWindow::createMenus()
 
     // View menue
     viewMenue = menuBar()->addMenu(tr("&View"));
+    viewMenue->addAction(showLineNumbersAct);
+    viewMenue->addSeparator();
+    viewMenue->addAction(showCaretLineAct);
+    viewMenue->addSeparator();
     viewMenue->addAction(toggleFoldAct);
     viewMenue->addSeparator();
+    charMenue = viewMenue->addMenu(tr("Special characters..."));
+    charMenue->addAction(showEOLAct);
+    charMenue->addAction(showUnprintableAct);
+
     viewMenue->addAction(showDebugInfoAct);
 
     menuBar()->addSeparator();
@@ -1088,6 +1122,7 @@ void MainWindow::actionGoto_Line()
         }
         textEdit->setCursorPosition(i-1,0);
         textEdit->setCaretLineVisible(true);
+        this->showCaretLineAct->setChecked(true);
     }
 }
 
@@ -2216,6 +2251,91 @@ void MainWindow::actionEmulator()
           }
 }
 
+//
+// Toggle visibility of caret line
+//
+void MainWindow::actionShowCaretLine()
+{
+    qDebug() << "in carret line";
+    //popNotImplemented();
+    if(showCaretLineAct->isChecked())
+    {
+        // show caret line
+        textEdit->setCaretLineVisible(true);
+    }
+    else
+    {
+        // don't show caret line
+        textEdit->setCaretLineVisible(false);
+    }
+}
+
+//
+// Toggle visibility of line numbers
+//
+void MainWindow::actionShowLineNumbers()
+{
+    QFontMetrics fontmetrics = QFontMetrics(textEdit->font());
+    qDebug() << "in line numbers";
+    // popNotImplemented();
+    if(showLineNumbersAct->isChecked())
+    {
+        // show line numbers
+        textEdit->setMarginLineNumbers(0, true);
+        textEdit->setMarginWidth(0, fontmetrics.width(QString::number(textEdit->lines())) + 10);
+    }
+    else
+    {
+        // don't show line numbers
+        textEdit->setMarginLineNumbers(0, false);
+        textEdit->setMarginWidth(0, "");
+    }
+}
+
+//
+//  TOGGLE: Show or hide unprintable characters
+//
+void MainWindow::actionShowUnprintable()
+{
+    qDebug() << "in unprintable";
+    if(showUnprintableAct->isChecked())
+    {
+        qDebug() << "in unprintable: checked";
+        // show unprintable characters
+        textEdit->setEolVisibility(true);
+        textEdit->setIndentationGuides(true);
+        textEdit->setWhitespaceVisibility(QsciScintilla::WsVisible);
+        this->showEOLAct->setChecked(true);
+        this->showEOLAct->setEnabled(false);
+    }
+    else
+    {
+        // don't show unprintable characters
+        textEdit->setEolVisibility(false);
+        textEdit->setIndentationGuides(false);
+        textEdit->setWhitespaceVisibility(QsciScintilla::WsInvisible);
+        this->showEOLAct->setChecked(false);
+        this->showEOLAct->setEnabled(true);
+    }
+}
+
+//
+//  TOGGLE: Show or hide EOL character
+//
+void MainWindow::actionShowEOL()
+{
+    if(showEOLAct->isChecked())
+    {
+        // show EOL character
+        textEdit->setEolVisibility(true);
+    }
+    else
+    {
+        // don't show EOL character
+        textEdit->setEolVisibility(true);
+    }
+}
+
 
 //
 // set default fonts, depending on OS
@@ -2476,6 +2596,8 @@ void MainWindow::initializeGUI()
 
     // make editor as Amiga-compatible as possible:
     textEdit->setEolMode(QsciScintilla::EolUnix);
+    textEdit->setIndentationsUseTabs(true);
+    textEdit->setIndentationWidth(4);
     textEdit->setTabWidth(4);
     textEdit->setAutoIndent(true);
     textEdit->setBraceMatching(QsciScintilla::SloppyBraceMatch);
@@ -2669,8 +2791,8 @@ int MainWindow::startProc(QString infile, QString outfile)
 
     myProcess.start(command, arguments);
 
-    QObject::connect(&myProcess, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(finished(int,QProcess::ExitStatus)));
-    QObject::connect(&myProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(compiler_readyReadStandardOutput()));
+    //QObject::connect(&myProcess, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(finished(int,QProcess::ExitStatus)));
+   // QObject::connect(&myProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(compiler_readyReadStandardOutput()));
     QObject::connect(&myProcess, SIGNAL(started()), this, SLOT(started()));
 
     //qDebug() << myProcess.command;
@@ -2777,6 +2899,7 @@ void MainWindow::readyReadStandardOutput()
   QByteArray buf = myProcess->readAllStandardOutput();
 
   QFile data(s_projectdir + QDir::separator() + "compiler_out.txt");
+  qDebug() << "logfile: " << s_projectdir + QDir::separator() + "compiler_out.txt";
   if (data.open(QFile::WriteOnly | QFile::Truncate))
   {
       //ui->textBrowser->clear();
