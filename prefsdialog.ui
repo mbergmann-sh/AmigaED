@@ -20,30 +20,6 @@
    <bool>true</bool>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <item row="1" column="1">
-    <widget class="QPushButton" name="btn_SavePrefs">
-     <property name="text">
-      <string>Save Prefs</string>
-     </property>
-     <property name="icon">
-      <iconset resource="application.qrc">
-       <normaloff>:/images/prefs.png</normaloff>:/images/prefs.png</iconset>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>297</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
    <item row="0" column="0" colspan="2">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
@@ -54,6 +30,45 @@
        <string>Project</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
+       <item row="6" column="1">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Expanding</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>3</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Email:</string>
+         </property>
+         <property name="buddy">
+          <cstring>lineEdit_email</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QLineEdit" name="lineEdit_purpose">
+         <property name="minimumSize">
+          <size>
+           <width>142</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>CHANGE_ME</string>
+         </property>
+        </widget>
+       </item>
        <item row="0" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
@@ -61,6 +76,42 @@
          </property>
          <property name="buddy">
           <cstring>lineEdit_author</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="lineEdit_description">
+         <property name="minimumSize">
+          <size>
+           <width>142</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>CHANGE_ME</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLineEdit" name="lineEdit_website">
+         <property name="minimumSize">
+          <size>
+           <width>142</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>http://www.somewhere.com</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_30">
+         <property name="text">
+          <string>Purpose:</string>
+         </property>
+         <property name="buddy">
+          <cstring>lineEdit_website</cstring>
          </property>
         </widget>
        </item>
@@ -77,15 +128,53 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_2">
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_29">
          <property name="text">
-          <string>Email:</string>
+          <string>Description:</string>
          </property>
          <property name="buddy">
-          <cstring>lineEdit_email</cstring>
+          <cstring>lineEdit_website</cstring>
          </property>
         </widget>
+       </item>
+       <item row="5" column="0" colspan="2">
+        <layout class="QGridLayout" name="gridLayout_5">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Projects root:</string>
+           </property>
+           <property name="buddy">
+            <cstring>lineEdit_projectsRootDir</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="lineEdit_projectsRootDir">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QPushButton" name="btn_getProjectRootDir">
+           <property name="maximumSize">
+            <size>
+             <width>31</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="application.qrc">
+             <normaloff>:/images/open.png</normaloff>:/images/open.png</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item row="1" column="1">
         <widget class="QLineEdit" name="lineEdit_email">
@@ -110,73 +199,6 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="lineEdit_website">
-         <property name="minimumSize">
-          <size>
-           <width>142</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>http://www.somewhere.com</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0" colspan="2">
-        <layout class="QGridLayout" name="gridLayout_5">
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>Projects root:</string>
-           </property>
-           <property name="buddy">
-            <cstring>lineEdit_projects_root</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEdit_projects_root">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="QPushButton" name="btn_getProjectRoot">
-           <property name="maximumSize">
-            <size>
-             <width>31</width>
-             <height>25</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="application.qrc">
-             <normaloff>:/images/open.png</normaloff>:/images/open.png</iconset>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="4" column="1">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Expanding</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>65</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tabGCC">
@@ -184,86 +206,17 @@
        <string>GCC</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_3">
-       <item row="0" column="0">
-        <layout class="QGridLayout" name="gridLayout_6">
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_5">
-           <property name="text">
-            <string>GNU gcc:</string>
-           </property>
-           <property name="buddy">
-            <cstring>lineEdit_projects_root</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEdit_projects_root_2">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="QPushButton" name="btn_getProjectRoot_2">
-           <property name="maximumSize">
-            <size>
-             <width>31</width>
-             <height>25</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="application.qrc">
-             <normaloff>:/images/open.png</normaloff>:/images/open.png</iconset>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="1" column="0">
-        <layout class="QGridLayout" name="gridLayout_7">
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>GNU g++:</string>
-           </property>
-           <property name="buddy">
-            <cstring>lineEdit_projects_root</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEdit_projects_root_3">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="QPushButton" name="btn_getProjectRoot_3">
-           <property name="maximumSize">
-            <size>
-             <width>31</width>
-             <height>25</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="application.qrc">
-             <normaloff>:/images/open.png</normaloff>:/images/open.png</iconset>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
        <item row="2" column="0">
         <layout class="QGridLayout" name="gridLayout_8">
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="lineEdit_getMAKEexefile">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="2">
-          <widget class="QPushButton" name="btn_getProjectRoot_4">
+          <widget class="QPushButton" name="btn_getMAKEexefile">
            <property name="maximumSize">
             <size>
              <width>31</width>
@@ -275,7 +228,7 @@
            </property>
            <property name="icon">
             <iconset resource="application.qrc">
-             <normaloff>:/images/open.png</normaloff>:/images/open.png</iconset>
+             <normaloff>:/images/new.png</normaloff>:/images/new.png</iconset>
            </property>
           </widget>
          </item>
@@ -285,52 +238,7 @@
             <string>GNU make:</string>
            </property>
            <property name="buddy">
-            <cstring>lineEdit_projects_root</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEdit_projects_root_4">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="3" column="0">
-        <layout class="QGridLayout" name="gridLayout_28">
-         <item row="0" column="2">
-          <widget class="QPushButton" name="btn_getProjectRoot_17">
-           <property name="maximumSize">
-            <size>
-             <width>31</width>
-             <height>25</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="application.qrc">
-             <normaloff>:/images/open.png</normaloff>:/images/open.png</iconset>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_27">
-           <property name="text">
-            <string>GNU strip:</string>
-           </property>
-           <property name="buddy">
-            <cstring>lineEdit_projects_root</cstring>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEdit_projects_root_20">
-           <property name="text">
-            <string/>
+            <cstring>lineEdit_projectsRootDir</cstring>
            </property>
           </widget>
          </item>
@@ -339,7 +247,7 @@
        <item row="4" column="0">
         <layout class="QGridLayout" name="gridLayout_9">
          <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEdit_projects_root_5">
+          <widget class="QLineEdit" name="lineEdit_GCCdefaultOpts">
            <property name="text">
             <string>-std=gnu89 -O2 -Wall -noixemul -lamiga</string>
            </property>
@@ -351,7 +259,7 @@
             <string>default opts:</string>
            </property>
            <property name="buddy">
-            <cstring>lineEdit_projects_root</cstring>
+            <cstring>lineEdit_projectsRootDir</cstring>
            </property>
           </widget>
          </item>
@@ -373,6 +281,120 @@
          </property>
         </spacer>
        </item>
+       <item row="0" column="0">
+        <layout class="QGridLayout" name="gridLayout_6">
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="lineEdit_getGCCexefile">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QPushButton" name="btn_getGCCexefile">
+           <property name="maximumSize">
+            <size>
+             <width>31</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="application.qrc">
+             <normaloff>:/images/new.png</normaloff>:/images/new.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>GNU gcc:</string>
+           </property>
+           <property name="buddy">
+            <cstring>lineEdit_projectsRootDir</cstring>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="0">
+        <layout class="QGridLayout" name="gridLayout_7">
+         <item row="0" column="2">
+          <widget class="QPushButton" name="btn_getGPPexefile">
+           <property name="maximumSize">
+            <size>
+             <width>31</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="application.qrc">
+             <normaloff>:/images/new.png</normaloff>:/images/new.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="lineEdit_getGPPexefile">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>GNU g++:</string>
+           </property>
+           <property name="buddy">
+            <cstring>lineEdit_projectsRootDir</cstring>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="3" column="0">
+        <layout class="QGridLayout" name="gridLayout_28">
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="lineEdit_getSTRIPexefile">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QPushButton" name="btn_getSTRIPexefile">
+           <property name="maximumSize">
+            <size>
+             <width>31</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="application.qrc">
+             <normaloff>:/images/new.png</normaloff>:/images/new.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_27">
+           <property name="text">
+            <string>GNU strip:</string>
+           </property>
+           <property name="buddy">
+            <cstring>lineEdit_projectsRootDir</cstring>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tabVBCC">
@@ -388,19 +410,19 @@
             <string>vc: </string>
            </property>
            <property name="buddy">
-            <cstring>lineEdit_projects_root</cstring>
+            <cstring>lineEdit_projectsRootDir</cstring>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEdit_projects_root_13">
+          <widget class="QLineEdit" name="lineEdit_getVCexefile">
            <property name="text">
             <string/>
            </property>
           </widget>
          </item>
          <item row="0" column="2">
-          <widget class="QPushButton" name="btn_getProjectRoot_11">
+          <widget class="QPushButton" name="btn_getVCexefile">
            <property name="maximumSize">
             <size>
              <width>31</width>
@@ -412,7 +434,7 @@
            </property>
            <property name="icon">
             <iconset resource="application.qrc">
-             <normaloff>:/images/open.png</normaloff>:/images/open.png</iconset>
+             <normaloff>:/images/new.png</normaloff>:/images/new.png</iconset>
            </property>
           </widget>
          </item>
@@ -426,19 +448,19 @@
             <string>vasm: </string>
            </property>
            <property name="buddy">
-            <cstring>lineEdit_projects_root</cstring>
+            <cstring>lineEdit_projectsRootDir</cstring>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEdit_projects_root_11">
+          <widget class="QLineEdit" name="lineEdit_getVASMexefile">
            <property name="text">
             <string/>
            </property>
           </widget>
          </item>
          <item row="0" column="2">
-          <widget class="QPushButton" name="btn_getProjectRoot_9">
+          <widget class="QPushButton" name="btn_getVASMexefile">
            <property name="maximumSize">
             <size>
              <width>31</width>
@@ -450,7 +472,7 @@
            </property>
            <property name="icon">
             <iconset resource="application.qrc">
-             <normaloff>:/images/open.png</normaloff>:/images/open.png</iconset>
+             <normaloff>:/images/new.png</normaloff>:/images/new.png</iconset>
            </property>
           </widget>
          </item>
@@ -459,7 +481,7 @@
        <item row="2" column="0">
         <layout class="QGridLayout" name="gridLayout_17">
          <item row="0" column="2">
-          <widget class="QPushButton" name="btn_getProjectRoot_10">
+          <widget class="QPushButton" name="btn_getVCconfigDir">
            <property name="maximumSize">
             <size>
              <width>31</width>
@@ -481,12 +503,12 @@
             <string>config dir:</string>
            </property>
            <property name="buddy">
-            <cstring>lineEdit_projects_root</cstring>
+            <cstring>lineEdit_projectsRootDir</cstring>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEdit_projects_root_12">
+          <widget class="QLineEdit" name="lineEdit_getVCconfigDir">
            <property name="text">
             <string/>
            </property>
@@ -497,7 +519,7 @@
        <item row="3" column="0">
         <layout class="QGridLayout" name="gridLayout_19">
          <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEdit_projects_root_14">
+          <widget class="QLineEdit" name="lineEdit_VCdefaultOpts">
            <property name="text">
             <string>-v -O2 -size -lamiga</string>
            </property>
@@ -509,7 +531,7 @@
             <string>default opts:</string>
            </property>
            <property name="buddy">
-            <cstring>lineEdit_projects_root</cstring>
+            <cstring>lineEdit_projectsRootDir</cstring>
            </property>
           </widget>
          </item>
@@ -546,19 +568,19 @@
             <string>UAE:</string>
            </property>
            <property name="buddy">
-            <cstring>lineEdit_projects_root</cstring>
+            <cstring>lineEdit_projectsRootDir</cstring>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEdit_projects_root_16">
+          <widget class="QLineEdit" name="lineEdit_getEmulatorExefile">
            <property name="text">
             <string/>
            </property>
           </widget>
          </item>
          <item row="0" column="2">
-          <widget class="QPushButton" name="btn_getProjectRoot_13">
+          <widget class="QPushButton" name="btn_getEmulatorExefile">
            <property name="maximumSize">
             <size>
              <width>31</width>
@@ -570,7 +592,7 @@
            </property>
            <property name="icon">
             <iconset resource="application.qrc">
-             <normaloff>:/images/open.png</normaloff>:/images/open.png</iconset>
+             <normaloff>:/images/new.png</normaloff>:/images/new.png</iconset>
            </property>
           </widget>
          </item>
@@ -584,19 +606,19 @@
             <string>OS 1.3 config:</string>
            </property>
            <property name="buddy">
-            <cstring>lineEdit_projects_root</cstring>
+            <cstring>lineEdit_projectsRootDir</cstring>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEdit_projects_root_15">
+          <widget class="QLineEdit" name="lineEdit_getOS13Configfile">
            <property name="text">
             <string/>
            </property>
           </widget>
          </item>
          <item row="0" column="2">
-          <widget class="QPushButton" name="btn_getProjectRoot_12">
+          <widget class="QPushButton" name="btn_getOS13Configfile">
            <property name="maximumSize">
             <size>
              <width>31</width>
@@ -608,7 +630,7 @@
            </property>
            <property name="icon">
             <iconset resource="application.qrc">
-             <normaloff>:/images/open.png</normaloff>:/images/open.png</iconset>
+             <normaloff>:/images/new.png</normaloff>:/images/new.png</iconset>
            </property>
           </widget>
          </item>
@@ -617,7 +639,7 @@
        <item row="2" column="0">
         <layout class="QGridLayout" name="gridLayout_23">
          <item row="0" column="2">
-          <widget class="QPushButton" name="btn_getProjectRoot_14">
+          <widget class="QPushButton" name="btn_getOS20Configfile">
            <property name="maximumSize">
             <size>
              <width>31</width>
@@ -629,7 +651,7 @@
            </property>
            <property name="icon">
             <iconset resource="application.qrc">
-             <normaloff>:/images/open.png</normaloff>:/images/open.png</iconset>
+             <normaloff>:/images/new.png</normaloff>:/images/new.png</iconset>
            </property>
           </widget>
          </item>
@@ -639,12 +661,12 @@
             <string>OS 2.0 config:</string>
            </property>
            <property name="buddy">
-            <cstring>lineEdit_projects_root</cstring>
+            <cstring>lineEdit_projectsRootDir</cstring>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEdit_projects_root_17">
+          <widget class="QLineEdit" name="lineEdit_getOS20Configfile">
            <property name="text">
             <string/>
            </property>
@@ -655,7 +677,7 @@
        <item row="3" column="0">
         <layout class="QGridLayout" name="gridLayout_24">
          <item row="0" column="2">
-          <widget class="QPushButton" name="btn_getProjectRoot_15">
+          <widget class="QPushButton" name="btn_getOS3Configfile">
            <property name="maximumSize">
             <size>
              <width>31</width>
@@ -667,7 +689,7 @@
            </property>
            <property name="icon">
             <iconset resource="application.qrc">
-             <normaloff>:/images/open.png</normaloff>:/images/open.png</iconset>
+             <normaloff>:/images/new.png</normaloff>:/images/new.png</iconset>
            </property>
           </widget>
          </item>
@@ -677,12 +699,12 @@
             <string>OS 3.x config:</string>
            </property>
            <property name="buddy">
-            <cstring>lineEdit_projects_root</cstring>
+            <cstring>lineEdit_projectsRootDir</cstring>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEdit_projects_root_18">
+          <widget class="QLineEdit" name="lineEdit_getOS3Configfile">
            <property name="text">
             <string/>
            </property>
@@ -693,7 +715,7 @@
        <item row="4" column="0">
         <layout class="QGridLayout" name="gridLayout_25">
          <item row="0" column="2">
-          <widget class="QPushButton" name="btn_getProjectRoot_16">
+          <widget class="QPushButton" name="btn_getOS4Configfile">
            <property name="maximumSize">
             <size>
              <width>31</width>
@@ -705,7 +727,7 @@
            </property>
            <property name="icon">
             <iconset resource="application.qrc">
-             <normaloff>:/images/open.png</normaloff>:/images/open.png</iconset>
+             <normaloff>:/images/new.png</normaloff>:/images/new.png</iconset>
            </property>
           </widget>
          </item>
@@ -715,12 +737,12 @@
             <string>OS 4.x config:</string>
            </property>
            <property name="buddy">
-            <cstring>lineEdit_projects_root</cstring>
+            <cstring>lineEdit_projectsRootDir</cstring>
            </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEdit_projects_root_19">
+          <widget class="QLineEdit" name="lineEdit_getOS4Configfile">
            <property name="text">
             <string/>
            </property>
@@ -751,7 +773,7 @@
           </widget>
          </item>
          <item row="0" column="2">
-          <widget class="QComboBox" name="comboBox">
+          <widget class="QComboBox" name="comboBox_defaultEmulator">
            <property name="toolTip">
             <string>Select default AmigaOS to be started</string>
            </property>
@@ -850,6 +872,30 @@
        </item>
       </layout>
      </widget>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>297</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="1">
+    <widget class="QPushButton" name="btn_SavePrefs">
+     <property name="text">
+      <string>Save Prefs</string>
+     </property>
+     <property name="icon">
+      <iconset resource="application.qrc">
+       <normaloff>:/images/prefs.png</normaloff>:/images/prefs.png</iconset>
+     </property>
     </widget>
    </item>
   </layout>

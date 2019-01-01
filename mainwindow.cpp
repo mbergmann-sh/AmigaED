@@ -3048,5 +3048,11 @@ void MainWindow::compiler_readyReadStandardOutput()
   qDebug() << buf;
 }
 
-
+////////////////////////////
+// Setters for prefs vars //
+///////////////////////////
+void MainWindow::setCompilerGCC(QString compiler)
+{
+    p_compiler_gcc = compiler;
+}
 
