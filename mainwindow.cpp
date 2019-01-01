@@ -60,7 +60,7 @@
 
 // allways get your defaults!
 #include "mainwindow.h"
-#include "compilerdialog.h"
+#include "prefsdialog.h"
 
 // Processes to start:
 static QProcess myProcess;      // the process for running the compiler
@@ -283,6 +283,10 @@ void MainWindow::createActions()
     saveAsAct = new QAction(QIcon(":/images/filesaveas.png"),tr("Save &As..."), this);
     saveAsAct->setStatusTip(tr("Save the document under a new name"));
     connect(saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
+
+    prefsAct = new QAction(QIcon(":/images/prefs.png"),tr("Global prefs..."), this);
+    prefsAct->setStatusTip(tr("Open global preferences..."));
+    connect(prefsAct, SIGNAL(triggered()), this, SLOT(actionPrefsDialog()));
 
     printAct = new QAction(QIcon(":/images/printer.png"),tr("&Print file..."), this);
     printAct->setShortcut(tr("Ctrl+p"));
@@ -639,6 +643,8 @@ void MainWindow::createMenus()
     fileMenue->addAction(saveAsAct);
     fileMenue->addSeparator();
     fileMenue->addAction(printAct);
+    fileMenue->addSeparator();
+    fileMenue->addAction(prefsAct);
     fileMenue->addSeparator();
     fileMenue->addAction(exitAct);
 
@@ -1377,6 +1383,7 @@ void MainWindow::actionInsertAmigaIncludes()
     textEdit->insertAt("#include\t<utility/hooks.h>\n", ++line, 0);
     textEdit->insertAt("\n", ++line, 0);  // insert empty line!
     textEdit->insertAt("/* --- protos ----------------- */\n", ++line, 0);
+    textEdit->insertAt("#if !defined(__MAXON__)\n", ++line, 0);
     textEdit->insertAt("#include\t<proto/asl.h>\n", ++line, 0);
     textEdit->insertAt("#include\t<proto/commodities.h>\n", ++line, 0);
     textEdit->insertAt("#include\t<proto/datatypes.h>\n", ++line, 0);
@@ -1393,6 +1400,7 @@ void MainWindow::actionInsertAmigaIncludes()
     textEdit->insertAt("#include\t<proto/rexxsyslib.h>\n", ++line, 0);
     textEdit->insertAt("#include\t<proto/utility.h>\n", ++line, 0);
     textEdit->insertAt("#include\t<proto/wb.h>\n", ++line, 0);
+    textEdit->insertAt("#endif\n", ++line, 0);
 
     // finally, move caret to next line.
     textEdit->setCursorPosition(line, index);
@@ -1474,34 +1482,34 @@ void MainWindow::actionInsertIfdefinedCompiler()
     // next, we need to continue printing at a certain location:
     textEdit->insertAt("#if defined(__STORM__)\n", ++line, 0);
     textEdit->insertAt("\t/* Compiler is StormC3 */\n", ++line, 0);
-    textEdit->insertAt("\tprintf(\"\\nCompiler in use: StormC3.\\n\");\n", ++line, 0);
+    textEdit->insertAt("\tprintf(\"compiled with StormC3.\\n\\n\");\n", ++line, 0);
     textEdit->insertAt("#elif defined(__STORMGCC__)\n", ++line, 0);
     textEdit->insertAt("\t/* Compiler is StormGCC4 */\n", ++line, 0);
-    textEdit->insertAt("\tprintf(\"\\nCompiler in use: GNU gcc, StormC4 flavour.\\n\");\n", ++line, 0);
+    textEdit->insertAt("\tprintf(\"compiled with GNU gcc, StormC4 flavour.\\n\\n\");\n", ++line, 0);
     textEdit->insertAt("#elif defined(__MAXON__)\n", ++line, 0);
     textEdit->insertAt("\t/* Compiler is Maxon/HiSoft C++ */\n", ++line, 0);
-    textEdit->insertAt("\tprintf(\"\\nCompiler in use: Maxon/HiSoft C++.\\n\");\n", ++line, 0);
+    textEdit->insertAt("\tprintf(\"compiled with Maxon/HiSoft C++.\\n\\n\");\n", ++line, 0);
     textEdit->insertAt("#elif defined(__GNUC__)\n", ++line, 0);
     textEdit->insertAt("\t/* Compiler is gcc */\n", ++line, 0);
-    textEdit->insertAt("\tprintf(\"\\nCompiler in use: GNU gcc v%d.%d Patchlevel %d.\\n\", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);\n", ++line, 0);
+    textEdit->insertAt("\tprintf(\"\compiled with GNU gcc v%d.%d Patchlevel %d.\\n\\n\", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);\n", ++line, 0);
     textEdit->insertAt("#elif defined(__VBCC__)\n", ++line, 0);
     textEdit->insertAt("\t/* Compiler is vbcc */\n", ++line, 0);
-    textEdit->insertAt("\tprintf(\"\\nCompiler in use: vbcc.\\n\");\n", ++line, 0);
+    textEdit->insertAt("\tprintf(\"compiled with vbcc.\\n\\n\");\n", ++line, 0);
     textEdit->insertAt("#elif defined(__SASC)\n", ++line, 0);
     textEdit->insertAt("\t/* Compiler is SAS/C */\n", ++line, 0);
-    textEdit->insertAt("\tprintf(\"\\nCompiler in use: SAS/C.\\n\");\n", ++line, 0);
+    textEdit->insertAt("\tprintf(\"compiled with SAS/C.\\n\\n\");\n", ++line, 0);
     textEdit->insertAt("#elif defined(LATTICE)\n", ++line, 0);
     textEdit->insertAt("\t/* Compiler is Lattice C */\n", ++line, 0);
-    textEdit->insertAt("\tprintf(\"\\nCompiler in use: Lattice C.\\n\");\n", ++line, 0);
+    textEdit->insertAt("\tprintf(\"compiled with Lattice C.\\n\\n\");\n", ++line, 0);
     textEdit->insertAt("#elif defined(AZTEC_C)\n", ++line, 0);
     textEdit->insertAt("\t/* Compiler is Aztec C */\n", ++line, 0);
-    textEdit->insertAt("\tprintf(\"\\nCompiler in use: Manx Aztec C.\\n\");\n", ++line, 0);
+    textEdit->insertAt("\tprintf(\"compiled with Manx Aztec C.\\n\\n\");\n", ++line, 0);
     textEdit->insertAt("#elif defined(_DCC)\n", ++line, 0);
     textEdit->insertAt("\t/* Compiler is dice */\n", ++line, 0);
-    textEdit->insertAt("\tprintf(\"\\nCompiler in use: dice.\\n\");\n", ++line, 0);
+    textEdit->insertAt("\tprintf(\"compiled with dice.\\n\\n\");\n", ++line, 0);
     textEdit->insertAt("#else\n", ++line, 0);
     textEdit->insertAt("\t/* Compiler not identified */\n", ++line, 0);
-    textEdit->insertAt("\tprintf(\"\\nCompiler was not identified.\\n\");\n", ++line, 0);
+    textEdit->insertAt("\tprintf(\"Compiler was not identified.\\n\\n\");\n", ++line, 0);
     textEdit->insertAt("#endif\n", ++line, 0);
 
     // finally, we set our caret to the next following empty line!
@@ -1764,7 +1772,8 @@ void MainWindow::actionInsertShellAppSkeletton()
         textEdit->insertAt("\n", ++line, 0);  // insert empty line!
 
         // Let's do some versioning...
-        textEdit->insertAt("/* ------------- PROGNAME & VERSION ---------------------------------- */\n", ++line, 0);
+        textEdit->insertAt("/* ------------- AUTHOR, PROGNAME & VERSION ----------------------------------- */\n", ++line, 0);
+        textEdit->insertAt("#define AUTHOR\t\t\"by [author_name]\"\n", ++line, 0);
         textEdit->insertAt("#define PROGRAMNAME\t\t\"my_app\"\n", ++line, 0);
         textEdit->insertAt("#define VERSION\t\t\t\t1\n", ++line, 0);
         textEdit->insertAt("#define REVISION\t\t\t\t0\n", ++line, 0);
@@ -1788,11 +1797,13 @@ void MainWindow::actionInsertShellAppSkeletton()
         textEdit->insertAt("#include\t<libraries/locale.h>\n", ++line, 0);
         textEdit->insertAt("\n", ++line, 0);  // insert empty line!
         textEdit->insertAt("/* --- protos ----------------- */\n", ++line, 0);
+        textEdit->insertAt("#if !defined(__MAXON__)\n", ++line, 0);
         textEdit->insertAt("#include\t<proto/asl.h>\n", ++line, 0);
         textEdit->insertAt("#include\t<proto/dos.h>\n", ++line, 0);
         textEdit->insertAt("#include\t<proto/exec.h>\n", ++line, 0);
         textEdit->insertAt("#include\t<proto/intuition.h>\n", ++line, 0);
         textEdit->insertAt("#include\t<proto/locale.h>\n", ++line, 0);
+        textEdit->insertAt("#endif\n", ++line, 0);
         textEdit->insertAt("\n", ++line, 0);  // insert empty line!
         textEdit->insertAt("/* --- console output --- */\n", ++line, 0);
         textEdit->insertAt("#include\t<stdio.h>\n", ++line, 0);
@@ -1804,9 +1815,9 @@ void MainWindow::actionInsertShellAppSkeletton()
         textEdit->insertAt("extern int main(int argc, char* argv[]);\n", ++line, 0);
 
         // ok - let's build an Amiga-style version tag:
-        QString sas_versionstring = "\tconst UBYTE VersionTag[] = \"$VER: \" PROGRAMNAME \" \" VERSIONSTRING \" \" __AMIGADATE__ \"\\n\\0\";";
-        QString dice_versionstring = "\tconst UBYTE VersionTag[] = \"$VER: \" PROGRAMNAME \" \" VERSIONSTRING \" (\" __COMMODORE_DATE__ \")\\n\\0\";";
-        QString other_versionstring = "\tconst UBYTE VersionTag[] = \"$VER: \" PROGRAMNAME \" \" VERSIONSTRING \" (\" __DATE__ \")\\n\\0\";";
+        QString sas_versionstring = "\tconst UBYTE VersionTag[] = \"$VER: \" PROGRAMNAME \" \" VERSIONSTRING \" \" AUTHOR \" \" __AMIGADATE__ \"\\n\\0\";";
+        QString dice_versionstring = "\tconst UBYTE VersionTag[] = \"$VER: \" PROGRAMNAME \" \" VERSIONSTRING \" \" AUTHOR \" (\" __COMMODORE_DATE__ \")\\n\\0\";";
+        QString other_versionstring = "\tconst UBYTE VersionTag[] = \"$VER: \" PROGRAMNAME \" \" VERSIONSTRING \" \" AUTHOR \" (\" __DATE__ \")\\n\\0\";";
 
         textEdit->insertAt("\n", ++line, 0);  // insert empty line!
         textEdit->insertAt("/* ------------- VERSION TAG -------------------------------------- */\n", ++line, 0);
@@ -2374,7 +2385,16 @@ void MainWindow::actionShowEOL()
 }
 
 //
-// Toggle visibility of caret line
+//  Open global preferences dialog
+//
+void MainWindow::actionPrefsDialog()
+{
+    PrefsDialog *acePrefs = new PrefsDialog(this);
+    acePrefs->exec();
+}
+
+//
+// search for given argument...
 //
 void MainWindow::actionSearch()
 {
@@ -2391,7 +2411,7 @@ void MainWindow::actionSearch()
     if (ok && !text.isEmpty())
     {
         qDebug() << text;
-        textEdit->SendScintilla(QsciScintillaBase::SCI_INDICSETSTYLE,0, 7);
+        textEdit->SendScintilla(QsciScintillaBase::SCI_INDICSETSTYLE, 0, 7);
 
         QString docText = textEdit->text();
         int end = docText.lastIndexOf(text);

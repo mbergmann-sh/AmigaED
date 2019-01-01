@@ -112,6 +112,7 @@ private slots:
     void documentWasModified();             // marks document as modified if text was changed
     void fitMarginLines();                  // adjusts margin sizes to fit line numbers
     // Menu actions...
+    void actionPrefsDialog();           // open Preferences
     void printFile();                   // print current file
     void actionGotoTop();               // jump to line #1
     void actionGotoBottom();            // jump to last line in text
@@ -235,6 +236,7 @@ private:
     QAction *openAct;               // open file
     QAction *saveAct;               // save file
     QAction *saveAsAct;             // save file as...
+    QAction *prefsAct;              // open prefs dialog
     QAction *printAct;              // print current file
     QAction *exitAct;               // quit the app
     // Actions for editMenue

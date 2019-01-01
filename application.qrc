@@ -15,5 +15,6 @@
         <file>images/filesaveas.png</file>
         <file>images/printer.png</file>
         <file>images/search.png</file>
+        <file>images/prefs.png</file>
     </qresource>
 </RCC>
