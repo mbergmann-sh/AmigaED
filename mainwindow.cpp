@@ -1240,6 +1240,7 @@ void MainWindow::actionCompile()
 
 
     QString text = p_selected_compiler_args;
+
     bool ok;
     qDebug() << "START: Proc started " << p_proc_is_started << " times.";
 
@@ -1256,7 +1257,8 @@ void MainWindow::actionCompile()
         p_compiledFile = outPath + QDir::separator() + outName + p_compiledFileSuffix;
         qDebug() << "compiled file: " << p_compiledFile;
 
-        temp_compiler_call = p_selected_compiler_args;                                                       // store compiler parameters temporarily
+        temp_compiler_call = p_selected_compiler_args;  // store compiler parameters temporarily
+        text.append(" ");   // add one space to separate arguments!!
         text.append(curFile + " -o " + outPath + QDir::separator() + outName + p_compiledFileSuffix);        // add output file name
         qDebug() << "Text not empty: " << text;
         p_selected_compiler_args = text;
@@ -2391,6 +2393,8 @@ void MainWindow::actionPrefsDialog()
 {
     PrefsDialog *acePrefs = new PrefsDialog(this);
     acePrefs->exec();
+    // insert new prefs into MainWindow variables for instant use!
+    getPrefs();
 }
 
 //
@@ -2702,6 +2706,9 @@ void MainWindow::initializeGUI()
     createMenus();
     createToolBars();
     createStatusBarMessage(tr("Ready"), 0);
+
+    // load preferences
+    getPrefs();
 
     // Set default Compiler
     p_selected_compiler = p_compiler_gcc;
@@ -3046,6 +3053,65 @@ void MainWindow::compiler_readyReadStandardOutput()
   QByteArray buf = myProcess->readAllStandardOutput();
 
   qDebug() << buf;
+}
+
+QString MainWindow::getPrefs()
+{
+    QString line;
+    QStringList fields;
+    // Construct file path to store values:
+    QString filename = QDir::homePath();
+    filename.append(QDir::separator());
+    filename.append(".amigaed");
+    filename.append(QDir::separator());
+    filename.append("ace.prefs");
+
+    QFile file(filename);
+
+    if(!file.open(QIODevice::ReadOnly))
+    {
+        QMessageBox::critical(this, "Amiga Cross Editor Prefs", "Error while opening prefs file: \n" + file.errorString() + "\n\nPlease edit and save prefs first and\nthen restart Amiga Cross Editor!");
+        return "Fuck you!";
+    }
+    else
+    {
+        QTextStream in(&file);
+        while(!in.atEnd())
+        {
+            line = in.readLine();
+            fields = line.split(", ");
+        }
+
+        file.close();
+
+        // TAB: Project
+        p_author = fields[0];
+        p_email = fields[1];
+        p_website = fields[2];
+        p_description = fields[3];
+        p_purpose = fields[4];
+        p_projectsRootDir =fields[5];
+        // TAB: GCC
+        p_compiler_gcc = fields[6];
+        p_compiler_gpp = fields[7];
+        p_make = fields[8];
+        p_strip = fields[9];
+        p_compiler_gcc_call = fields[10];
+        // TAB: VBCC
+        p_compiler_vc = fields[11];
+        p_compiler_vasm = fields[12];
+        p_vbcc_config_dir = fields[13];
+        p_compiler_vc_call = fields[14];
+        // TAB: Emulator
+        p_emulator = fields[15];
+        p_os13_config = fields[16];
+        p_os20_config = fields[17];
+        p_os13_config = fields[18];
+        p_os13_config = fields[19];
+        p_defaultEmulator = fields[20];
+    }
+
+    return line;
 }
 
 ////////////////////////////

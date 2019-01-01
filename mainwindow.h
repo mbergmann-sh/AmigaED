@@ -73,26 +73,38 @@ public:
     bool fileExists(QString path);
 
     // vars for controlling file header comments
-    const QString p_purpose = "CHANGE_ME";
-    const QString p_author = "Michael Bergmann";
-    const QString p_email = "mb@mbergmann-sh.de";
-    const QString p_version = "1.0";
-    const QString p_revision = "0";
-    const QString p_description = "CHANGE_ME";
+    QString p_purpose = "CHANGE_ME";
+    QString p_author = "Michael Bergmann";
+    QString p_email = "mb@mbergmann-sh.de";
+    QString p_website;
+    QString p_version = "1.0";
+    QString p_revision = "0";
+    QString p_description = "CHANGE_ME";
     QString p_compiler = "/opt/amiga/bin/m68k-amigaos-gcc";                     // C-Compiler to call...
     QString p_compiler_call = "-Wall -O2 -s -noixemul -lamiga ";
     QString p_compiler_gcc;// = "/opt/amiga/bin/m68k-amigaos-gcc";
     QString p_compiler_gpp = "/opt/amiga/bin/m68k-amigaos-g++";
     QString p_compiler_vc = "/opt/amiga/bin/vc";
+    QString p_compiler_vasm;
     QString p_compiler_gcc_call = "-Wall -O2 -s -noixemul -lamiga ";                // Arguments for compilation..
     QString p_compiler_vc_call = "-v -O2 -size -lamiga ";
     QString p_selected_compiler;
     QString p_selected_compiler_args;
+    QString p_vbcc_config_dir;
+    QString p_make;
+    QString p_strip;
     QString p_compiledFile;                                                     // keep the currently compiled file for file checking
     QString p_compiledFileSuffix;                                               // keep filename suffix for compiled output
     QFileInfo p_stripped_name;
     QString s_projectdir;
-    QStringList p_Compilers = {"VBCC (C mode only)", "GNU gcc (C mode)", "GNU g++ (C++ mode)"};    // unused ATM...
+    QString p_emulator;
+    QString p_os13_config;
+    QString p_os20_config;
+    QString p_os30_config;
+    QString p_os40_config;
+    QString p_defaultEmulator;
+    QString p_projectsRootDir;
+    QStringList p_Compilers = {"VBCC (C mode only)", "GNU gcc (C mode)", "GNU g++ (C++ mode)"};    // used for building combobox entries
 
     // Setter for prefs vars
     void setCompilerGCC(QString compiler);
@@ -111,6 +123,7 @@ public slots:
     void emu_readyReadStandardOutput();
     void compiler_readyReadStandardOutput();
     void SelectCompiler(int index);
+    QString getPrefs();
 
 private slots:
     int startProc(QString command, QString out); // starts a process (f.e. Compiler, Emulator)
