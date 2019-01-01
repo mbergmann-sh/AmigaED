@@ -38,6 +38,9 @@ private slots:
     void on_btn_getOS20Configfile_clicked();
     void on_btn_getOS3Configfile_clicked();
     void on_btn_getOS4Configfile_clicked();
+    QString getPrefs(); // load prefs and reinsert values
+
+    void on_btn_CancelSave_clicked();
 
 private:
     Ui::PrefsDialog *ui;
