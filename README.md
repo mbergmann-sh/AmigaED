@@ -70,9 +70,9 @@ you might also add this folder to your search path instead!
 - implement inserts and snippets [mostly done]
 - add a search/replace dialog
 - improve printing [partially done - prints text and line numbers on DIN A4 paper]
-- implement direct cross compiling to Amiga target for vbcc and gcc cross compiler toolchain
+- implement direct cross compiling to Amiga target for vbcc and gcc cross compiler toolchain [working, so far...]
 - startup Amiga Emulator
-- implement a prefs dialog
+- implement a prefs dialog  [DONE]
 - implement project manager
 - implement makefile generator
 - implement compiler settings for vbcc, gcc, SAS/C [can allready be done via textinput by now]
