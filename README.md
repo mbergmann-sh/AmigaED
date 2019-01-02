@@ -33,6 +33,7 @@ This program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRA
 - code insertion via menue, shortcuts and custom context menue [partially]
 - app template creation [AmigaShell, ANSI C, C++ app ATM]
 - select cross compiler to use: vbcc, gcc or g++
+- Preferences dialog for most important stuff, like compiler settings, et cetera..
 
 more to come...
 
