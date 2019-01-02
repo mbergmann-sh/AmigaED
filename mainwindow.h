@@ -104,7 +104,7 @@ public:
     QString p_os40_config;
     QString p_defaultEmulator;
     QString p_projectsRootDir;
-    QStringList p_Compilers = {"VBCC (C mode only)", "GNU gcc (C mode)", "GNU g++ (C++ mode)"};    // used for building combobox entries
+    QStringList p_Compilers = {"VBCC (C mode only)", "GNU gcc (C mode)", "GNU g++ (C++ mode)", "GNU gcc (OS 1.3)", "GNU g++ (OS 1.3)" };    // used for building combobox entries
 
     // Setter for prefs vars
     void setCompilerGCC(QString compiler);
@@ -126,8 +126,8 @@ public slots:
     QString getPrefs();
 
 private slots:
-    int startProc(QString command, QString out); // starts a process (f.e. Compiler, Emulator)
-    int startCompiler();
+    int startEmulator();                            // starts a process (f.e. Emulator)
+    int startCompiler();                            // starts a process (f.e. Compiler)
     void popNotImplemented();                       // shows "not implemented" MessageBox
     void newFile();                                 // sets editor into new file mode
     void open();                                    // loads a file

@@ -962,6 +962,7 @@ int MainWindow::loadNonExistantFile(const QString &fileName)
                 stream << "\n *";
                 stream << "\n * Author:\t" << p_author;
                 stream << "\n * Email:\t" << p_email;
+                stream << "\n * Web:\t" << p_website;
                 stream << "\n *";
                 stream << "\n*/" << endl;
 
@@ -1229,12 +1230,32 @@ void MainWindow::SelectCompiler(int index)
 void MainWindow::actionCompile()
 {
     QString temp_compiler_call, mbox_title;
+    QFileInfo file(curFile);
 
     // set approbriate title for QInputDialog:
     if(selectCompilerVBCCAct->isChecked())
-        mbox_title = "vbcc";
+    {
+        qDebug() << "Extension: " << file.suffix();
+        if((file.suffix() == "cpp") || (file.suffix() == "CPP"))
+        {
+            qDebug() << "vbcc ERROR C++";
+            selectCompilerVBCCAct->setChecked(false);
+            selectCompilerGPPAct->setChecked(true);
+            compilerCombo->setCurrentIndex(2);
+
+            // give a user warning
+            (void)QMessageBox::warning(this,
+                           "Amiga Cross Editor", "VBCC does <i><b>NOT</b> permit</i> to compile <b><i>C++ sources!</i></b><br> "
+                            "Compiler was set to <b>GNU g++</b> instead.<br>"
+                            "<br>This usually makes more sense, ya know?!",
+                            QMessageBox::Ok);
+
+        } else {mbox_title = "vbcc";}
+    }
+
     if(selectCompilerGCCAct->isChecked())
         mbox_title = "m68k-amigaos-gcc";
+
     if(selectCompilerGPPAct->isChecked())
         mbox_title = "m68k-amigaos-g++";
 
@@ -1493,7 +1514,7 @@ void MainWindow::actionInsertIfdefinedCompiler()
     textEdit->insertAt("\tprintf(\"compiled with Maxon/HiSoft C++.\\n\\n\");\n", ++line, 0);
     textEdit->insertAt("#elif defined(__GNUC__)\n", ++line, 0);
     textEdit->insertAt("\t/* Compiler is gcc */\n", ++line, 0);
-    textEdit->insertAt("\tprintf(\"\compiled with GNU gcc v%d.%d Patchlevel %d.\\n\\n\", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);\n", ++line, 0);
+    textEdit->insertAt("\tprintf(\"compiled with GNU gcc v%d.%d Patchlevel %d.\\n\\n\", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);\n", ++line, 0);
     textEdit->insertAt("#elif defined(__VBCC__)\n", ++line, 0);
     textEdit->insertAt("\t/* Compiler is vbcc */\n", ++line, 0);
     textEdit->insertAt("\tprintf(\"compiled with vbcc.\\n\\n\");\n", ++line, 0);
@@ -1753,6 +1774,8 @@ void MainWindow::actionInsertShellAppSkeletton()
         // Let's save our template with a new name first!
         saveAs();
         qDebug() << "Filename after creation: " << curFile;
+        QFileInfo file(curFile);
+        qDebug() << "File: " << file.baseName();
 
         // Now let's build a fileheader containing some information
         int line, index;
@@ -1761,22 +1784,24 @@ void MainWindow::actionInsertShellAppSkeletton()
         // ...now insert the first line of text!
         textEdit->insert("/*\n");
         // next, we need to continue printing at a certain location:
-        textEdit->insertAt(" *\tFile:\t\t " + strippedName(curFile)+ "\n", ++line, 0);
+        textEdit->insertAt(" *\tFile:\t\t " + strippedName(curFile) + "\n", ++line, 0);
+        textEdit->insertAt(" *\tProgram:\t\t " + file.baseName() + "\n", ++line, 0);
         textEdit->insertAt(" *\tVersion:\t\t1.0\n", ++line, 0);
         textEdit->insertAt(" *\tRevision:\t\t0\n", ++line, 0);
         textEdit->insertAt(" *\n", ++line, 0);
-        textEdit->insertAt(" *\tDescription:\t\tCHANGE_ME\n", ++line, 0);
-        textEdit->insertAt(" *\tPurpose:\t\tCHANGE_ME\n", ++line, 0);
+        textEdit->insertAt(" *\tDescription:\t\t" + p_description + "\n", ++line, 0);
+        textEdit->insertAt(" *\tPurpose:\t\t\t" + p_purpose + "\n", ++line, 0);
         textEdit->insertAt(" *\n", ++line, 0);
         textEdit->insertAt(" *\tAuthor:\t\t" + p_author + "\n", ++line, 0);
         textEdit->insertAt(" *\tEmail:\t\t" + p_email + "\n", ++line, 0);
+        textEdit->insertAt(" *\tWeb:\t\t" + p_website + "\n", ++line, 0);
         textEdit->insertAt(" */\n", ++line, 0);
         textEdit->insertAt("\n", ++line, 0);  // insert empty line!
 
         // Let's do some versioning...
         textEdit->insertAt("/* ------------- AUTHOR, PROGNAME & VERSION ----------------------------------- */\n", ++line, 0);
-        textEdit->insertAt("#define AUTHOR\t\t\"by [author_name]\"\n", ++line, 0);
-        textEdit->insertAt("#define PROGRAMNAME\t\t\"my_app\"\n", ++line, 0);
+        textEdit->insertAt("#define AUTHOR\t\t\"by " + p_author + "\""  + "\n", ++line, 0);
+        textEdit->insertAt("#define PROGRAMNAME\t\t""\"" + file.baseName() + "\"" + "\n", ++line, 0);
         textEdit->insertAt("#define VERSION\t\t\t\t1\n", ++line, 0);
         textEdit->insertAt("#define REVISION\t\t\t\t0\n", ++line, 0);
         textEdit->insertAt("#define VERSIONSTRING\t\t\"1.0\"\n", ++line, 0);
@@ -1896,6 +1921,7 @@ void MainWindow::actionInsertCAppSkeletton()
         // Let's save our template with a new name first!
         saveAs();
         qDebug() << "Filename after creation: " << curFile;
+        QFileInfo file(curFile);
 
         // Now let's build a fileheader containing some information
         int line, index;
@@ -1904,15 +1930,17 @@ void MainWindow::actionInsertCAppSkeletton()
         // ...now insert the first line of text!
         textEdit->insert("/*\n");
         // next, we need to continue printing at a certain location:
-        textEdit->insertAt(" *\tFile:\t\t " + strippedName(curFile)+ "\n", ++line, 0);
+        textEdit->insertAt(" *\tFile:\t\t " + strippedName(curFile) + "\n", ++line, 0);
+        textEdit->insertAt(" *\tProgram:\t\t " + file.baseName() + "\n", ++line, 0);
         textEdit->insertAt(" *\tVersion:\t\t1.0\n", ++line, 0);
         textEdit->insertAt(" *\tRevision:\t\t0\n", ++line, 0);
         textEdit->insertAt(" *\n", ++line, 0);
-        textEdit->insertAt(" *\tDescription:\t\tCHANGE_ME\n", ++line, 0);
-        textEdit->insertAt(" *\tPurpose:\t\tCHANGE_ME\n", ++line, 0);
+        textEdit->insertAt(" *\tDescription:\t\t" + p_description + "\n", ++line, 0);
+        textEdit->insertAt(" *\tPurpose:\t\t" + p_purpose + "\n", ++line, 0);
         textEdit->insertAt(" *\n", ++line, 0);
         textEdit->insertAt(" *\tAuthor:\t\t" + p_author + "\n", ++line, 0);
         textEdit->insertAt(" *\tEmail:\t\t" + p_email + "\n", ++line, 0);
+        textEdit->insertAt(" *\tWeb:\t\t" + p_website + "\n", ++line, 0);
         textEdit->insertAt(" */\n", ++line, 0);
         textEdit->insertAt("\n", ++line, 0);  // insert empty line!
 
@@ -1986,6 +2014,7 @@ void MainWindow::actionInsertCppAppSkeletton()
         // Let's save our template with a new name first!
         saveAs();
         qDebug() << "Filename after creation: " << curFile;
+        QFileInfo file(curFile);
 
         // Now let's build a fileheader containing some information
         int line, index;
@@ -1994,15 +2023,17 @@ void MainWindow::actionInsertCppAppSkeletton()
         // ...now insert the first line of text!
         textEdit->insert("/*\n");
         // next, we need to continue printing at a certain location:
-        textEdit->insertAt(" *\tFile:\t\t " + strippedName(curFile)+ "\n", ++line, 0);
+        textEdit->insertAt(" *\tFile:\t\t " + strippedName(curFile) + "\n", ++line, 0);
+        textEdit->insertAt(" *\tProgram:\t\t " + file.baseName() + "\n", ++line, 0);
         textEdit->insertAt(" *\tVersion:\t\t1.0\n", ++line, 0);
         textEdit->insertAt(" *\tRevision:\t\t0\n", ++line, 0);
         textEdit->insertAt(" *\n", ++line, 0);
-        textEdit->insertAt(" *\tDescription:\t\tCHANGE_ME\n", ++line, 0);
-        textEdit->insertAt(" *\tPurpose:\t\tCHANGE_ME\n", ++line, 0);
+        textEdit->insertAt(" *\tDescription:\t\t" + p_description + "\n", ++line, 0);
+        textEdit->insertAt(" *\tPurpose:\t\t" + p_purpose + "\n", ++line, 0);
         textEdit->insertAt(" *\n", ++line, 0);
         textEdit->insertAt(" *\tAuthor:\t\t" + p_author + "\n", ++line, 0);
         textEdit->insertAt(" *\tEmail:\t\t" + p_email + "\n", ++line, 0);
+        textEdit->insertAt(" *\tWeb:\t\t" + p_website + "\n", ++line, 0);
         textEdit->insertAt(" */\n", ++line, 0);
         textEdit->insertAt("\n", ++line, 0);  // insert empty line!
 
@@ -2135,11 +2166,12 @@ void MainWindow::actionInsertFileheaderComment()
     textEdit->insertAt(" *\tVersion:\t\t1.0\n", ++line, 0);
     textEdit->insertAt(" *\tRevision:\t\t0\n", ++line, 0);
     textEdit->insertAt(" *\n", ++line, 0);
-    textEdit->insertAt(" *\tDescription:\t\tCHANGE_ME\n", ++line, 0);
-    textEdit->insertAt(" *\tPurpose:\t\tCHANGE_ME\n", ++line, 0);
+    textEdit->insertAt(" *\tDescription:\t\t" + p_description + "\n", ++line, 0);
+    textEdit->insertAt(" *\tPurpose:\t\t" + p_purpose + "\n", ++line, 0);
     textEdit->insertAt(" *\n", ++line, 0);
     textEdit->insertAt(" *\tAuthor:\t\t" + p_author + "\n", ++line, 0);
     textEdit->insertAt(" *\tEmail:\t\t" + p_email + "\n", ++line, 0);
+    textEdit->insertAt(" *\tWeb:\t\t" + p_website + "\n", ++line, 0);
     textEdit->insertAt(" */\n", ++line, 0);
 
     // finally, we set our caret to the next following empty line!
@@ -2880,11 +2912,11 @@ bool MainWindow::fileExists(QString path)
 /**************************************
  * Stuff for launching a Compiler... **
  **************************************/
-int MainWindow::startProc(QString infile, QString outfile)
+int MainWindow::startEmulator()
 {
-    qDebug() << "startProc() called.";
+    qDebug() << "startEmulator() called.";
      //debugVars();
-    QString command = p_selected_compiler;
+    QString command = p_emulator;
     QStringList arguments;
     arguments << p_selected_compiler_args.split(" ");
 
@@ -2904,6 +2936,7 @@ int MainWindow::startProc(QString infile, QString outfile)
 
 int MainWindow::startCompiler()
 {
+    qDebug() << "startCompiler() called.";
     //debugVars();
     QString command = p_selected_compiler;
     QStringList arguments;
