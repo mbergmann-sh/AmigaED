@@ -51,6 +51,13 @@
 #include <QActionEvent>
 #include <QPoint>
 #include <QProcess>
+#include <QSplitter>
+#include <QListView>
+#include <QTextBrowser>
+#include <QGroupBox>
+#include <QVBoxLayout>
+#include <QSpacerItem>
+#include <QPushButton>
 
 #include <QDebug>
 
@@ -88,6 +95,7 @@ public:
     QString p_compiler_vasm;
     QString p_compiler_gcc_call = "-Wall -O2 -s -noixemul -lamiga ";                // Arguments for compilation..
     QString p_compiler_vc_call = "-v -O2 -size -lamiga ";
+    QString p_compiler_gpp_call = "-std=c++11 -Wall -O2 -s -noixemul -lamiga ";
     QString p_selected_compiler;
     QString p_selected_compiler_args;
     QString p_vbcc_config_dir;
@@ -104,7 +112,7 @@ public:
     QString p_os40_config;
     QString p_defaultEmulator;
     QString p_projectsRootDir;
-    QStringList p_Compilers = {"VBCC (C mode only)", "GNU gcc (C mode)", "GNU g++ (C++ mode)", "GNU gcc (OS 1.3)", "GNU g++ (OS 1.3)" };    // used for building combobox entries
+    QStringList p_Compilers = {"VBCC (C mode only)", "GNU gcc (C mode)", "GNU g++ (C++ mode)", "GNU gcc (OS 1.3)"};    // used for building combobox entries
 
     // Setter for prefs vars
     void setCompilerGCC(QString compiler);
@@ -159,7 +167,13 @@ private slots:
     void actionGoto_Line();             // jump to line X
     void actionGoto_matching_brace();   // jumps to matching brace
     void actionCompile();               // calls compilation of current file
+    // Emulator
     void actionEmulator();              // starts UAE
+//    void actionEmuOS13();
+//    void actionEmuOS20();
+//    void actionEmuOS30();
+//    void actionEmuOS40();
+//    void actionEmuDefault();
     void actionSearch();                // opens a search dialog
     // viewMenue and submenue actions
     void actionShowLineNumbers();         // show or hide line numbers
@@ -206,6 +220,8 @@ private slots:
     void actionSelectCompilerVBCC();
     void actionSelectCompilerGCC();
     void actionSelectCompilerGPP();
+    // Splitter
+    void actionCloseOutputConsole();
 
 
 private:
@@ -232,6 +248,12 @@ private:
 
     // Qscintila Editor widget instance
     QsciScintilla *textEdit;
+    // Instances for Splitter
+    QSplitter *splitter;
+    QListView *lview;
+    QTextBrowser *output;
+    QGroupBox *outputGroup;
+    QPushButton *btnCloseOutput;
 
     // stores name of the file currently in use
     QString curFile;

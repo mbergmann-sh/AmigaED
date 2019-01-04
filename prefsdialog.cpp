@@ -22,7 +22,7 @@ void PrefsDialog::on_btn_SavePrefs_clicked()
     // TAB: Project
     myPrefs << ui->lineEdit_author->text() << ui->lineEdit_email->text() << ui->lineEdit_website->text() << ui->lineEdit_description->text() << ui->lineEdit_purpose->text() << ui->lineEdit_projectsRootDir->text();
     // TAB: GCC
-    myPrefs << ui->lineEdit_getGCCexefile->text() << ui->lineEdit_getGPPexefile->text() << ui->lineEdit_getMAKEexefile->text() << ui->lineEdit_getSTRIPexefile->text() << ui->lineEdit_GCCdefaultOpts->text();
+    myPrefs << ui->lineEdit_getGCCexefile->text() << ui->lineEdit_getGPPexefile->text() << ui->lineEdit_getMAKEexefile->text() << ui->lineEdit_getSTRIPexefile->text() << ui->lineEdit_GCCdefaultOpts->text() << ui->lineEdit_GPPdefaultOpts->text();
     // TAB: VBCC
     myPrefs << ui->lineEdit_getVCexefile->text() << ui->lineEdit_getVASMexefile->text() << ui->lineEdit_getVCconfigDir->text() << ui->lineEdit_VCdefaultOpts->text();
     // TAB: Emulator
@@ -43,7 +43,7 @@ void PrefsDialog::on_btn_SavePrefs_clicked()
     // check if the folder exists!
     if(!(QDir(filename).exists()))
     {
-        qDebug() << "Folder dows not exist!";
+        qDebug() << "Folder does not exist!";
         QDir dir(filename);
         dir.mkdir(filename);
     }
@@ -65,8 +65,8 @@ void PrefsDialog::on_btn_SavePrefs_clicked()
    this->close();  // quit PrefsDialog
 
    QMessageBox::information(this, tr("Amiga Cross Editor"),
-                       tr("Prefs saved!\n"
-                          "Please restart Amiga Cross Editor to activate changes!"),
+                       tr("Prefs saved.\n"
+                          "Some changes might require to restart the Application in order to be activated!"),
                             QMessageBox::Ok);
 }
 
@@ -300,18 +300,19 @@ QString PrefsDialog::getPrefs()
         ui->lineEdit_getMAKEexefile->setText(fields[8]);
         ui->lineEdit_getSTRIPexefile->setText(fields[9]);
         ui->lineEdit_GCCdefaultOpts->setText(fields[10]);
+        ui->lineEdit_GPPdefaultOpts->setText(fields[11]);
         // TAB: VBCC
-        ui->lineEdit_getVCexefile->setText(fields[11]);
-        ui->lineEdit_getVASMexefile->setText(fields[12]);
-        ui->lineEdit_getVCconfigDir->setText(fields[13]);
-        ui->lineEdit_VCdefaultOpts->setText(fields[14]);
+        ui->lineEdit_getVCexefile->setText(fields[12]);
+        ui->lineEdit_getVASMexefile->setText(fields[13]);
+        ui->lineEdit_getVCconfigDir->setText(fields[14]);
+        ui->lineEdit_VCdefaultOpts->setText(fields[15]);
         // TAB: Emulator
-        ui->lineEdit_getEmulatorExefile->setText(fields[15]);
-        ui->lineEdit_getOS13Configfile->setText(fields[16]);
-        ui->lineEdit_getOS20Configfile->setText(fields[17]);
-        ui->lineEdit_getOS3Configfile->setText(fields[18]);
-        ui->lineEdit_getOS4Configfile->setText(fields[19]);
-        ui->comboBox_defaultEmulator->setCurrentText(fields[20]);
+        ui->lineEdit_getEmulatorExefile->setText(fields[16]);
+        ui->lineEdit_getOS13Configfile->setText(fields[17]);
+        ui->lineEdit_getOS20Configfile->setText(fields[18]);
+        ui->lineEdit_getOS3Configfile->setText(fields[19]);
+        ui->lineEdit_getOS4Configfile->setText(fields[20]);
+        ui->comboBox_defaultEmulator->setCurrentText(fields[21]);
     }
 
     return line;

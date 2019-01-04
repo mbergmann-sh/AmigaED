@@ -47,6 +47,8 @@
 #include <QStatusBar>
 #include <QTextStream>
 #include <QToolBar>
+#include <QSplitter>
+#include <QListView>
 
 #include <Qsci/qsciscintilla.h>
 #include <Qsci/qsciscintillabase.h>
@@ -69,8 +71,30 @@ static QProcess myEmulator;     // the process for running the emulator
 // Open MainWindow with given filename...
 MainWindow::MainWindow(QString cmdFileName)
 {
+    QList<int> sizes;
+    sizes << 300 <<150 << 200;
+    splitter = new QSplitter(this);
+    btnCloseOutput = new QPushButton(tr("Hide compiler output"), this);
+    btnCloseOutput->setGeometry(50, 40, 75, 30);
     textEdit = new QsciScintilla;
-    setCentralWidget(textEdit);
+    lview = new QListView;
+    outputGroup = new QGroupBox(tr("Compiler output"));
+    output = new QTextBrowser;
+    output->setStyleSheet(QString::fromUtf8("background-color: rgb(255,250,250);"));
+
+    QVBoxLayout *vbox = new QVBoxLayout;
+    vbox->addWidget(output);
+    vbox->addWidget(btnCloseOutput);
+    outputGroup->setLayout(vbox);
+
+    splitter->setOrientation(Qt::Vertical);
+    splitter->setHandleWidth(8);
+    splitter->insertWidget(0,textEdit);
+    splitter->insertWidget(1,outputGroup);
+    splitter->setSizes(sizes);
+    //lview->setVisible(false);
+    outputGroup->hide();
+    setCentralWidget(splitter);
 
     initializeGUI();    // most initializations are done within tis method!
 
@@ -1195,8 +1219,12 @@ void MainWindow::actionSelectCompilerGPP()
 //
 void MainWindow::SelectCompiler(int index)
 {
-    qDebug() << "Compiler selection called.";
-    qDebug() << "Value: " << index;
+    if(p_mydebug)
+    {
+        qDebug() << "Compiler selection called.";
+        qDebug() << "Value: " << index;
+    }
+
     switch(index)
     {
     case 0:
@@ -1215,12 +1243,20 @@ void MainWindow::SelectCompiler(int index)
         break;
     case 2:
         p_selected_compiler = p_compiler_gpp;
-        p_selected_compiler_args = p_compiler_gcc_call;
+        p_selected_compiler_args = p_compiler_gpp_call;
         p_compiledFileSuffix = "_gpp";
         // check selected menu item, uncheck others
         selectCompilerGPPAct->setChecked(true);
         break;
     }
+}
+
+//
+// Close Output console in Splitter...
+//
+void MainWindow::actionCloseOutputConsole()
+{
+    outputGroup->hide();
 }
 
 //
@@ -1235,10 +1271,14 @@ void MainWindow::actionCompile()
     // set approbriate title for QInputDialog:
     if(selectCompilerVBCCAct->isChecked())
     {
-        qDebug() << "Extension: " << file.suffix();
+        if(p_mydebug)
+            qDebug() << "Extension: " << file.suffix();
+
         if((file.suffix() == "cpp") || (file.suffix() == "CPP"))
         {
-            qDebug() << "vbcc ERROR C++";
+            if(p_mydebug)
+                qDebug() << "vbcc ERROR C++";
+
             selectCompilerVBCCAct->setChecked(false);
             selectCompilerGPPAct->setChecked(true);
             compilerCombo->setCurrentIndex(2);
@@ -1254,7 +1294,30 @@ void MainWindow::actionCompile()
     }
 
     if(selectCompilerGCCAct->isChecked())
-        mbox_title = "m68k-amigaos-gcc";
+    {
+        if((file.suffix() == "cpp") || (file.suffix() == "CPP"))
+        {
+            if(p_mydebug)
+                qDebug() << "gcc ERROR C++";
+
+            selectCompilerGCCAct->setChecked(false);
+            selectCompilerGPPAct->setChecked(true);
+            compilerCombo->setCurrentIndex(2);
+
+            // give a user warning
+            (void)QMessageBox::warning(this,
+                           "Amiga Cross Editor", "GCC does <i><b>NOT</b> permit</i> to compile <b><i>C++ sources!</i></b><br> "
+                            "Compiler was set to <b>GNU g++</b> instead.<br>"
+                            "<br>This usually makes more sense, ya know?!",
+                            QMessageBox::Ok);
+
+        }
+        else
+        {
+            mbox_title = "m68k-amigaos-gcc";
+        }
+    }
+
 
     if(selectCompilerGPPAct->isChecked())
         mbox_title = "m68k-amigaos-g++";
@@ -1263,7 +1326,8 @@ void MainWindow::actionCompile()
     QString text = p_selected_compiler_args;
 
     bool ok;
-    qDebug() << "START: Proc started " << p_proc_is_started << " times.";
+    if(p_mydebug)
+        qDebug() << "START: Proc started " << p_proc_is_started << " times.";
 
     text = QInputDialog::getText(this, mbox_title,
                                        tr("Compiler Options:"), QLineEdit::Normal,
@@ -1276,13 +1340,21 @@ void MainWindow::actionCompile()
 
         // construct path and name of compiled file for file checking:
         p_compiledFile = outPath + QDir::separator() + outName + p_compiledFileSuffix;
-        qDebug() << "compiled file: " << p_compiledFile;
+
+        if(p_mydebug)
+            qDebug() << "compiled file: " << p_compiledFile;
 
         temp_compiler_call = p_selected_compiler_args;  // store compiler parameters temporarily
         text.append(" ");   // add one space to separate arguments!!
         text.append(curFile + " -o " + outPath + QDir::separator() + outName + p_compiledFileSuffix);        // add output file name
-        qDebug() << "Text not empty: " << text;
+
+        if(p_mydebug)
+            qDebug() << "Text not empty: " << text;
+
         p_selected_compiler_args = text;
+
+        // make output window visible:
+        outputGroup->show();
 
         //
         // put REAL compiler start HERE!
@@ -1297,13 +1369,18 @@ void MainWindow::actionCompile()
     }
     else
     {
-      text.append(curFile);
-      p_compiler_call = text;
+        text.append(curFile);
+        p_compiler_call = text;
 
-      qDebug() << "Text: " << text;
-      qDebug() << "Compiler call: " << p_compiler_call;
-      text.clear();
+        if(p_mydebug)
+        {
+            qDebug() << "Text: " << text;
+            qDebug() << "Compiler call: " << p_compiler_call;
+        }
     }
+
+    text.clear();
+
 }
 
 //
@@ -2319,6 +2396,9 @@ void MainWindow::actionInsertSnippet4()
 void MainWindow::actionEmulator()
 {
     qDebug() << "in Emulator";
+    //lview->setVisible(true);
+    lview->show();
+
     popNotImplemented();
 
     bool ok;
@@ -2477,10 +2557,12 @@ void MainWindow::initializeFont()
         QFont font("Courier New", 10);
         #elif defined(__APPLE__)
         QFont font("SF Mono Regular", 11);
-        qDebug() << "Running on Mac. Font is SF Mono Regular now!";
+        if(p_mydebug)
+            qDebug() << "Running on Mac. Font is SF Mono Regular now!";
     #elif defined(__unix__)
         QFont font("Source Code Pro", 9);
-        qDebug() << "Linux detected. Setting font to Source Code Pro";
+        if(p_mydebug)
+            qDebug() << "Linux detected. Setting font to Source Code Pro";
     #endif
 
     myfont = font;
@@ -2750,11 +2832,13 @@ void MainWindow::initializeGUI()
     p_compiledFileSuffix = "_gcc";
 
     connect(compilerCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SelectCompiler(int)));
+    connect(btnCloseOutput, SIGNAL(clicked(bool)), this, SLOT(actionCloseOutputConsole()));
 
     //connect(&proc, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(ProcBeendet(int, QProcess::ExitStatus)));
     QObject::connect(&myProcess, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(finished(int,QProcess::ExitStatus)));
     QObject::connect(&myProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(compiler_readyReadStandardOutput()));
     QObject::connect(&myProcess, SIGNAL(started()), this, SLOT(started()));
+
 }
 
 //
@@ -2899,12 +2983,18 @@ bool MainWindow::fileExists(QString path)
     // check if exists and if yes: Is it really a file?
     if(check_file.exists() && check_file.isFile())
     {
-        qDebug() << "compiled file: " << p_compiledFile << " exists.";
+        if(p_mydebug)
+        {
+            qDebug() << "compiled file: " << p_compiledFile << " exists.";
+        }
         return true;
     }
     else
     {
-        qDebug() << "compiled file: " << p_compiledFile << " does not exist!";
+        if(p_mydebug)
+        {
+            qDebug() << "compiled file: " << p_compiledFile << " does not exist!";
+        }
         return false;
     }
 }
@@ -2914,8 +3004,9 @@ bool MainWindow::fileExists(QString path)
  **************************************/
 int MainWindow::startEmulator()
 {
-    qDebug() << "startEmulator() called.";
-     //debugVars();
+    if(p_mydebug)
+        qDebug() << "startEmulator() called.";
+
     QString command = p_emulator;
     QStringList arguments;
     arguments << p_selected_compiler_args.split(" ");
@@ -2926,17 +3017,19 @@ int MainWindow::startEmulator()
 
     //QObject::connect(&myProcess, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(finished(int,QProcess::ExitStatus)));
    // QObject::connect(&myProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(compiler_readyReadStandardOutput()));
+    connect(&myProcess, SIGNAL (readyRead()), this, SLOT (readCommand()));
     QObject::connect(&myProcess, SIGNAL(started()), this, SLOT(started()));
-
-    //qDebug() << myProcess.command;
-    qDebug() << myProcess.arguments();
 
     return 0;
 }
 
 int MainWindow::startCompiler()
 {
-    qDebug() << "startCompiler() called.";
+    myProcess.setProcessChannelMode(QProcess::MergedChannels);
+    if(p_mydebug)
+    {
+        qDebug() << "startCompiler() called.";
+    }
     //debugVars();
     QString command = p_selected_compiler;
     QStringList arguments;
@@ -2950,15 +3043,18 @@ int MainWindow::startCompiler()
 
     myProcess.start(command, arguments);
 
-    qDebug() << "\nCommand: " << command;
-    qDebug() << "Argumets: " << myProcess.arguments();
+    if(p_mydebug)
+    {
+        qDebug() << "\nCommand: " << command;
+        qDebug() << "Argumets: " << myProcess.arguments();
+    }
 
     return 0;
 }
 
 void MainWindow::error(QProcess::ProcessError error)
-{
-  qDebug() << "Error: " << error;
+{   if(p_mydebug)
+        qDebug() << "Error: " << error;
 }
 
 void MainWindow::finished(int exitCode, QProcess::ExitStatus exitStatus)
@@ -2980,8 +3076,8 @@ void MainWindow::finished(int exitCode, QProcess::ExitStatus exitStatus)
 //        ui->btnCompile->setDisabled(true);
 
     }
-  qDebug() << "Finished: " << exitCode;
-  //qApp->exit();
+    if(p_mydebug)
+        qDebug() << "Finished: " << exitCode;
 
   if (exitStatus==QProcess::CrashExit || exitCode!=0)
   {      
@@ -3023,69 +3119,94 @@ void MainWindow::finished(int exitCode, QProcess::ExitStatus exitStatus)
 
 void MainWindow::readyReadStandardError()
 {
-  qDebug() << "ReadyError";
+    if(p_mydebug)
+      qDebug() << "ReadyError";
 }
 
 void MainWindow::readyReadStandardOutput()
 {
-  qDebug() << "readyOut";
-  QProcess *myProcess = (QProcess *)sender();
-  QByteArray buf = myProcess->readAllStandardOutput();
+    if(p_mydebug)
+    {
+        qDebug() << "readyOut";
+    }
+    QProcess *myProcess = (QProcess *)sender();
+    QByteArray buf = myProcess->readAllStandardOutput();
 
-  QFile data(s_projectdir + QDir::separator() + "compiler_out.txt");
-  qDebug() << "logfile: " << s_projectdir + QDir::separator() + "compiler_out.txt";
-  if (data.open(QFile::WriteOnly | QFile::Truncate))
-  {
+    QFile data(s_projectdir + QDir::separator() + "compiler_out.txt");
+
+    if(p_mydebug)
+    {
+        qDebug() << "logfile: " << s_projectdir + QDir::separator() + "compiler_out.txt";
+    }
+    if (data.open(QFile::WriteOnly | QFile::Truncate))
+    {
       //ui->textBrowser->clear();
       QTextStream out(&data);
       out << buf;
       //ui->textBrowser->append(buf);
-  }
+    }
 }
 
 void MainWindow::started()
 {
-  qDebug() << "START: Proc Started";
+    if(p_mydebug)
+        qDebug() << "START: Proc Started";
 }
 
 void MainWindow::emu_finished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     if(exitCode == 0)
     {
-        qDebug() << "Emulator terminated regularily.";
+        if(p_mydebug)
+        {
+            qDebug() << "Emulator terminated regularily.";
+        }
     }
     else
     {
-        qDebug() << "Emulator NOT terminated regularily.";
+        if(p_mydebug)
+        {
+            qDebug() << "Emulator NOT terminated regularily.";
+        }
     }
-  qDebug() << "Finished: " << exitCode;
 
-  if (exitStatus==QProcess::CrashExit || exitCode!=0)
-  {
+    if(p_mydebug)
+    {
+        qDebug() << "Finished: " << exitCode;
+    }
+
+    if (exitStatus==QProcess::CrashExit || exitCode!=0)
+    {
      createStatusBarMessage("CrashExit - Problem mit dem Emulator!!", 0);
-  }
-  else
-  {
+    }
+    else
+    {
       createStatusBarMessage("Emulator normal beendet.", 0);
   }
 }
 
 void MainWindow::emu_readyReadStandardOutput()
 {
-  qDebug() << "readyOut";
+    if(p_mydebug)
+        qDebug() << "readyOut";
+
   QProcess *myEmulator = (QProcess *)sender();
   QByteArray buf = myEmulator->readAllStandardOutput();
 
-  qDebug() << buf;
+  if(p_mydebug)
+      qDebug() << buf;
 }
 
 void MainWindow::compiler_readyReadStandardOutput()
 {
-  qDebug() << "readyOut";
+    if(p_mydebug)
+        qDebug() << "readyReadStandardOut";
+
   QProcess *myProcess = (QProcess *)sender();
   QByteArray buf = myProcess->readAllStandardOutput();
 
-  qDebug() << buf;
+    if(p_mydebug)
+        qDebug() << buf;
 }
 
 QString MainWindow::getPrefs()
@@ -3130,18 +3251,19 @@ QString MainWindow::getPrefs()
         p_make = fields[8];
         p_strip = fields[9];
         p_compiler_gcc_call = fields[10];
+        p_compiler_gpp_call = fields[11];
         // TAB: VBCC
-        p_compiler_vc = fields[11];
-        p_compiler_vasm = fields[12];
-        p_vbcc_config_dir = fields[13];
-        p_compiler_vc_call = fields[14];
+        p_compiler_vc = fields[12];
+        p_compiler_vasm = fields[13];
+        p_vbcc_config_dir = fields[14];
+        p_compiler_vc_call = fields[15];
         // TAB: Emulator
-        p_emulator = fields[15];
-        p_os13_config = fields[16];
-        p_os20_config = fields[17];
-        p_os13_config = fields[18];
+        p_emulator = fields[16];
+        p_os13_config = fields[17];
+        p_os20_config = fields[18];
         p_os13_config = fields[19];
-        p_defaultEmulator = fields[20];
+        p_os13_config = fields[20];
+        p_defaultEmulator = fields[21];
     }
 
     return line;
