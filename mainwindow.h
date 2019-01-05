@@ -136,6 +136,7 @@ public slots:
     void showCustomContextMenue(const QPoint &pos); // implements custom context menu for QScintilla
     // methods for launching a compiler
     void error(QProcess::ProcessError error);
+    void stateChanged(QProcess::ProcessState state);
     void finished(int exitCode, QProcess::ExitStatus exitStatus);
     void readyReadStandardError();
     void readyReadStandardOutput();
@@ -145,6 +146,10 @@ public slots:
     void compiler_readyReadStandardOutput();
     void SelectCompiler(int index);
     void debugVars();
+    void runCommand(QString command, QStringList arguments);
+    void readCommand();
+    void stopCommand(int exitCode, QProcess::ExitStatus exitStatus);
+
 
 private slots:
     int startEmulator();                            // starts a process (f.e. Emulator)
@@ -238,6 +243,7 @@ private slots:
 
 
 private:
+    QProcess *cmd;
     QProcess proc;
     QProcess myProcess;                                                 // we need a QProcess to run a compiler...
     QProcess myEmulator;

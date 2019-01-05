@@ -115,6 +115,20 @@ MainWindow::MainWindow(QString cmdFileName)
     // notify if cursor position changed
     connect(textEdit, SIGNAL(cursorPositionChanged(int, int)), this, SLOT(showCurrendCursorPosition()));
 
+    cmd = new QProcess(this);
+    cmd->setProcessChannelMode(QProcess::MergedChannels);
+
+    ///////////////////////////////////////////////////
+    // Process handling for output to QTextBrowser ///
+    /////////////////////////////////////////////////
+    // process has some data to read
+    connect(cmd, SIGNAL (readyRead()), this, SLOT (readCommand()));
+    //process finished
+    connect(cmd, SIGNAL (finished(int, QProcess::ExitStatus)), this, SLOT (stopCommand(int, QProcess::ExitStatus)));
+
+    /////////////////////////////
+    /// command line handling //
+    ///////////////////////////
     setCurrentFile("");
 
     // Load a file if specified on command line...
@@ -2456,8 +2470,6 @@ void MainWindow::actionInsertSnippet4()
 void MainWindow::actionEmulator()
 {
     qDebug() << "in Emulator";
-    //lview->setVisible(true);
-    lview->show();
 
     popNotImplemented();
 
@@ -3103,7 +3115,8 @@ int MainWindow::startCompiler()
 
     createStatusBarMessage(tr("Compiler run has been started."),0);
 
-    myProcess.start(command, arguments);
+    //myProcess.start(command, arguments);
+    runCommand(command, arguments);
 
     if(p_mydebug)
     {
@@ -3112,11 +3125,6 @@ int MainWindow::startCompiler()
     }
 
     return 0;
-}
-
-void MainWindow::error(QProcess::ProcessError error)
-{   if(p_mydebug)
-        qDebug() << "Error: " << error;
 }
 
 void MainWindow::finished(int exitCode, QProcess::ExitStatus exitStatus)
@@ -3323,4 +3331,53 @@ void MainWindow::debugVars()
         qDebug() << "p_defaultCompiler: " << p_defaultCompiler;
     }
 }
+
+/////////////////////////////////////////////////////////////////////////
+/// new process handling methods for compiler output to QTextBrowser ///
+///////////////////////////////////////////////////////////////////////
+void MainWindow::runCommand(QString command, QStringList arguments)
+{
+//    QString command;
+//    QStringList arguments;
+    cmd->setProcessChannelMode(QProcess::MergedChannels);
+
+    // Empty output widget
+    output->clear();
+    // Give message about started process:
+    output->append("Run process...\nCompiler started:\n");
+
+    // fire up our process:
+    cmd->start(command, arguments);
+}
+
+void MainWindow::readCommand(){
+    output->append(cmd->readAll()); // output is QTextBrowser
+}
+void MainWindow::stopCommand(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    output->append(cmd->readAll());
+    output->append("cmd finished");
+    output->append(QString::number(exitCode));
+    qDebug() << "exitCode: " << QString::number(exitCode);
+    if(QString::number(exitCode) == "0")
+    {
+        createStatusBarMessage(tr("File compiled."), 0);
+    }
+    else
+    {
+        createStatusBarMessage(tr("There where errors..."), 0);
+    }
+}
+
+void MainWindow::error(QProcess::ProcessError error)
+{
+       qDebug() << "Error" << error;
+}
+
+void MainWindow::stateChanged(QProcess::ProcessState state)
+{
+    qDebug() << "Process::stateChanged" << state;
+}
+
+
 
