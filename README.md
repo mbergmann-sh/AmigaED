@@ -68,7 +68,7 @@ you might also add this folder to your search path instead!
 # Roadmap - wanted features (at least hopefully planned...)
 - make the editor drag'n'drop-aware
 - implement inserts and snippets [mostly done]
-- add a search/replace dialog
+- add a search/replace dialog   [partially done]
 - improve printing [partially done - prints text and line numbers on DIN A4 paper]
 - implement direct cross compiling to Amiga target for vbcc and gcc cross compiler toolchain [working, so far...]
 - startup Amiga Emulator
