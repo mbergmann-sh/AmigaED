@@ -6,6 +6,11 @@
 #include <QStandardPaths>
 #include <QStringList>
 #include <QDir>
+#include <QStyle>
+#include <QStyleFactory>
+#include <QComboBox>
+#include <QSettings>
+#include <QCoreApplication>
 
 class MainWindow;
 
@@ -22,6 +27,17 @@ public:
     ~PrefsDialog();
 
     QStringList myPrefs;
+    QStringList p_Compilers = {"VBCC (C mode only)", "GNU gcc (C mode)", "GNU g++ (C++ mode)", "GNU gcc (OS 1.3)"};    // used for building combobox entries
+    QStringList p_style_items;
+
+    QString line;
+    QStringList fields;
+
+    QSettings mySettings;
+
+public slots:
+    void save_mySettings();
+    void load_mySettings();
 
 private slots:
     void on_btn_SavePrefs_clicked();
@@ -38,8 +54,6 @@ private slots:
     void on_btn_getOS20Configfile_clicked();
     void on_btn_getOS3Configfile_clicked();
     void on_btn_getOS4Configfile_clicked();
-    QString getPrefs(); // load prefs and reinsert values
-
     void on_btn_CancelSave_clicked();
 
 private:

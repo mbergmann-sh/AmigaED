@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>423</width>
-    <height>292</height>
+    <height>334</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,10 +24,32 @@
    <bool>true</bool>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
+   <item row="1" column="2">
+    <widget class="QPushButton" name="btn_SavePrefs">
+     <property name="text">
+      <string>Save Prefs</string>
+     </property>
+     <property name="icon">
+      <iconset resource="application.qrc">
+       <normaloff>:/images/save.png</normaloff>:/images/save.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QPushButton" name="btn_CancelSave">
+     <property name="text">
+      <string>Cancel</string>
+     </property>
+     <property name="icon">
+      <iconset resource="application.qrc">
+       <normaloff>:/images/fileexit.png</normaloff>:/images/fileexit.png</iconset>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0" colspan="3">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>4</number>
      </property>
      <widget class="QWidget" name="tabProject">
       <attribute name="title">
@@ -76,7 +98,7 @@
        <item row="0" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>Author:</string>
+          <string>Au&amp;thor:</string>
          </property>
          <property name="buddy">
           <cstring>lineEdit_author</cstring>
@@ -147,7 +169,7 @@
          <item row="0" column="0">
           <widget class="QLabel" name="label_4">
            <property name="text">
-            <string>Projects root:</string>
+            <string>Pro&amp;jects root:</string>
            </property>
            <property name="buddy">
             <cstring>lineEdit_projectsRootDir</cstring>
@@ -608,7 +630,7 @@
          <item row="0" column="0">
           <widget class="QLabel" name="label_21">
            <property name="text">
-            <string>OS 1.3 config:</string>
+            <string>OS &amp;1.3 config:</string>
            </property>
            <property name="buddy">
             <cstring>lineEdit_projectsRootDir</cstring>
@@ -663,7 +685,7 @@
          <item row="0" column="0">
           <widget class="QLabel" name="label_23">
            <property name="text">
-            <string>OS 2.0 config:</string>
+            <string>OS &amp;2.0 config:</string>
            </property>
            <property name="buddy">
             <cstring>lineEdit_projectsRootDir</cstring>
@@ -701,7 +723,7 @@
          <item row="0" column="0">
           <widget class="QLabel" name="label_24">
            <property name="text">
-            <string>OS 3.x config:</string>
+            <string>OS &amp;3.x config:</string>
            </property>
            <property name="buddy">
             <cstring>lineEdit_projectsRootDir</cstring>
@@ -739,7 +761,7 @@
          <item row="0" column="0">
           <widget class="QLabel" name="label_25">
            <property name="text">
-            <string>OS 4.x config:</string>
+            <string>OS &amp;4.x config:</string>
            </property>
            <property name="buddy">
             <cstring>lineEdit_projectsRootDir</cstring>
@@ -815,65 +837,83 @@
       <attribute name="title">
        <string>Misc</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout_29">
-       <item row="0" column="1">
-        <spacer name="verticalSpacer_4">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+      <layout class="QGridLayout" name="gridLayout_10">
+       <item row="0" column="0">
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string>Application Look and Feel</string>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>77</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="1" column="0">
-        <spacer name="horizontalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>121</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLabel" name="label_28">
-         <property name="text">
-          <string>No nothing so far!</string>
-         </property>
+         <layout class="QGridLayout" name="gridLayout_9">
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="checkBoxDebugOutput">
+            <property name="layoutDirection">
+             <enum>Qt::RightToLeft</enum>
+            </property>
+            <property name="text">
+             <string>Show debug output:</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="checkBoxIndentationLines">
+            <property name="layoutDirection">
+             <enum>Qt::RightToLeft</enum>
+            </property>
+            <property name="text">
+             <string>Show indentation lines:</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="checkBoxStylesheet">
+            <property name="layoutDirection">
+             <enum>Qt::RightToLeft</enum>
+            </property>
+            <property name="text">
+             <string>Use blackish stylesheet:</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_28">
+            <property name="text">
+             <string>Default application style:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="comboBoxDefaultStyle"/>
+          </item>
+         </layout>
         </widget>
        </item>
-       <item row="1" column="2">
-        <spacer name="horizontalSpacer_4">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+       <item row="1" column="0">
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Build System</string>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>121</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="2" column="1">
-        <spacer name="verticalSpacer_5">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>76</height>
-          </size>
-         </property>
-        </spacer>
+         <layout class="QGridLayout" name="gridLayout_11">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_31">
+            <property name="text">
+             <string>Default Cross Compiler:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="comboBoxDefaultCompiler"/>
+          </item>
+         </layout>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -891,28 +931,6 @@
       </size>
      </property>
     </spacer>
-   </item>
-   <item row="1" column="1">
-    <widget class="QPushButton" name="btn_CancelSave">
-     <property name="text">
-      <string>Cancel</string>
-     </property>
-     <property name="icon">
-      <iconset resource="application.qrc">
-       <normaloff>:/images/fileexit.png</normaloff>:/images/fileexit.png</iconset>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2">
-    <widget class="QPushButton" name="btn_SavePrefs">
-     <property name="text">
-      <string>Save Prefs</string>
-     </property>
-     <property name="icon">
-      <iconset resource="application.qrc">
-       <normaloff>:/images/save.png</normaloff>:/images/save.png</iconset>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>

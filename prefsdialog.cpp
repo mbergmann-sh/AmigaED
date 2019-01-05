@@ -7,8 +7,19 @@ PrefsDialog::PrefsDialog(QWidget *parent) :
     ui(new Ui::PrefsDialog)
 {
     ui->setupUi(this);
-    // load prefs from file (if exists!)
-    QString Meldung = getPrefs();
+
+    // Start Tabwidget with first tab visible allways
+    ui->tabWidget->setCurrentIndex(0);
+
+    // set items for default style combobox:
+    p_style_items << QStyleFactory::keys();
+    ui->comboBoxDefaultStyle->addItems(p_style_items);
+
+    // set items for default compiler combobox:
+    ui->comboBoxDefaultCompiler->addItems(p_Compilers);
+
+    // load global configuration
+    load_mySettings();
 }
 
 PrefsDialog::~PrefsDialog()
@@ -18,50 +29,7 @@ PrefsDialog::~PrefsDialog()
 
 void PrefsDialog::on_btn_SavePrefs_clicked()
 {
-    // Collect values, store them in $HOMEDIR/.amigaed/ace.prefs
-    // TAB: Project
-    myPrefs << ui->lineEdit_author->text() << ui->lineEdit_email->text() << ui->lineEdit_website->text() << ui->lineEdit_description->text() << ui->lineEdit_purpose->text() << ui->lineEdit_projectsRootDir->text();
-    // TAB: GCC
-    myPrefs << ui->lineEdit_getGCCexefile->text() << ui->lineEdit_getGPPexefile->text() << ui->lineEdit_getMAKEexefile->text() << ui->lineEdit_getSTRIPexefile->text() << ui->lineEdit_GCCdefaultOpts->text() << ui->lineEdit_GPPdefaultOpts->text();
-    // TAB: VBCC
-    myPrefs << ui->lineEdit_getVCexefile->text() << ui->lineEdit_getVASMexefile->text() << ui->lineEdit_getVCconfigDir->text() << ui->lineEdit_VCdefaultOpts->text();
-    // TAB: Emulator
-    myPrefs << ui->lineEdit_getEmulatorExefile->text() << ui->lineEdit_getOS13Configfile->text() << ui->lineEdit_getOS20Configfile->text() << ui->lineEdit_getOS3Configfile->text() << ui->lineEdit_getOS4Configfile->text() << ui->comboBox_defaultEmulator->currentText();
-    // TAB: Misc
-    // no nothing up to now.
-
-     //Debug:
-     for (int i = 0; i < myPrefs.size(); ++i)
-             qDebug() << myPrefs.at(i).toLocal8Bit().constData();
-
-    QString str = myPrefs.join(", ");
-
-    // Construct file path to store values:
-    QString filename = QDir::homePath();
-    filename.append(QDir::separator());
-    filename.append(".amigaed");
-    // check if the folder exists!
-    if(!(QDir(filename).exists()))
-    {
-        qDebug() << "Folder does not exist!";
-        QDir dir(filename);
-        dir.mkdir(filename);
-    }
-    filename.append(QDir::separator());
-    filename.append("ace.prefs");
-    // TODO: save values to $HOMEDIR/.amigaed/ace.prefs
-    qDebug() << " prefs dir: " << filename;
-    QFile file(filename);
-    if (file.open(QIODevice::ReadWrite))
-    {
-        QTextStream stream(&file);
-        stream << str << endl;
-    }
-    else
-    {
-        qDebug() << "Dateifehler!";
-    }
-
+    save_mySettings();
    this->close();  // quit PrefsDialog
 
    QMessageBox::information(this, tr("Amiga Cross Editor"),
@@ -258,68 +226,89 @@ void PrefsDialog::on_btn_getOS4Configfile_clicked()
     ui->lineEdit_getOS4Configfile->setText(fileName);
 }
 
-QString PrefsDialog::getPrefs()
-{
-    QString line;
-    QStringList fields;
-    // Construct file path to store values:
-    QString filename = QDir::homePath();
-    filename.append(QDir::separator());
-    filename.append(".amigaed");
-    filename.append(QDir::separator());
-    filename.append("ace.prefs");
-
-    QFile file(filename);
-
-    if(!file.open(QIODevice::ReadOnly))
-    {
-        QMessageBox::critical(this, "Amiga Cross Editor Prefs", "Error while opening prefs file: \n" + file.errorString() + "\n\nPlease edit and save prefs first and\nthen restart Amiga Cross Editor!");
-        return "Fuck you!";
-    }
-    else
-    {
-        QTextStream in(&file);
-        while(!in.atEnd())
-        {
-            line = in.readLine();
-            fields = line.split(", ");
-        }
-
-        file.close();
-
-        // TAB: Project
-        ui->lineEdit_author->setText(fields[0]);
-        ui->lineEdit_email->setText(fields[1]);
-        ui->lineEdit_website->setText(fields[2]);
-        ui->lineEdit_description->setText(fields[3]);
-        ui->lineEdit_purpose->setText(fields[4]);
-        ui->lineEdit_projectsRootDir->setText(fields[5]);
-        // TAB: GCC
-        ui->lineEdit_getGCCexefile->setText(fields[6]);
-        ui->lineEdit_getGPPexefile->setText(fields[7]);
-        ui->lineEdit_getMAKEexefile->setText(fields[8]);
-        ui->lineEdit_getSTRIPexefile->setText(fields[9]);
-        ui->lineEdit_GCCdefaultOpts->setText(fields[10]);
-        ui->lineEdit_GPPdefaultOpts->setText(fields[11]);
-        // TAB: VBCC
-        ui->lineEdit_getVCexefile->setText(fields[12]);
-        ui->lineEdit_getVASMexefile->setText(fields[13]);
-        ui->lineEdit_getVCconfigDir->setText(fields[14]);
-        ui->lineEdit_VCdefaultOpts->setText(fields[15]);
-        // TAB: Emulator
-        ui->lineEdit_getEmulatorExefile->setText(fields[16]);
-        ui->lineEdit_getOS13Configfile->setText(fields[17]);
-        ui->lineEdit_getOS20Configfile->setText(fields[18]);
-        ui->lineEdit_getOS3Configfile->setText(fields[19]);
-        ui->lineEdit_getOS4Configfile->setText(fields[20]);
-        ui->comboBox_defaultEmulator->setCurrentText(fields[21]);
-    }
-
-    return line;
-}
 
 
 void PrefsDialog::on_btn_CancelSave_clicked()
 {
     this->close();
+}
+
+void PrefsDialog::save_mySettings()
+{
+    // TAB: Project
+    mySettings.setValue("Project/Author", ui->lineEdit_author->text());
+    mySettings.setValue("Project/Email", ui->lineEdit_email->text());
+    mySettings.setValue("Project/Website", ui->lineEdit_website->text());
+    mySettings.setValue("Project/Description", ui->lineEdit_description->text());
+    mySettings.setValue("Project/Purpose", ui->lineEdit_purpose->text());
+    mySettings.setValue("Project/ProjectRootDir", ui->lineEdit_projectsRootDir->text());
+
+    // TAB: GCC
+    mySettings.setValue("GCC/GccPath", ui->lineEdit_getGCCexefile->text());
+    mySettings.setValue("GCC/GppPath", ui->lineEdit_getGPPexefile->text());
+    mySettings.setValue("GCC/MakePath", ui->lineEdit_getMAKEexefile->text());
+    mySettings.setValue("GCC/StripPath", ui->lineEdit_getSTRIPexefile->text());
+    mySettings.setValue("GCC/GccDefaultOpts", ui->lineEdit_GCCdefaultOpts->text());
+    mySettings.setValue("GCC/GppDefaultOpts", ui->lineEdit_GPPdefaultOpts->text());
+
+    // TAB: VBCC
+    mySettings.setValue("VBCC/VcPath", ui->lineEdit_getVCexefile->text());
+    mySettings.setValue("VBCC/VasmPath", ui->lineEdit_getVASMexefile->text());
+    mySettings.setValue("VBCC/VcConfigPath", ui->lineEdit_getVCconfigDir->text());
+    mySettings.setValue("VBCC/VcDefaultOpts", ui->lineEdit_VCdefaultOpts->text());
+
+    // TAB: Emulator
+     mySettings.setValue("UAE/UaePath", ui->lineEdit_getEmulatorExefile->text());
+     mySettings.setValue("UAE/Os13ConfigPath", ui->lineEdit_getOS13Configfile->text());
+     mySettings.setValue("UAE/Os20ConfigPath", ui->lineEdit_getOS20Configfile->text());
+     mySettings.setValue("UAE/Os30ConfigPath", ui->lineEdit_getOS3Configfile->text());
+     mySettings.setValue("UAE/Os40ConfigPath", ui->lineEdit_getOS4Configfile->text());
+     mySettings.setValue("UAE/DefaultConfig", ui->comboBox_defaultEmulator->currentIndex());
+
+     // TAB: Misc
+     mySettings.setValue("MISC/DefaultStyle", ui->comboBoxDefaultStyle->currentText());
+     mySettings.setValue("MISC/UseBlackishStyle", ui->checkBoxStylesheet->isChecked());
+     mySettings.setValue("MISC/ShowIndentGuide", ui->checkBoxIndentationLines->isChecked());
+     mySettings.setValue("MISC/ShowDebugOutput", ui->checkBoxDebugOutput->isChecked());
+     mySettings.setValue("MISC/DefaultCrossCompiler", ui->comboBoxDefaultCompiler->currentIndex());
+}
+
+void PrefsDialog::load_mySettings()
+{
+    // TAB: Project
+    ui->lineEdit_author->setText(mySettings.value("Project/Author").toString());
+    ui->lineEdit_email->setText(mySettings.value("Project/Email").toString());
+    ui->lineEdit_website->setText(mySettings.value("Project/Website").toString());
+    ui->lineEdit_description->setText(mySettings.value("Project/Description").toString());
+    ui->lineEdit_purpose->setText(mySettings.value("Project/Purpose").toString());
+    ui->lineEdit_projectsRootDir->setText(mySettings.value("Project/ProjectRootDir").toString());
+
+    // TAB: GCC
+    ui->lineEdit_getGCCexefile->setText(mySettings.value("GCC/GccPath").toString());
+    ui->lineEdit_getGPPexefile->setText(mySettings.value("GCC/GppPath").toString());
+    ui->lineEdit_getMAKEexefile->setText(mySettings.value("GCC/MakePath").toString());
+    ui->lineEdit_getSTRIPexefile->setText(mySettings.value("GCC/StripPath").toString());
+    ui->lineEdit_GCCdefaultOpts->setText(mySettings.value("GCC/GccDefaultOpts").toString());
+    ui->lineEdit_GPPdefaultOpts->setText(mySettings.value("GCC/GppDefaultOpts").toString());
+
+    // TAB: VBCC
+    ui->lineEdit_getVCexefile->setText(mySettings.value("VBCC/VcPath").toString());
+    ui->lineEdit_getVASMexefile->setText(mySettings.value("VBCC/VasmPath").toString());
+    ui->lineEdit_getVCconfigDir->setText(mySettings.value("VBCC/VcConfigPath").toString());
+    ui->lineEdit_VCdefaultOpts->setText(mySettings.value("VBCC/VcDefaultOpts").toString());
+
+    // TAB: Emulator
+    ui->lineEdit_getEmulatorExefile->setText(mySettings.value("UAE/UaePath").toString());
+    ui->lineEdit_getOS13Configfile->setText(mySettings.value("UAE/Os13ConfigPath").toString());
+    ui->lineEdit_getOS20Configfile->setText(mySettings.value("UAE/Os20ConfigPath").toString());
+    ui->lineEdit_getOS3Configfile->setText(mySettings.value("UAE/Os30ConfigPath").toString());
+    ui->lineEdit_getOS4Configfile->setText(mySettings.value("UAE/Os40ConfigPath").toString());
+    ui->comboBox_defaultEmulator->setCurrentIndex(mySettings.value("UAE/DefaultConfig").toInt());
+
+    // TAB: Misc
+    ui->comboBoxDefaultStyle->setCurrentText(mySettings.value("MISC/DefaultStyle").toString());
+    ui->checkBoxStylesheet->setChecked(mySettings.value("MISC/UseBlackishStyle").toBool());
+    ui->checkBoxIndentationLines->setChecked(mySettings.value("MISC/ShowIndentGuide").toBool());
+    ui->checkBoxDebugOutput->setChecked(mySettings.value("MISC/ShowDebugOutput").toBool());
+    ui->comboBoxDefaultCompiler->setCurrentIndex(mySettings.value("MISC/DefaultCrossCompiler").toInt());
 }

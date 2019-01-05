@@ -49,6 +49,7 @@
 #include <QToolBar>
 #include <QSplitter>
 #include <QListView>
+#include <QStyleFactory>
 
 #include <Qsci/qsciscintilla.h>
 #include <Qsci/qsciscintillabase.h>
@@ -64,6 +65,8 @@
 #include "mainwindow.h"
 #include "prefsdialog.h"
 
+
+
 // Processes to start:
 static QProcess myProcess;      // the process for running the compiler
 static QProcess myEmulator;     // the process for running the emulator
@@ -71,8 +74,15 @@ static QProcess myEmulator;     // the process for running the emulator
 // Open MainWindow with given filename...
 MainWindow::MainWindow(QString cmdFileName)
 {
+    // load preferences
+    // restores last saved position and size of the editor window, load other defaults
+    readSettings();
+    debugVars();
+
+    QApplication::setStyle(p_default_style);
+
     QList<int> sizes;
-    sizes << 300 <<150 << 200;
+    sizes << 320 <<150 << 200;
     splitter = new QSplitter(this);
     btnCloseOutput = new QPushButton(tr("Hide compiler output"), this);
     btnCloseOutput->setGeometry(50, 40, 75, 30);
@@ -88,7 +98,7 @@ MainWindow::MainWindow(QString cmdFileName)
     outputGroup->setLayout(vbox);
 
     splitter->setOrientation(Qt::Vertical);
-    splitter->setHandleWidth(8);
+    splitter->setHandleWidth(4);
     splitter->insertWidget(0,textEdit);
     splitter->insertWidget(1,outputGroup);
     splitter->setSizes(sizes);
@@ -97,9 +107,7 @@ MainWindow::MainWindow(QString cmdFileName)
     setCentralWidget(splitter);
 
     initializeGUI();    // most initializations are done within tis method!
-
-    // restore last saved position and size of the editor window
-    readSettings();
+    activateGUIdefaultSettings();
 
     // react if document was modified
     connect(textEdit, SIGNAL(textChanged()), this, SLOT(documentWasModified()));
@@ -412,7 +420,7 @@ void MainWindow::createActions()
 
     showIndentationGuidesAct = new QAction(tr("Show indentation guides"), this);
     showIndentationGuidesAct->setCheckable(true);
-    showIndentationGuidesAct->setChecked(false);
+    showIndentationGuidesAct->setChecked(p_show_indentation);
     showIndentationGuidesAct->setStatusTip(tr("Toggle indentation guides visibility"));
     connect(showIndentationGuidesAct, SIGNAL(triggered()), this, SLOT(actionShowIndentationGuides()));
 
@@ -856,11 +864,48 @@ void MainWindow::createStatusBarMessage(QString statusmessage, int timeout)
 //
 void MainWindow::readSettings()
 {
-    QSettings settings("MB-SoftWorX", "QScintilla Amiga Cross Editor Example");
+    QSettings settings("MB-SoftWorX", "Amiga Cross Editor");
     QPoint pos = settings.value("pos", QPoint(200, 200)).toPoint();
     QSize size = settings.value("size", QSize(400, 400)).toSize();
     resize(size);
     move(pos);
+
+    // TAB: Project
+    p_author = (settings.value("Project/Author").toString());
+    p_email = (settings.value("Project/Email").toString());
+    p_website = (settings.value("Project/Website").toString());
+    p_description = (settings.value("Project/Description").toString());
+    p_purpose = (settings.value("Project/Purpose").toString());
+    p_projectsRootDir = (settings.value("Project/ProjectRootDir").toString());
+
+    // TAB: GCC
+    p_compiler_gcc = (settings.value("GCC/GccPath").toString());
+    p_compiler_gpp = (settings.value("GCC/GppPath").toString());
+    p_make = (settings.value("GCC/MakePath").toString());
+    p_strip = (settings.value("GCC/StripPath").toString());
+    p_compiler_gcc_call = (settings.value("GCC/GccDefaultOpts").toString());
+    p_compiler_gpp_call = (settings.value("GCC/GppDefaultOpts").toString());
+
+    // TAB: VBCC
+    p_compiler_vc = (settings.value("VBCC/VcPath").toString());
+    p_compiler_vasm = (settings.value("VBCC/VasmPath").toString());
+    p_vbcc_config_dir = (settings.value("VBCC/VcConfigPath").toString());
+    p_compiler_vc_call = (settings.value("VBCC/VcDefaultOpts").toString());
+
+    // TAB: Emulator
+    p_emulator = (settings.value("UAE/UaePath").toString());
+    p_os13_config = (settings.value("UAE/Os13ConfigPath").toString());
+    p_os20_config = (settings.value("UAE/Os20ConfigPath").toString());
+    p_os30_config = (settings.value("UAE/Os30ConfigPath").toString());
+    p_os40_config = (settings.value("UAE/Os40ConfigPath").toString());
+    p_defaultEmulator = (settings.value("UAE/DefaultConfig").toInt());
+
+    // TAB: Misc
+    p_default_style = (settings.value("MISC/DefaultStyle").toString());
+    p_blackish = (settings.value("MISC/UseBlackishStyle").toBool());
+    p_show_indentation = (settings.value("MISC/ShowIndentGuide").toBool());
+    p_mydebug = (settings.value("MISC/ShowDebugOutput").toBool());
+    p_defaultCompiler = (settings.value("MISC/DefaultCrossCompiler").toInt());
 }
 
 //
@@ -868,7 +913,7 @@ void MainWindow::readSettings()
 //
 void MainWindow::writeSettings()
 {
-    QSettings settings("MB-SoftWorX", "QScintilla Amiga Cross Editor Example");
+    QSettings settings("MB-SoftWorX", "Amiga Cross Editor");
     settings.setValue("pos", pos());
     settings.setValue("size", size());
 }
@@ -1225,29 +1270,32 @@ void MainWindow::SelectCompiler(int index)
         qDebug() << "Value: " << index;
     }
 
+    // Toggle statusbar combobox:
+    this->compilerCombo->setCurrentIndex(index);
+
     switch(index)
     {
-    case 0:
-        p_selected_compiler = p_compiler_vc;
-        p_selected_compiler_args = p_compiler_vc_call;
-        p_compiledFileSuffix = "_vc";
-        // check selected menu item, uncheck others
-        selectCompilerVBCCAct->setChecked(true);
-        break;
-    case 1:
-        p_selected_compiler = p_compiler_gcc;
-        p_selected_compiler_args = p_compiler_gcc_call;
-        p_compiledFileSuffix = "_gcc";
-        // check selected menu item, uncheck others
-        selectCompilerGCCAct->setChecked(true);
-        break;
-    case 2:
-        p_selected_compiler = p_compiler_gpp;
-        p_selected_compiler_args = p_compiler_gpp_call;
-        p_compiledFileSuffix = "_gpp";
-        // check selected menu item, uncheck others
-        selectCompilerGPPAct->setChecked(true);
-        break;
+        case 0:
+            p_selected_compiler = p_compiler_vc;
+            p_selected_compiler_args = p_compiler_vc_call;
+            p_compiledFileSuffix = "_vc";
+            // check selected menu item, uncheck others
+            selectCompilerVBCCAct->setChecked(true);
+            break;
+        case 1:
+            p_selected_compiler = p_compiler_gcc;
+            p_selected_compiler_args = p_compiler_gcc_call;
+            p_compiledFileSuffix = "_gcc";
+            // check selected menu item, uncheck others
+            selectCompilerGCCAct->setChecked(true);
+            break;
+        case 2:
+            p_selected_compiler = p_compiler_gpp;
+            p_selected_compiler_args = p_compiler_gpp_call;
+            p_compiledFileSuffix = "_gpp";
+            // check selected menu item, uncheck others
+            selectCompilerGPPAct->setChecked(true);
+            break;
     }
 }
 
@@ -1265,122 +1313,134 @@ void MainWindow::actionCloseOutputConsole()
 //
 void MainWindow::actionCompile()
 {
-    QString temp_compiler_call, mbox_title;
-    QFileInfo file(curFile);
-
-    // set approbriate title for QInputDialog:
-    if(selectCompilerVBCCAct->isChecked())
+    // Don't start compiler on an empty source!
+    if(!(textEdit->text().isEmpty()))
     {
+        QString temp_compiler_call, mbox_title;
+        QFileInfo file(curFile);
+
+        // set approbriate title for QInputDialog:
+        if(selectCompilerVBCCAct->isChecked())
+        {
+            if(p_mydebug)
+                qDebug() << "Extension: " << file.suffix();
+
+            if((file.suffix() == "cpp") || (file.suffix() == "CPP"))
+            {
+                if(p_mydebug)
+                    qDebug() << "vbcc ERROR C++";
+
+                selectCompilerVBCCAct->setChecked(false);
+                selectCompilerGPPAct->setChecked(true);
+                compilerCombo->setCurrentIndex(2);
+
+                // give a user warning
+                (void)QMessageBox::warning(this,
+                               "Amiga Cross Editor", "VBCC does <i><b>NOT</b> permit</i> to compile <b><i>C++ sources!</i></b><br> "
+                                "Compiler was set to <b>GNU g++</b> instead.<br>"
+                                "<br>This usually makes more sense, ya know?!",
+                                QMessageBox::Ok);
+
+            } else {mbox_title = "vbcc";}
+        }
+
+        if(selectCompilerGCCAct->isChecked())
+        {
+            if((file.suffix() == "cpp") || (file.suffix() == "CPP"))
+            {
+                if(p_mydebug)
+                    qDebug() << "gcc ERROR C++";
+
+                selectCompilerGCCAct->setChecked(false);
+                selectCompilerGPPAct->setChecked(true);
+                compilerCombo->setCurrentIndex(2);
+
+                // give a user warning
+                (void)QMessageBox::warning(this,
+                               "Amiga Cross Editor", "GCC does <i><b>NOT</b> permit</i> to compile <b><i>C++ sources!</i></b><br> "
+                                "Compiler was set to <b>GNU g++</b> instead.<br>"
+                                "<br>This usually makes more sense, ya know?!",
+                                QMessageBox::Ok);
+
+            }
+            else
+            {
+                mbox_title = "m68k-amigaos-gcc";
+            }
+        }
+
+
+        if(selectCompilerGPPAct->isChecked())
+            mbox_title = "m68k-amigaos-g++";
+
+
+        QString text = p_selected_compiler_args;
+
+        bool ok;
         if(p_mydebug)
-            qDebug() << "Extension: " << file.suffix();
+            qDebug() << "START: Proc started " << p_proc_is_started << " times.";
 
-        if((file.suffix() == "cpp") || (file.suffix() == "CPP"))
+        text = QInputDialog::getText(this, mbox_title,
+                                           tr("Compiler Options:"), QLineEdit::Normal,
+                                           p_selected_compiler_args, &ok);
+        if (ok && !text.isEmpty())
         {
+            save();
+            QString outName = QFileInfo(curFile).baseName();
+            QString outPath = QFileInfo(curFile).absolutePath();
+
+            // construct path and name of compiled file for file checking:
+            p_compiledFile = outPath + QDir::separator() + outName + p_compiledFileSuffix;
+
             if(p_mydebug)
-                qDebug() << "vbcc ERROR C++";
+                qDebug() << "compiled file: " << p_compiledFile;
 
-            selectCompilerVBCCAct->setChecked(false);
-            selectCompilerGPPAct->setChecked(true);
-            compilerCombo->setCurrentIndex(2);
+            temp_compiler_call = p_selected_compiler_args;  // store compiler parameters temporarily
+            text.append(" ");   // add one space to separate arguments!!
+            text.append(curFile + " -o " + outPath + QDir::separator() + outName + p_compiledFileSuffix);        // add output file name
 
-            // give a user warning
-            (void)QMessageBox::warning(this,
-                           "Amiga Cross Editor", "VBCC does <i><b>NOT</b> permit</i> to compile <b><i>C++ sources!</i></b><br> "
-                            "Compiler was set to <b>GNU g++</b> instead.<br>"
-                            "<br>This usually makes more sense, ya know?!",
-                            QMessageBox::Ok);
-
-        } else {mbox_title = "vbcc";}
-    }
-
-    if(selectCompilerGCCAct->isChecked())
-    {
-        if((file.suffix() == "cpp") || (file.suffix() == "CPP"))
-        {
             if(p_mydebug)
-                qDebug() << "gcc ERROR C++";
+                qDebug() << "Text not empty: " << text;
 
-            selectCompilerGCCAct->setChecked(false);
-            selectCompilerGPPAct->setChecked(true);
-            compilerCombo->setCurrentIndex(2);
+            p_selected_compiler_args = text;
 
-            // give a user warning
-            (void)QMessageBox::warning(this,
-                           "Amiga Cross Editor", "GCC does <i><b>NOT</b> permit</i> to compile <b><i>C++ sources!</i></b><br> "
-                            "Compiler was set to <b>GNU g++</b> instead.<br>"
-                            "<br>This usually makes more sense, ya know?!",
-                            QMessageBox::Ok);
+            // make output window visible:
+            outputGroup->show();
 
+            //
+            // put REAL compiler start HERE!
+            // (uses p_compiler and p_compiler_call in mainwindow.h as default options)
+            //
+            startCompiler();
+
+            // afterwards, reset everything to its defaults!
+            text.clear();
+            p_selected_compiler_args.clear();
+            p_selected_compiler_args = temp_compiler_call;
         }
         else
         {
-            mbox_title = "m68k-amigaos-gcc";
+            text.append(curFile);
+            p_compiler_call = text;
+
+            if(p_mydebug)
+            {
+                qDebug() << "Text: " << text;
+                qDebug() << "Compiler call: " << p_compiler_call;
+            }
         }
-    }
 
-
-    if(selectCompilerGPPAct->isChecked())
-        mbox_title = "m68k-amigaos-g++";
-
-
-    QString text = p_selected_compiler_args;
-
-    bool ok;
-    if(p_mydebug)
-        qDebug() << "START: Proc started " << p_proc_is_started << " times.";
-
-    text = QInputDialog::getText(this, mbox_title,
-                                       tr("Compiler Options:"), QLineEdit::Normal,
-                                       p_selected_compiler_args, &ok);
-    if (ok && !text.isEmpty())
-    {
-        save();
-        QString outName = QFileInfo(curFile).baseName();
-        QString outPath = QFileInfo(curFile).absolutePath();
-
-        // construct path and name of compiled file for file checking:
-        p_compiledFile = outPath + QDir::separator() + outName + p_compiledFileSuffix;
-
-        if(p_mydebug)
-            qDebug() << "compiled file: " << p_compiledFile;
-
-        temp_compiler_call = p_selected_compiler_args;  // store compiler parameters temporarily
-        text.append(" ");   // add one space to separate arguments!!
-        text.append(curFile + " -o " + outPath + QDir::separator() + outName + p_compiledFileSuffix);        // add output file name
-
-        if(p_mydebug)
-            qDebug() << "Text not empty: " << text;
-
-        p_selected_compiler_args = text;
-
-        // make output window visible:
-        outputGroup->show();
-
-        //
-        // put REAL compiler start HERE!
-        // (uses p_compiler and p_compiler_call in mainwindow.h as default options)
-        //
-        startCompiler();
-
-        // afterwards, reset everything to its defaults!
         text.clear();
-        p_selected_compiler_args.clear();
-        p_selected_compiler_args = temp_compiler_call;
-    }
+        }
     else
     {
-        text.append(curFile);
-        p_compiler_call = text;
-
-        if(p_mydebug)
-        {
-            qDebug() << "Text: " << text;
-            qDebug() << "Compiler call: " << p_compiler_call;
-        }
+        // give a user warning
+        (void)QMessageBox::critical(this,
+                       "Amiga Cross Editor", "It makes <i><b>no sense</b></i> to compile <b><i>empty source files!</i></b><br> "
+                        "Compilation was <b>terminated</b> instead.<br>"
+                        "<br>This usually makes more sense, ya know?!",
+                        QMessageBox::Ok);
     }
-
-    text.clear();
-
 }
 
 //
@@ -2505,8 +2565,10 @@ void MainWindow::actionPrefsDialog()
 {
     PrefsDialog *acePrefs = new PrefsDialog(this);
     acePrefs->exec();
-    // insert new prefs into MainWindow variables for instant use!
-    getPrefs();
+
+    // afterwards insert new prefs into MainWindow variables for instant use!
+    readSettings();
+    activateGUIdefaultSettings();
 }
 
 //
@@ -2779,7 +2841,7 @@ void MainWindow::initializeGUI()
     compilerLabel->setText("Compiler:");
     statusBar()->addPermanentWidget(compilerCombo);
     compilerCombo->addItems(p_Compilers);
-    compilerCombo->setCurrentIndex(1);
+    compilerCombo->setCurrentIndex(p_defaultCompiler);
     statusBar()->addPermanentWidget(statusLabelX);
     statusLabelX->setText(tr("Line:"));
     statusBar()->addPermanentWidget(statusLCD_X);
@@ -2789,11 +2851,14 @@ void MainWindow::initializeGUI()
     statusBar()->addPermanentWidget(statusLCD_Y);
     statusLCD_Y->display(1);
 
-    // give some blackish style to MainWindow
-    // ...surely looks nasty on OS X, so we will skip that for Mac!
-    #if !defined(__APPLE__)
-        this->setStyleSheet(QString::fromUtf8("background-color: rgb(175, 175, 175);"));
-    #endif
+    // give some blackish style to MainWindow (if the user wants so...)
+    if(p_blackish)
+    {
+        // ...surely looks nasty on OS X, so we will skip that for Mac!
+        #if !defined(__APPLE__)
+            this->setStyleSheet(QString::fromUtf8("background-color: rgb(175, 175, 175);"));
+        #endif
+    }
 
     // implement a custom context menue for textEdit:
     textEdit->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -2821,15 +2886,12 @@ void MainWindow::initializeGUI()
     createToolBars();
     createStatusBarMessage(tr("Ready"), 0);
 
-    // load preferences
-    getPrefs();
-
     // Set default Compiler
-    p_selected_compiler = p_compiler_gcc;
-    p_selected_compiler_args = p_compiler_gcc_call;
-    compilerCombo->setCurrentIndex(1);
-    selectCompilerGCCAct->setChecked(true);
-    p_compiledFileSuffix = "_gcc";
+//    p_selected_compiler = p_compiler_gcc;
+//    p_selected_compiler_args = p_compiler_gcc_call;
+//    compilerCombo->setCurrentIndex(1);
+//    selectCompilerGCCAct->setChecked(true);
+//    p_compiledFileSuffix = "_gcc";
 
     connect(compilerCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SelectCompiler(int)));
     connect(btnCloseOutput, SIGNAL(clicked(bool)), this, SLOT(actionCloseOutputConsole()));
@@ -3132,11 +3194,11 @@ void MainWindow::readyReadStandardOutput()
     QProcess *myProcess = (QProcess *)sender();
     QByteArray buf = myProcess->readAllStandardOutput();
 
-    QFile data(s_projectdir + QDir::separator() + "compiler_out.txt");
+    QFile data(p_projectdir + QDir::separator() + "compiler_out.txt");
 
     if(p_mydebug)
     {
-        qDebug() << "logfile: " << s_projectdir + QDir::separator() + "compiler_out.txt";
+        qDebug() << "logfile: " << p_projectdir + QDir::separator() + "compiler_out.txt";
     }
     if (data.open(QFile::WriteOnly | QFile::Truncate))
     {
@@ -3209,71 +3271,56 @@ void MainWindow::compiler_readyReadStandardOutput()
         qDebug() << buf;
 }
 
-QString MainWindow::getPrefs()
+
+//
+// set GUI according to default prefs
+//
+void MainWindow::activateGUIdefaultSettings()
 {
-    QString line;
-    QStringList fields;
-    // Construct file path to store values:
-    QString filename = QDir::homePath();
-    filename.append(QDir::separator());
-    filename.append(".amigaed");
-    filename.append(QDir::separator());
-    filename.append("ace.prefs");
-
-    QFile file(filename);
-
-    if(!file.open(QIODevice::ReadOnly))
-    {
-        QMessageBox::critical(this, "Amiga Cross Editor Prefs", "Error while opening prefs file: \n" + file.errorString() + "\n\nPlease edit and save prefs first and\nthen restart Amiga Cross Editor!");
-        return "Fuck you!";
-    }
-    else
-    {
-        QTextStream in(&file);
-        while(!in.atEnd())
-        {
-            line = in.readLine();
-            fields = line.split(", ");
-        }
-
-        file.close();
-
-        // TAB: Project
-        p_author = fields[0];
-        p_email = fields[1];
-        p_website = fields[2];
-        p_description = fields[3];
-        p_purpose = fields[4];
-        p_projectsRootDir =fields[5];
-        // TAB: GCC
-        p_compiler_gcc = fields[6];
-        p_compiler_gpp = fields[7];
-        p_make = fields[8];
-        p_strip = fields[9];
-        p_compiler_gcc_call = fields[10];
-        p_compiler_gpp_call = fields[11];
-        // TAB: VBCC
-        p_compiler_vc = fields[12];
-        p_compiler_vasm = fields[13];
-        p_vbcc_config_dir = fields[14];
-        p_compiler_vc_call = fields[15];
-        // TAB: Emulator
-        p_emulator = fields[16];
-        p_os13_config = fields[17];
-        p_os20_config = fields[18];
-        p_os13_config = fields[19];
-        p_os13_config = fields[20];
-        p_defaultEmulator = fields[21];
-    }
-
-    return line;
+    // setup Compiler Environment
+    SelectCompiler(p_defaultCompiler);
+    actionShowIndentationGuides();
 }
 
 ////////////////////////////
-// Setters for prefs vars //
+// Debug Helper           //
 ///////////////////////////
-void MainWindow::setCompilerGCC(QString compiler)
+void MainWindow::debugVars()
 {
-    p_compiler_gcc = compiler;
+    if(p_mydebug)
+    {
+        // TAB: Project
+        qDebug() << "p_author: " << p_author;
+        qDebug() << "p_email: " << p_email;
+        qDebug() << "p_website: " << p_website;
+        qDebug() << "p_description: " << p_description;
+        qDebug() << "p_purpose: " << p_purpose;
+        qDebug() << "p_projectsRootDir: " << p_projectsRootDir;
+        // TAB: GCC
+        qDebug() << "p_compiler_gcc: " << p_compiler_gcc;
+        qDebug() << "p_compiler_gpp: " << p_compiler_gpp;
+        qDebug() << "p_make: " << p_make;
+        qDebug() << "p_strip: " << p_strip;
+        qDebug() << "p_compiler_gcc_call: " << p_compiler_gcc_call;
+        qDebug() << "p_compiler_gpp_call: " << p_compiler_gpp_call;
+        // TAB: VBCC
+        qDebug() << "p_compiler_vc: " << p_compiler_vc;
+        qDebug() << "pp_compiler_vasm: " << p_compiler_vasm;
+        qDebug() << "p_vbcc_config_dir: " << p_vbcc_config_dir;
+        qDebug() << "p_compiler_vc_call: " << p_compiler_vc_call;
+        // TAB: Emulator
+        qDebug() << "p_emulator: " << p_emulator;
+        qDebug() << "p_os13_config: " << p_os13_config;
+        qDebug() << "p_os20_config: " << p_os20_config;
+        qDebug() << "p_os30_config: " << p_os30_config;
+        qDebug() << "p_os40_config: " << p_os40_config;
+        qDebug() << "p_defaultEmulator: " << p_defaultEmulator;
+        // TAB: Misc
+        qDebug() << "p_default_style: " << p_default_style;
+        qDebug() << "p_blackish: " << p_blackish;
+        qDebug() << "p_show_indentation: " << p_show_indentation;
+        qDebug() << "p_mydebug: " << p_mydebug;
+        qDebug() << "p_defaultCompiler: " << p_defaultCompiler;
+    }
 }
 

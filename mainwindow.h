@@ -29,10 +29,13 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QtGui>
 #include <QMainWindow>
+#include <QSettings>
 #include <QMessageBox>
 #include <QString>
 #include <QStyle>
+#include <QStyleFactory>
 #include <QFile>
 #include <QFileInfo>
 #include <QTextStream>
@@ -68,6 +71,7 @@ class QLabel;
 class QComboBox;
 class QsciScintilla;
 class PrefsDialog;
+class QtGui;
 
 
 class MainWindow : public QMainWindow
@@ -79,23 +83,26 @@ public:
     explicit MainWindow(QString cmdFileName);
     bool fileExists(QString path);
 
+    QString line;
+    QStringList fields;
+
     // vars for controlling file header comments
-    QString p_purpose = "CHANGE_ME";
-    QString p_author = "Michael Bergmann";
-    QString p_email = "mb@mbergmann-sh.de";
+    QString p_purpose;
+    QString p_author;
+    QString p_email;
     QString p_website;
     QString p_version = "1.0";
     QString p_revision = "0";
-    QString p_description = "CHANGE_ME";
-    QString p_compiler = "/opt/amiga/bin/m68k-amigaos-gcc";                     // C-Compiler to call...
-    QString p_compiler_call = "-Wall -O2 -s -noixemul -lamiga ";
-    QString p_compiler_gcc;// = "/opt/amiga/bin/m68k-amigaos-gcc";
-    QString p_compiler_gpp = "/opt/amiga/bin/m68k-amigaos-g++";
-    QString p_compiler_vc = "/opt/amiga/bin/vc";
+    QString p_description;
+    QString p_compiler ;                     // C-Compiler to call...
+    QString p_compiler_call;
+    QString p_compiler_gcc;
+    QString p_compiler_gpp ;
+    QString p_compiler_vc;
     QString p_compiler_vasm;
-    QString p_compiler_gcc_call = "-Wall -O2 -s -noixemul -lamiga ";                // Arguments for compilation..
-    QString p_compiler_vc_call = "-v -O2 -size -lamiga ";
-    QString p_compiler_gpp_call = "-std=c++11 -Wall -O2 -s -noixemul -lamiga ";
+    QString p_compiler_gcc_call;                // Arguments for compilation..
+    QString p_compiler_vc_call;
+    QString p_compiler_gpp_call;
     QString p_selected_compiler;
     QString p_selected_compiler_args;
     QString p_vbcc_config_dir;
@@ -104,15 +111,21 @@ public:
     QString p_compiledFile;                                                     // keep the currently compiled file for file checking
     QString p_compiledFileSuffix;                                               // keep filename suffix for compiled output
     QFileInfo p_stripped_name;
-    QString s_projectdir;
+    QString p_projectdir;
     QString p_emulator;
     QString p_os13_config;
     QString p_os20_config;
     QString p_os30_config;
     QString p_os40_config;
-    QString p_defaultEmulator;
+    int p_defaultEmulator;
     QString p_projectsRootDir;
-    QStringList p_Compilers = {"VBCC (C mode only)", "GNU gcc (C mode)", "GNU g++ (C++ mode)", "GNU gcc (OS 1.3)"};    // used for building combobox entries
+    QStringList p_Compilers = {"VBCC (C mode only)", "GNU gcc (C mode)", "GNU g++ (C++ mode)"};    // used for building combobox entries
+    int p_defaultCompiler;      // set from prefs file
+    QString p_default_style;    // set from prefs file
+    bool p_blackish;            // use blackish stylesheet?
+    bool p_show_indentation;
+    // show or hide debugging informations
+    bool p_mydebug = false;
 
     // Setter for prefs vars
     void setCompilerGCC(QString compiler);
@@ -131,7 +144,7 @@ public slots:
     void emu_readyReadStandardOutput();
     void compiler_readyReadStandardOutput();
     void SelectCompiler(int index);
-    QString getPrefs();
+    void debugVars();
 
 private slots:
     int startEmulator();                            // starts a process (f.e. Emulator)
@@ -244,6 +257,7 @@ private:
     bool saveFile(const QString &fileName);             // save current file
     void setCurrentFile(const QString &fileName);       // will be called to store current filename and put it into window title
     QString strippedName(const QString &fullFileName);  // gives back current filename without path
+    void activateGUIdefaultSettings();
 
 
     // Qscintila Editor widget instance
@@ -403,10 +417,6 @@ private:
     // is document text folded?
     bool foldall;
 
-
-
-    // show or hide debugging informations
-    bool p_mydebug = false;
     // check if there is allready a main() function in a file
     bool p_main_set = false;
     bool p_versionstring_set = false;
