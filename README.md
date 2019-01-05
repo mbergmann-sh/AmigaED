@@ -104,6 +104,7 @@ Developing and enhancing this example code is kind of time intensive, though a w
 ![acrossedit_w10_contextmenu](https://user-images.githubusercontent.com/23148422/50419018-db2a2180-082e-11e9-9c10-5f5ff82f0733.png)
 ![amiged_shell-tmplate](https://user-images.githubusercontent.com/23148422/50439937-2bb78280-08f4-11e9-9fc0-c0201770fabd.png)
 ![ace](https://user-images.githubusercontent.com/23148422/50571363-762f7800-0da8-11e9-8da6-1bea5fc5f000.png)
+![screenshot_20190105_181721](https://user-images.githubusercontent.com/23148422/50727162-24278300-1117-11e9-9254-dfadd392de17.png)
 
 # Usefull links for Qt5/QScintilla coders
 - Qt5 open source edition download site: https://www.qt.io/download-qt-installer?hsCtaTracking=9f6a2170-a938-42df-a8e2-a9f0b1d6cdce%7C6cb0de4f-9bb5-4778-ab02-bfb62735f3e5
