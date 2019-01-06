@@ -45,7 +45,7 @@ more to come...
 Optional, but usefull:
 - Amiga Cross Compiler Toolchain installed and working. I suggest Bebbo's repo at https://github.com/bebbo/amiga-gcc. Windows users might want to download a precompiled, installable version. You can find it here: https://franke.ms/download/setup-amiga-gcc.exe
 - Some UAE flavour installed and set up to boot a virtual Amiga environment
-- Folder that is mounted as a HD in your virtual Amiga to test your cross compilates
+- Folder that is mounted as a HD in your virtual Amiga to test your cross compilates. Select this as your project default folder in Amiga Cross Editor's preferences!
 
 # Compiling the app...
 ...should work fine under Linux, Windows, MacOS X and probably under BSD, too (didn't test that!).
