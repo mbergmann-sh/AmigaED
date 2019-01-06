@@ -37,6 +37,16 @@ This program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRA
 
 more to come...
 
+# Prerequisites
+- Qt5 development environment installed and working
+- QScintilla installed and working
+- GIT client installed (if you want to pull updates!)
+
+Optional, but usefull:
+- Amiga Cross Compiler Toolchain installed and working
+- Some UAE flavour installed and set up to boot a virtual Amiga environment
+- Folder that is mounted as a HD in your virtual Amiga to test your cross compilates
+
 # Compiling the app...
 ...should work fine under Linux, Windows, MacOS X and probably under BSD, too (didn't test that!).
 You'll need a computer with either MSVC, GCC or MinGW C/C++ compiler setup with Qt5 and QScintilla installed and working!
