@@ -98,6 +98,9 @@ Since there aren't too many working examples on how to write an advanced editor 
 Developing and enhancing this example code is kind of time intensive, though a whole lot of fun. If you like my work and want to support the developent of AmigaED with some beer, books or Espresso, feel free to donate to mb@mbergmann-sh.de via PayPal. Thanks for your support!
 
 # Screenshots
+![aced_compile](https://user-images.githubusercontent.com/23148422/50733066-a9964c00-1186-11e9-8a7b-5eb29e18adaa.png)
+![aced_prefs](https://user-images.githubusercontent.com/23148422/50733067-a9964c00-1186-11e9-8dc6-0ab818d6f368.png)
+![aced_prefs_uae](https://user-images.githubusercontent.com/23148422/50733068-aa2ee280-1186-11e9-8df9-b134e33c1dce.png)
 ![acrossedit_linux](https://user-images.githubusercontent.com/23148422/50418994-bdf55300-082e-11e9-988d-c91130b71946.png)
 ![acrossedit_osx](https://user-images.githubusercontent.com/23148422/50419007-ca79ab80-082e-11e9-964e-945d7b04968e.png)
 ![acrossedit_w10_insertsmenu](https://user-images.githubusercontent.com/23148422/50419014-d6fe0400-082e-11e9-8386-0a12e1908cb3.png)
