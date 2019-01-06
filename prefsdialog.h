@@ -27,7 +27,7 @@ public:
     ~PrefsDialog();
 
     QStringList myPrefs;
-    QStringList p_Compilers = {"VBCC (C mode only)", "GNU gcc (C mode)", "GNU g++ (C++ mode)", "GNU gcc (OS 1.3)"};    // used for building combobox entries
+    QStringList p_Compilers = {"VBCC (C mode only)", "GNU gcc (C mode)", "GNU g++ (C++ mode)"};    // used for building combobox entries
     QStringList p_style_items;
 
     QString line;
@@ -38,6 +38,7 @@ public:
 public slots:
     void save_mySettings();
     void load_mySettings();
+    void simpleStatusbar();
 
 private slots:
     void on_btn_SavePrefs_clicked();
@@ -56,8 +57,15 @@ private slots:
     void on_btn_getOS4Configfile_clicked();
     void on_btn_CancelSave_clicked();
 
+    void on_checkBoxSimpleStatusbar_clicked();
+
+    void on_checkBoxNoLCD_clicked();
+
+    void on_checkBoxNoCompileButton_clicked();
+
 private:
     Ui::PrefsDialog *ui;
+    bool p_prefs_changed;
 };
 
 #endif // PREFSDIALOG_H

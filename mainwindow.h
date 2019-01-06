@@ -62,6 +62,7 @@
 #include <QVBoxLayout>
 #include <QSpacerItem>
 #include <QPushButton>
+#include <QShortcut>
 
 #include <QDebug>
 
@@ -127,6 +128,12 @@ public:
     bool p_show_indentation;
     // show or hide debugging informations
     bool p_mydebug = false;
+    bool p_no_lcd_statusbar;    // use normal text instead of LCD for cursor position view
+    bool p_no_compilerbuttons;  // hide compiler selector and compile button from statusbar
+    bool p_simple_statusbar;    // show basic statusbar only
+    bool p_create_icon;         // create icon for compiled program?
+    bool p_console_on_fail;     // open console only if compilation fails
+    bool p_no_warn_requesters;  // reduce messegebox show-up
 
     // Setter for prefs vars
     void setCompilerGCC(QString compiler);
@@ -416,6 +423,8 @@ private:
     QLabel *compilerLabel;
     QLCDNumber  *statusLCD_X;       // shows cursor's line coordinate
     QLCDNumber  *statusLCD_Y;       // shows cursor's column coordinate
+    QLabel *statusContainer_X;      // alternative view for cursor position
+    QLabel *statusContainer_Y;      // alternative view for cursor position
     QComboBox *compilerCombo;       // puts a Compobox for compiler selection into statusbar
     QPushButton *compilerButton;    // puts a dice button for compiler start into statusbar
 

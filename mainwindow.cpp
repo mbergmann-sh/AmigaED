@@ -336,6 +336,7 @@ void MainWindow::createActions()
     connect(saveAsAct, SIGNAL(triggered()), this, SLOT(saveAs()));
 
     prefsAct = new QAction(QIcon(":/images/prefs.png"),tr("Global prefs..."), this);
+    prefsAct->setShortcut(tr("F12"));
     prefsAct->setStatusTip(tr("Open global preferences..."));
     connect(prefsAct, SIGNAL(triggered()), this, SLOT(actionPrefsDialog()));
 
@@ -470,7 +471,7 @@ void MainWindow::createActions()
     compilerGroup->addAction(selectCompilerGPPAct);
 
     compileAct = new QAction(QIcon(":/images/dice.png"), tr("Comp&ile..."), this);
-    compileAct->setShortcut(tr("Ctrl+r"));
+    compileAct->setShortcut(tr("F6"));
     compileAct->setStatusTip(tr("Compile current file..."));
     connect(compileAct, SIGNAL(triggered()), this, SLOT(actionCompile()));
 
@@ -924,7 +925,13 @@ void MainWindow::readSettings()
     p_blackish = (settings.value("MISC/UseBlackishStyle").toBool());
     p_show_indentation = (settings.value("MISC/ShowIndentGuide").toBool());
     p_mydebug = (settings.value("MISC/ShowDebugOutput").toBool());
+    p_no_lcd_statusbar = (settings.value("MISC/NoLCDstatusbar").toBool());
     p_defaultCompiler = (settings.value("MISC/DefaultCrossCompiler").toInt());
+    p_no_compilerbuttons = (settings.value("MISC/NoCompileButton").toBool());
+    p_simple_statusbar = (settings.value("MISC/SimpleStatusbar").toBool());
+    p_create_icon = (settings.value("MISC/CreateIcon").toBool());
+    p_console_on_fail = (settings.value("MISC/OpenConsoleOnFail").toBool());
+    p_no_warn_requesters = (settings.value("MISC/NoWarnRequester").toBool());
 }
 
 //
@@ -1254,7 +1261,10 @@ void MainWindow::actionGoto_matching_brace()
 void MainWindow::actionSelectCompilerVBCC()
 {
     qDebug() << "VBCC selection called.";
-    compilerCombo->setCurrentIndex(0);
+    if(!(p_no_compilerbuttons))    // react on user prefs: show or hide compiler combo and -button
+    {
+        compilerCombo->setCurrentIndex(0);
+    }
     SelectCompiler(0);
 }
 
@@ -1264,7 +1274,10 @@ void MainWindow::actionSelectCompilerVBCC()
 void MainWindow::actionSelectCompilerGCC()
 {
     qDebug() << "GCC selection called.";
-    compilerCombo->setCurrentIndex(1);
+    if(!(p_no_compilerbuttons))    // react on user prefs: show or hide compiler combo and -button
+    {
+        compilerCombo->setCurrentIndex(1);
+    }
     SelectCompiler(1);
 }
 
@@ -1274,7 +1287,10 @@ void MainWindow::actionSelectCompilerGCC()
 void MainWindow::actionSelectCompilerGPP()
 {
     qDebug() << "g++ selection called.";
-    compilerCombo->setCurrentIndex(2);
+    if(!(p_no_compilerbuttons))    // react on user prefs: show or hide compiler combo and -button
+    {
+        compilerCombo->setCurrentIndex(2);
+    }
     SelectCompiler(2);
 }
 
@@ -1290,7 +1306,10 @@ void MainWindow::SelectCompiler(int index)
     }
 
     // Toggle statusbar combobox:
-    this->compilerCombo->setCurrentIndex(index);
+    if(!(p_no_compilerbuttons))    // react on user prefs: show or hide compiler combo and -button
+    {
+        this->compilerCombo->setCurrentIndex(index);
+    }
 
     switch(index)
     {
@@ -1351,7 +1370,10 @@ void MainWindow::actionCompile()
 
                 selectCompilerVBCCAct->setChecked(false);
                 selectCompilerGPPAct->setChecked(true);
-                compilerCombo->setCurrentIndex(2);
+                if(!(p_no_compilerbuttons))    // react on user prefs: show or hide compiler combo and -button
+                {
+                    compilerCombo->setCurrentIndex(2);
+                }
 
                 // give a user warning
                 (void)QMessageBox::warning(this,
@@ -1372,7 +1394,10 @@ void MainWindow::actionCompile()
 
                 selectCompilerGCCAct->setChecked(false);
                 selectCompilerGPPAct->setChecked(true);
-                compilerCombo->setCurrentIndex(2);
+                if(!(p_no_compilerbuttons))    // react on user prefs: show or hide compiler combo and -button
+                {
+                    compilerCombo->setCurrentIndex(2);
+                }
 
                 // give a user warning
                 (void)QMessageBox::warning(this,
@@ -2585,7 +2610,7 @@ void MainWindow::actionPrefsDialog()
 
     // afterwards insert new prefs into MainWindow variables for instant use!
     readSettings();
-    activateGUIdefaultSettings();
+    //activateGUIdefaultSettings();
 }
 
 //
@@ -2815,8 +2840,18 @@ void MainWindow::showCurrendCursorPosition()
 {
     int line, index;
     textEdit->getCursorPosition(&line, &index);
-    statusLCD_X->display(line + 1);
-    statusLCD_Y->display(index +1);
+    // did we want LCD display?
+    if(!(p_no_lcd_statusbar))
+    {
+        statusLCD_X->display(line + 1);
+        statusLCD_Y->display(index +1);
+    }
+    // ...or did we want pain text display?
+    else
+    {
+        statusContainer_X->setText(QString::number(line + 1));
+        statusContainer_Y->setText(QString::number(index + 1));
+    }
 }
 
 //
@@ -2841,44 +2876,88 @@ void MainWindow::initializeGUI()
     this->setMinimumSize(600, 450);
 
     // prepare and initialize statusbar items:
-    this->compilerLabel = new QLabel(this);
-    this->compilerCombo = new QComboBox(this);
+    if(!(p_no_compilerbuttons))    // react on user prefs: show or hide compiler combo and -button
+    {
+        this->compilerLabel = new QLabel(this);
+        this->compilerCombo = new QComboBox(this);
+    }
+
     this->statusLabelX = new QLabel(this);
 
-    this->statusLCD_X = new QLCDNumber(this);
-    this->statusLCD_X->display(0);
+    if(!(p_no_lcd_statusbar))
+    {
+        this->statusLCD_X = new QLCDNumber(this);
+        this->statusLCD_X->display(0);
+    }
+    else
+    {
+        this->statusContainer_X = new QLabel(this);
+        this->statusContainer_X->setFrameShape(QFrame::Panel);
+        this->statusContainer_X->setFrameShadow(QFrame::Sunken);
+        this->statusContainer_X->setMinimumWidth(40);
+        this->statusContainer_X->setAlignment(Qt::AlignRight);
+        this->statusContainer_X->setText("0");
+    }
 
     this->statusLabelY = new QLabel(this);
 
-    this->statusLCD_Y = new QLCDNumber(this);
-    this->statusLCD_Y->display(0);
-
-    this->compilerButton = new QPushButton(NULL,this);
-    if(p_show_compilerbutton)
+    if(!(p_no_lcd_statusbar))
     {
+        this->statusLCD_Y = new QLCDNumber(this);
+        this->statusLCD_Y->display(0);
+    }
+    else
+    {
+        this->statusContainer_Y = new QLabel(this);
+        this->statusContainer_Y->setFrameShape(QFrame::Panel);
+        this->statusContainer_Y->setFrameShadow(QFrame::Sunken);
+        this->statusContainer_Y->setMinimumWidth(40);
+        this->statusContainer_Y->setAlignment(Qt::AlignRight);
+        this->statusContainer_Y->setText("0");
+    }
+
+    if(!(p_no_compilerbuttons))    // react on user prefs: show or hide compiler combo and -button
+    {
+        this->compilerButton = new QPushButton(NULL,this);
         compilerButton->setIcon(QIcon(":/images/dice.png"));
         compilerButton->setIconSize(QSize(18,18));
-        qDebug() << "Iconsize: " <<compilerButton->iconSize();
     }
 
     // permanently add the controls to the status bar
-    statusBar()->addPermanentWidget(compilerLabel);
-    compilerLabel->setText("Compiler:");
-    statusBar()->addPermanentWidget(compilerCombo);
-    compilerCombo->addItems(p_Compilers);
-    compilerCombo->setCurrentIndex(p_defaultCompiler);
-    if(p_show_compilerbutton)
+    if(!(p_no_compilerbuttons))    // react on user prefs: show or hide compiler combo and -button
     {
-        statusBar()->addPermanentWidget(compilerButton);
+        statusBar()->addPermanentWidget(compilerLabel);
+        compilerLabel->setText("Compiler:");
+        statusBar()->addPermanentWidget(compilerCombo);
+        compilerCombo->addItems(p_Compilers);
+        compilerCombo->setCurrentIndex(p_defaultCompiler);
+        statusBar()->addPermanentWidget(compilerButton);   
     }
+
     statusBar()->addPermanentWidget(statusLabelX);
     statusLabelX->setText(tr("Line:"));
-    statusBar()->addPermanentWidget(statusLCD_X);
-    statusLCD_X->display(1);
+    if(!(p_no_lcd_statusbar))
+    {
+        statusBar()->addPermanentWidget(statusLCD_X);
+        statusLCD_X->display(1);
+    }
+    else
+    {
+        statusBar()->addPermanentWidget(statusContainer_X);
+        statusContainer_X->setText("1");
+    }
     statusBar()->addPermanentWidget(statusLabelY);
     statusLabelY->setText(tr("Column:"));
-    statusBar()->addPermanentWidget(statusLCD_Y);
-    statusLCD_Y->display(1);
+    if(!(p_no_lcd_statusbar))
+    {
+        statusBar()->addPermanentWidget(statusLCD_Y);
+        statusLCD_Y->display(1);
+    }
+    else
+    {
+        statusBar()->addPermanentWidget(statusContainer_Y);
+        statusContainer_Y->setText("1");
+    }
 
     // give some blackish style to MainWindow (if the user wants so...)
     if(p_blackish)
@@ -2915,15 +2994,12 @@ void MainWindow::initializeGUI()
     createToolBars();
     createStatusBarMessage(tr("Ready"), 0);
 
-    // Set default Compiler
-//    p_selected_compiler = p_compiler_gcc;
-//    p_selected_compiler_args = p_compiler_gcc_call;
-//    compilerCombo->setCurrentIndex(1);
-//    selectCompilerGCCAct->setChecked(true);
-//    p_compiledFileSuffix = "_gcc";
 
-    connect(compilerCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SelectCompiler(int)));
-    connect(compilerButton, SIGNAL(clicked(bool)), this, SLOT(actionCompile()));
+    if(!(p_no_compilerbuttons))    // react on user prefs: show or hide compiler combo and -button
+    {
+        connect(compilerCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SelectCompiler(int)));
+        connect(compilerButton, SIGNAL(clicked(bool)), this, SLOT(actionCompile()));
+    }
     connect(btnCloseOutput, SIGNAL(clicked(bool)), this, SLOT(actionCloseOutputConsole()));
 
     //connect(&proc, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(ProcBeendet(int, QProcess::ExitStatus)));
@@ -3347,6 +3423,12 @@ void MainWindow::debugVars()
         qDebug() << "p_show_indentation: " << p_show_indentation;
         qDebug() << "p_mydebug: " << p_mydebug;
         qDebug() << "p_defaultCompiler: " << p_defaultCompiler;
+        qDebug() << "p_no_lcd_statusbar: " << p_no_lcd_statusbar;
+        qDebug() << "p_no_compilerbuttons: " << p_no_compilerbuttons;
+        qDebug() << "p_simple_statusbar: " << p_simple_statusbar;
+        qDebug() << "p_create_icon: " << p_create_icon;
+        qDebug() << "p_console_on_fail: " << p_console_on_fail;
+        qDebug() << "p_no_warn_requesters: " << p_no_warn_requesters;
     }
 }
 
@@ -3374,7 +3456,7 @@ void MainWindow::readCommand(){
 void MainWindow::stopCommand(int exitCode, QProcess::ExitStatus exitStatus)
 {
     output->append(cmd->readAll());
-    output->append("cmd finished");
+    output->append("cmd finished:\t");
     output->append(QString::number(exitCode));
     qDebug() << "exitCode: " << QString::number(exitCode);
     if(QString::number(exitCode) == "0")

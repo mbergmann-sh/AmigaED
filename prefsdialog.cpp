@@ -20,6 +20,8 @@ PrefsDialog::PrefsDialog(QWidget *parent) :
 
     // load global configuration
     load_mySettings();
+    simpleStatusbar();
+
 }
 
 PrefsDialog::~PrefsDialog()
@@ -29,12 +31,13 @@ PrefsDialog::~PrefsDialog()
 
 void PrefsDialog::on_btn_SavePrefs_clicked()
 {
-    save_mySettings();
+   save_mySettings();
    this->close();  // quit PrefsDialog
 
    QMessageBox::information(this, tr("Amiga Cross Editor"),
                        tr("Prefs saved.\n"
-                          "Some changes might require to restart the Application in order to be activated!"),
+                          "Changes will be activated after restarting the application!"
+                          "\n\nYou might consider saving all your work and restart now."),
                             QMessageBox::Ok);
 }
 
@@ -270,7 +273,13 @@ void PrefsDialog::save_mySettings()
      mySettings.setValue("MISC/UseBlackishStyle", ui->checkBoxStylesheet->isChecked());
      mySettings.setValue("MISC/ShowIndentGuide", ui->checkBoxIndentationLines->isChecked());
      mySettings.setValue("MISC/ShowDebugOutput", ui->checkBoxDebugOutput->isChecked());
+     mySettings.setValue("MISC/NoLCDstatusbar", ui->checkBoxNoLCD->isChecked());
+     mySettings.setValue("MISC/NoCompileButton", ui->checkBoxNoCompileButton->isChecked());
+     mySettings.setValue("MISC/SimpleStatusbar", ui->checkBoxSimpleStatusbar->isChecked());
      mySettings.setValue("MISC/DefaultCrossCompiler", ui->comboBoxDefaultCompiler->currentIndex());
+     mySettings.setValue("MISC/CreateIcon", ui->checkBoxCreateIcon->isChecked());
+     mySettings.setValue("MISC/OpenConsoleOnFail", ui->checkBoxOpenOnFail->isChecked());
+     mySettings.setValue("MISC/NoWarnRequester", ui->checkBoxWarnRequesters->isChecked());
 }
 
 void PrefsDialog::load_mySettings()
@@ -310,5 +319,55 @@ void PrefsDialog::load_mySettings()
     ui->checkBoxStylesheet->setChecked(mySettings.value("MISC/UseBlackishStyle").toBool());
     ui->checkBoxIndentationLines->setChecked(mySettings.value("MISC/ShowIndentGuide").toBool());
     ui->checkBoxDebugOutput->setChecked(mySettings.value("MISC/ShowDebugOutput").toBool());
+    ui->checkBoxNoLCD->setChecked(mySettings.value("MISC/NoLCDstatusbar").toBool());
+    ui->checkBoxNoCompileButton->setChecked(mySettings.value("MISC/NoCompileButton").toBool());
+    ui->checkBoxSimpleStatusbar->setChecked(mySettings.value("MISC/SimpleStatusbar").toBool());
     ui->comboBoxDefaultCompiler->setCurrentIndex(mySettings.value("MISC/DefaultCrossCompiler").toInt());
+    ui->checkBoxCreateIcon->setChecked(mySettings.value("MISC/CreateIcon").toBool());
+    ui->checkBoxOpenOnFail->setChecked(mySettings.value("MISC/OpenConsoleOnFail").toBool());
+    ui->checkBoxWarnRequesters->setChecked(mySettings.value("MISC/NoWarnRequester").toBool());
+}
+
+void PrefsDialog::on_checkBoxSimpleStatusbar_clicked()
+{
+    if(ui->checkBoxSimpleStatusbar->isChecked())
+    {
+        ui->checkBoxNoCompileButton->setChecked(true);
+        ui->checkBoxNoCompileButton->setDisabled(true);
+        ui->checkBoxNoLCD->setChecked(true);
+        ui->checkBoxNoLCD->setDisabled(true);
+    }
+    else
+    {
+        ui->checkBoxNoCompileButton->setChecked(false);
+        ui->checkBoxNoCompileButton->setDisabled(false);
+        ui->checkBoxNoLCD->setChecked(false);
+        ui->checkBoxNoLCD->setDisabled(false);
+    }
+}
+
+//
+// if both statusbar comfort options are disabled:
+// Select simpleStatusbar as default!
+//
+void PrefsDialog::simpleStatusbar()
+{
+    if((ui->checkBoxNoCompileButton->isChecked()) && (ui->checkBoxNoLCD->isChecked()))
+    {
+        ui->checkBoxNoCompileButton->setChecked(true);
+        ui->checkBoxNoCompileButton->setDisabled(true);
+        ui->checkBoxNoLCD->setChecked(true);
+        ui->checkBoxNoLCD->setDisabled(true);
+        ui->checkBoxSimpleStatusbar->setChecked(true);
+    }
+}
+
+void PrefsDialog::on_checkBoxNoLCD_clicked()
+{
+    simpleStatusbar();
+}
+
+void PrefsDialog::on_checkBoxNoCompileButton_clicked()
+{
+    simpleStatusbar();
 }

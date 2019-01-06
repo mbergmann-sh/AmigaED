@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>423</width>
-    <height>334</height>
+    <width>467</width>
+    <height>366</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,29 +23,7 @@
   <property name="modal">
    <bool>true</bool>
   </property>
-  <layout class="QGridLayout" name="gridLayout_2">
-   <item row="1" column="2">
-    <widget class="QPushButton" name="btn_SavePrefs">
-     <property name="text">
-      <string>Save Prefs</string>
-     </property>
-     <property name="icon">
-      <iconset resource="application.qrc">
-       <normaloff>:/images/save.png</normaloff>:/images/save.png</iconset>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QPushButton" name="btn_CancelSave">
-     <property name="text">
-      <string>Cancel</string>
-     </property>
-     <property name="icon">
-      <iconset resource="application.qrc">
-       <normaloff>:/images/fileexit.png</normaloff>:/images/fileexit.png</iconset>
-     </property>
-    </widget>
-   </item>
+  <layout class="QGridLayout" name="gridLayout_9">
    <item row="0" column="0" colspan="3">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
@@ -843,35 +821,26 @@
          <property name="title">
           <string>Application Look and Feel</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_9">
-          <item row="3" column="0">
-           <widget class="QCheckBox" name="checkBoxDebugOutput">
-            <property name="layoutDirection">
-             <enum>Qt::RightToLeft</enum>
-            </property>
+         <layout class="QGridLayout" name="gridLayout_2">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_28">
             <property name="text">
-             <string>Show debug output:</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
+             <string>Default application style:</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QCheckBox" name="checkBoxIndentationLines">
-            <property name="layoutDirection">
-             <enum>Qt::RightToLeft</enum>
-            </property>
-            <property name="text">
-             <string>Show indentation lines:</string>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="comboBoxDefaultStyle">
+            <property name="toolTip">
+             <string>Select default Application style (only styles that are available on your system will be shown!)</string>
             </property>
            </widget>
           </item>
           <item row="1" column="0">
            <widget class="QCheckBox" name="checkBoxStylesheet">
+            <property name="toolTip">
+             <string>Activate a dark-style look for this application</string>
+            </property>
             <property name="layoutDirection">
              <enum>Qt::RightToLeft</enum>
             </property>
@@ -883,15 +852,85 @@
             </property>
            </widget>
           </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_28">
+          <item row="1" column="1">
+           <widget class="QCheckBox" name="checkBoxNoLCD">
+            <property name="toolTip">
+             <string>Use standard text widgets for cursor position</string>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::RightToLeft</enum>
+            </property>
             <property name="text">
-             <string>Default application style:</string>
+             <string>Don't use LCD for cursor position</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="comboBoxDefaultStyle"/>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="checkBoxIndentationLines">
+            <property name="toolTip">
+             <string>Show indentation guides by default?</string>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::RightToLeft</enum>
+            </property>
+            <property name="text">
+             <string>Show indentation lines:</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QCheckBox" name="checkBoxNoCompileButton">
+            <property name="toolTip">
+             <string>Hide compiler selection and compile buttons from statusbar</string>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::RightToLeft</enum>
+            </property>
+            <property name="text">
+             <string>Don't show compiler buttons in statusbar</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="checkBoxDebugOutput">
+            <property name="toolTip">
+             <string>Show debug output (only usefull for developers in order to enhange Amiga Cross Editor!)</string>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::RightToLeft</enum>
+            </property>
+            <property name="text">
+             <string>Show debug output:</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QCheckBox" name="checkBoxSimpleStatusbar">
+            <property name="toolTip">
+             <string>use a simple statusbar without any gimmicks</string>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::RightToLeft</enum>
+            </property>
+            <property name="text">
+             <string>Use simple statusbar</string>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -902,6 +941,16 @@
           <string>Build System</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_11">
+          <item row="1" column="1">
+           <widget class="QCheckBox" name="checkBoxWarnRequesters">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dont' show messageboxes on compilation finished or failed&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>Don't use warn requesters</string>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="0">
            <widget class="QLabel" name="label_31">
             <property name="text">
@@ -909,8 +958,29 @@
             </property>
            </widget>
           </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="checkBoxOpenOnFail">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open output console on compiler failure only&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>Open panel on failure only</string>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="1">
-           <widget class="QComboBox" name="comboBoxDefaultCompiler"/>
+           <widget class="QComboBox" name="comboBoxDefaultCompiler">
+            <property name="toolTip">
+             <string>Select default cross compiler to use</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QCheckBox" name="checkBoxCreateIcon">
+            <property name="text">
+             <string>create icon</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -932,8 +1002,80 @@
      </property>
     </spacer>
    </item>
+   <item row="1" column="1">
+    <widget class="QPushButton" name="btn_CancelSave">
+     <property name="text">
+      <string>Cancel</string>
+     </property>
+     <property name="icon">
+      <iconset resource="application.qrc">
+       <normaloff>:/images/fileexit.png</normaloff>:/images/fileexit.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QPushButton" name="btn_SavePrefs">
+     <property name="text">
+      <string>Save Prefs</string>
+     </property>
+     <property name="icon">
+      <iconset resource="application.qrc">
+       <normaloff>:/images/save.png</normaloff>:/images/save.png</iconset>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>lineEdit_author</tabstop>
+  <tabstop>lineEdit_email</tabstop>
+  <tabstop>lineEdit_website</tabstop>
+  <tabstop>lineEdit_description</tabstop>
+  <tabstop>lineEdit_purpose</tabstop>
+  <tabstop>lineEdit_projectsRootDir</tabstop>
+  <tabstop>btn_getProjectRootDir</tabstop>
+  <tabstop>btn_SavePrefs</tabstop>
+  <tabstop>btn_CancelSave</tabstop>
+  <tabstop>lineEdit_getEmulatorExefile</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>lineEdit_getGCCexefile</tabstop>
+  <tabstop>btn_getGCCexefile</tabstop>
+  <tabstop>lineEdit_getGPPexefile</tabstop>
+  <tabstop>btn_getGPPexefile</tabstop>
+  <tabstop>lineEdit_getMAKEexefile</tabstop>
+  <tabstop>btn_getMAKEexefile</tabstop>
+  <tabstop>lineEdit_getSTRIPexefile</tabstop>
+  <tabstop>btn_getSTRIPexefile</tabstop>
+  <tabstop>lineEdit_GCCdefaultOpts</tabstop>
+  <tabstop>lineEdit_GPPdefaultOpts</tabstop>
+  <tabstop>lineEdit_getVCexefile</tabstop>
+  <tabstop>btn_getVCexefile</tabstop>
+  <tabstop>lineEdit_getVASMexefile</tabstop>
+  <tabstop>btn_getVASMexefile</tabstop>
+  <tabstop>lineEdit_getVCconfigDir</tabstop>
+  <tabstop>btn_getVCconfigDir</tabstop>
+  <tabstop>lineEdit_VCdefaultOpts</tabstop>
+  <tabstop>btn_getEmulatorExefile</tabstop>
+  <tabstop>lineEdit_getOS13Configfile</tabstop>
+  <tabstop>btn_getOS13Configfile</tabstop>
+  <tabstop>lineEdit_getOS20Configfile</tabstop>
+  <tabstop>btn_getOS20Configfile</tabstop>
+  <tabstop>lineEdit_getOS3Configfile</tabstop>
+  <tabstop>btn_getOS3Configfile</tabstop>
+  <tabstop>lineEdit_getOS4Configfile</tabstop>
+  <tabstop>btn_getOS4Configfile</tabstop>
+  <tabstop>comboBox_defaultEmulator</tabstop>
+  <tabstop>checkBoxIndentationLines</tabstop>
+  <tabstop>checkBoxStylesheet</tabstop>
+  <tabstop>checkBoxDebugOutput</tabstop>
+  <tabstop>comboBoxDefaultStyle</tabstop>
+  <tabstop>comboBoxDefaultCompiler</tabstop>
+  <tabstop>checkBoxNoLCD</tabstop>
+  <tabstop>checkBoxNoCompileButton</tabstop>
+  <tabstop>checkBoxSimpleStatusbar</tabstop>
+  <tabstop>checkBoxOpenOnFail</tabstop>
+  <tabstop>checkBoxWarnRequesters</tabstop>
+ </tabstops>
  <resources>
   <include location="application.qrc"/>
  </resources>
