@@ -57,6 +57,7 @@
 #include <QSplitter>
 #include <QListView>
 #include <QTextBrowser>
+#include <QTextEdit>
 #include <QGroupBox>
 #include <QVBoxLayout>
 #include <QSpacerItem>
@@ -271,7 +272,7 @@ private:
     // Instances for Splitter
     QSplitter *splitter;
     QListView *lview;
-    QTextBrowser *output;
+    QsciScintilla *output;
     QGroupBox *outputGroup;
     QPushButton *btnCloseOutput;
 
@@ -416,12 +417,14 @@ private:
     QLCDNumber  *statusLCD_X;       // shows cursor's line coordinate
     QLCDNumber  *statusLCD_Y;       // shows cursor's column coordinate
     QComboBox *compilerCombo;       // puts a Compobox for compiler selection into statusbar
+    QPushButton *compilerButton;    // puts a dice button for compiler start into statusbar
 
     // Font in use
     QFont myfont;
 
     // is document text folded?
     bool foldall;
+    bool p_show_compilerbutton = true;  // enable or disable Button in statusbar via prefs
 
     // check if there is allready a main() function in a file
     bool p_main_set = false;

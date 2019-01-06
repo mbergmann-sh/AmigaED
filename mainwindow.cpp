@@ -59,6 +59,7 @@
 #include <Qsci/qscilexerpascal.h>
 #include <Qsci/qscilexerfortran.h>
 #include <Qsci/qscilexerfortran77.h>
+#include <Qsci/qscilexerbash.h>
 #include <Qsci/qsciprinter.h>
 
 // allways get your defaults!
@@ -81,6 +82,8 @@ MainWindow::MainWindow(QString cmdFileName)
 
     QApplication::setStyle(p_default_style);
 
+    QsciLexerBash *lexerbash = new QsciLexerBash;
+    //lexer->setFoldComments(true);
     QList<int> sizes;
     sizes << 320 <<150 << 200;
     splitter = new QSplitter(this);
@@ -89,8 +92,10 @@ MainWindow::MainWindow(QString cmdFileName)
     textEdit = new QsciScintilla;
     lview = new QListView;
     outputGroup = new QGroupBox(tr("Compiler output"));
-    output = new QTextBrowser;
-    output->setStyleSheet(QString::fromUtf8("background-color: rgb(255,250,250);"));
+    output = new QsciScintilla;
+    output->setLexer(lexerbash);
+    //output->setStyleSheet(QString::fromUtf8("background-color: rgb(255,250,250);"));
+    output->setReadOnly(true);
 
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->addWidget(output);
@@ -118,17 +123,17 @@ MainWindow::MainWindow(QString cmdFileName)
     cmd = new QProcess(this);
     cmd->setProcessChannelMode(QProcess::MergedChannels);
 
-    ///////////////////////////////////////////////////
-    // Process handling for output to QTextBrowser ///
-    /////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////
+    // Process handling for output to QTextBrowser or QTextEdit ///
+    //////////////////////////////////////////////////////////////
     // process has some data to read
     connect(cmd, SIGNAL (readyRead()), this, SLOT (readCommand()));
     //process finished
     connect(cmd, SIGNAL (finished(int, QProcess::ExitStatus)), this, SLOT (stopCommand(int, QProcess::ExitStatus)));
 
-    /////////////////////////////
-    /// command line handling //
-    ///////////////////////////
+    ////////////////////////////////////////////
+    /// command line handling for file input //
+    //////////////////////////////////////////
     setCurrentFile("");
 
     // Load a file if specified on command line...
@@ -2829,7 +2834,7 @@ void MainWindow::initializeGUI()
     #endif
 
     // give an icon and a name to the app:
-    this->setWindowIcon(QIcon(":/images/lemming.png"));
+    this->setWindowIcon(QIcon(":/images/amiga_classic.png"));
     this->setWindowTitle("Amiga Cross Editor");
 
     // set a decent start value for app's size
@@ -2848,12 +2853,24 @@ void MainWindow::initializeGUI()
     this->statusLCD_Y = new QLCDNumber(this);
     this->statusLCD_Y->display(0);
 
+    this->compilerButton = new QPushButton(NULL,this);
+    if(p_show_compilerbutton)
+    {
+        compilerButton->setIcon(QIcon(":/images/dice.png"));
+        compilerButton->setIconSize(QSize(18,18));
+        qDebug() << "Iconsize: " <<compilerButton->iconSize();
+    }
+
     // permanently add the controls to the status bar
     statusBar()->addPermanentWidget(compilerLabel);
     compilerLabel->setText("Compiler:");
     statusBar()->addPermanentWidget(compilerCombo);
     compilerCombo->addItems(p_Compilers);
     compilerCombo->setCurrentIndex(p_defaultCompiler);
+    if(p_show_compilerbutton)
+    {
+        statusBar()->addPermanentWidget(compilerButton);
+    }
     statusBar()->addPermanentWidget(statusLabelX);
     statusLabelX->setText(tr("Line:"));
     statusBar()->addPermanentWidget(statusLCD_X);
@@ -2906,6 +2923,7 @@ void MainWindow::initializeGUI()
 //    p_compiledFileSuffix = "_gcc";
 
     connect(compilerCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SelectCompiler(int)));
+    connect(compilerButton, SIGNAL(clicked(bool)), this, SLOT(actionCompile()));
     connect(btnCloseOutput, SIGNAL(clicked(bool)), this, SLOT(actionCloseOutputConsole()));
 
     //connect(&proc, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(ProcBeendet(int, QProcess::ExitStatus)));
@@ -3367,11 +3385,49 @@ void MainWindow::stopCommand(int exitCode, QProcess::ExitStatus exitStatus)
     {
         createStatusBarMessage(tr("There where errors..."), 0);
     }
+
+    if (exitStatus==QProcess::CrashExit || exitCode!=0)
+    {
+        createStatusBarMessage("Compiler error!", 0);
+        (void)QMessageBox::critical(this, tr("Amiga Cross Editor"),
+        tr("Build error!\n"
+        "Please check source for errors and recompile."),
+        QMessageBox::Ok);
+    }
+    else
+    {
+        // Let's check if the compiler produced an executable file:
+        if(fileExists(p_compiledFile))
+        {
+            createStatusBarMessage("Compiler run finished.", 0);
+            //ui->actionStart_im_Emulator->setEnabled(true);
+
+            (void)QMessageBox::information(this, tr("Amiga Cross Editor"),
+            tr("Successfully compiled.\n"
+            "You may now want to test it in UAE."),
+            QMessageBox::Ok);
+
+            createStatusBarMessage("Compiler run finished successfully.", 0);
+        }
+        else
+        {
+            //ui->actionStart_im_Emulator->setEnabled(true);
+
+            (void)QMessageBox::information(this, tr("Amiga Cross Editor"),
+            tr("No success in building your executable file!.\n"
+            "Please check for Errors and recompile."),
+            QMessageBox::Ok);
+
+            createStatusBarMessage("Compiler run finished unsuccessfully.", 0);
+        }
+
+    }
 }
 
 void MainWindow::error(QProcess::ProcessError error)
 {
        qDebug() << "Error" << error;
+
 }
 
 void MainWindow::stateChanged(QProcess::ProcessState state)

@@ -16,5 +16,6 @@
         <file>images/printer.png</file>
         <file>images/search.png</file>
         <file>images/prefs.png</file>
+        <file>images/amiga_classic.png</file>
     </qresource>
 </RCC>
