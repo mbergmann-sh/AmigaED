@@ -65,6 +65,7 @@
 // allways get your defaults!
 #include "mainwindow.h"
 #include "prefsdialog.h"
+#include "aboutdialog.h"
 
 
 
@@ -285,12 +286,8 @@ bool MainWindow::saveAs()
 //
 void MainWindow::about()
 {
-   QMessageBox::about(this, tr("About AmigaED"),
-            tr("This <b>Application</b> example demonstrates how to "
-               "write modern GUI applications using Qt and QScintilla, with a menu bar, "
-               "toolbars, and a status bar.<br>"
-               "<br>Source: Riverbank QScintilla example app</br>"
-               "<br>Modifications and Enhancements: Michael Bergmann 2018/2019</br>"));
+   aboutDialog *aceAbout = new aboutDialog(this);
+   aceAbout->exec();
 }
 
 //

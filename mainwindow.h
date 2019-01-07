@@ -73,6 +73,7 @@ class QLabel;
 class QComboBox;
 class QsciScintilla;
 class PrefsDialog;
+class aboutDialog;
 class QtGui;
 
 

@@ -9,9 +9,11 @@ macx {
 }
 
 HEADERS      = mainwindow.h \
-    prefsdialog.h
+    prefsdialog.h \
+    aboutdialog.h
 SOURCES      = main.cpp mainwindow.cpp \
-    prefsdialog.cpp
+    prefsdialog.cpp \
+    aboutdialog.cpp
 RESOURCES    += application.qrc
 
 
@@ -31,4 +33,5 @@ DISTFILES += \
     syntax-examples/pascal_boublesort.pas
 
 FORMS += \
-    prefsdialog.ui
+    prefsdialog.ui \
+    aboutdialog.ui

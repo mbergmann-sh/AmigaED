@@ -17,5 +17,6 @@
         <file>images/search.png</file>
         <file>images/prefs.png</file>
         <file>images/amiga_classic.png</file>
+        <file>images/aced-logo.png</file>
     </qresource>
 </RCC>
