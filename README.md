@@ -34,6 +34,7 @@ This program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRA
 - app template creation [AmigaShell, ANSI C, C++ app ATM]
 - select cross compiler to use: vbcc, gcc or g++
 - Preferences dialog for most important stuff, like compiler settings, et cetera..
+- startup Amiga Emulator, different models and Workbenches selectable
 
 more to come...
 
@@ -76,12 +77,13 @@ The easy way: Simply import the .pro file into Qt Creator, configure your toolch
 you might also add this folder to your search path instead!
 
 # Roadmap - wanted features (at least hopefully planned...)
+- make error console output clickable, jump to error line
 - make the editor drag'n'drop-aware
 - implement inserts and snippets [mostly done]
 - add a search/replace dialog   [partially done]
 - improve printing [partially done - prints text and line numbers on DIN A4 paper]
 - implement direct cross compiling to Amiga target for vbcc and gcc cross compiler toolchain [working, so far...]
-- startup Amiga Emulator
+- startup Amiga Emulator    [DONE]
 - implement a prefs dialog  [DONE]
 - implement project manager
 - implement makefile generator

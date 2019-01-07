@@ -2,14 +2,16 @@
 #include "ui_prefsdialog.h"
 #include "mainwindow.h"
 
-PrefsDialog::PrefsDialog(QWidget *parent) :
+PrefsDialog::PrefsDialog(QWidget *parent, int tabindex) :
     QDialog(parent),
     ui(new Ui::PrefsDialog)
 {
     ui->setupUi(this);
 
+    qDebug() << "tabindex = " << tabindex;
+
     // Start Tabwidget with first tab visible allways
-    ui->tabWidget->setCurrentIndex(0);
+    ui->tabWidget->setCurrentIndex(tabindex);
 
     // set items for default style combobox:
     p_style_items << QStyleFactory::keys();

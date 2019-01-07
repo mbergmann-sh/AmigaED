@@ -23,7 +23,8 @@ class PrefsDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit PrefsDialog(QWidget *parent = 0);
+    explicit PrefsDialog(QWidget *parent = 0, int tabindex = 0);
+    //explicit PrefsDialog(int tabindex);
     ~PrefsDialog();
 
     QStringList myPrefs;

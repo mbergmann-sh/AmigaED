@@ -349,7 +349,7 @@ void MainWindow::createActions()
     prefsAct = new QAction(QIcon(":/images/prefs.png"),tr("Global prefs..."), this);
     prefsAct->setShortcut(tr("F12"));
     prefsAct->setStatusTip(tr("Open global preferences..."));
-    connect(prefsAct, SIGNAL(triggered()), this, SLOT(actionPrefsDialog()));
+    connect(prefsAct, SIGNAL(triggered()), this, SLOT(startPrefs()));
 
     printAct = new QAction(QIcon(":/images/printer.png"),tr("&Print file..."), this);
     printAct->setShortcut(tr("Ctrl+p"));
@@ -485,6 +485,16 @@ void MainWindow::createActions()
     compileAct->setShortcut(tr("F6"));
     compileAct->setStatusTip(tr("Compile current file..."));
     connect(compileAct, SIGNAL(triggered()), this, SLOT(actionCompile()));
+
+    showOutputAct = new QAction(tr("Show output pane..."), this);
+    showOutputAct->setShortcut(tr("F9"));
+    showOutputAct->setStatusTip(tr("Show Compiler output..."));
+    connect(showOutputAct, SIGNAL(triggered()), this, SLOT(actionShowOutputConsole()));
+
+    hideOutputAct = new QAction(tr("Hide output pane..."), this);
+    hideOutputAct->setShortcut(tr("Shift+F9"));
+    hideOutputAct->setStatusTip(tr("Hide Compiler output..."));
+    connect(hideOutputAct, SIGNAL(triggered()), this, SLOT(actionCloseOutputConsole()));
 
     /* --- Tools -----------------------------------------------------------------------*/
     emulatorAct = new QAction(QIcon(":/images/workbench.png"), tr("Start default Workbench in UA&E..."), this);
@@ -811,6 +821,9 @@ void MainWindow::createMenus()
     compilerMenue->addAction(selectCompilerGPPAct);
     buildMenue->addSeparator();
     buildMenue->addAction(compileAct);
+    buildMenue->addSeparator();
+    buildMenue->addAction(showOutputAct);
+    buildMenue->addAction(hideOutputAct);
 
     menuBar()->addSeparator();
 
@@ -1398,11 +1411,57 @@ void MainWindow::actionCloseOutputConsole()
 }
 
 //
+// OpenOutput console in Splitter...
+//
+void MainWindow::actionShowOutputConsole()
+{
+    outputGroup->show();
+}
+
+//
 // Compile current file
 // CHANGE THIS according to your compiler and opts!
 //
-void MainWindow::actionCompile()
+int MainWindow::actionCompile()
 {
+    // check if we have a valid compiler to call:
+    if(p_selected_compiler.isEmpty())
+    {
+        if(p_mydebug)
+            qDebug() << "in actionCompile:\nNo compiler selected in prefs!\n";
+
+        (void)QMessageBox::critical(this, tr("Amiga Cross Editor"),
+        tr("There is a problem with your compiler presets!\n"
+        "Please set preferences according to your compiler locations and default options.\n\n"
+           "You need to restart Amiga Cross Editor afterwards!"),
+        QMessageBox::Ok);
+        if(selectCompilerGCCAct->isChecked() || selectCompilerGPPAct->isChecked())
+            actionPrefsDialog(1);
+        else
+            actionPrefsDialog(2);
+
+        return 1;
+    }
+
+    // check if we have valid compiler arguments in prefs:
+    if(p_compiler_gcc_call.isEmpty() || p_compiler_gpp_call.isEmpty())
+    {
+        if(p_mydebug)
+            qDebug() << "in actionCompile:\nNo valid arguments selected in prefs!\n";
+
+        (void)QMessageBox::critical(this, tr("Amiga Cross Editor"),
+        tr("There is a problem with your compiler presets!\n"
+        "Please set preferences according to your compiler locations and default options.\n\n"
+           "You need to restart Amiga Cross Editor afterwards!"),
+        QMessageBox::Ok);
+        if(selectCompilerGCCAct->isChecked() || selectCompilerGPPAct->isChecked())
+            actionPrefsDialog(1);
+        else
+            actionPrefsDialog(2);
+
+        return 1;
+    }
+
     // Don't start compiler on an empty source!
     if(!(textEdit->text().isEmpty()))
     {
@@ -1511,8 +1570,11 @@ void MainWindow::actionCompile()
 
             p_selected_compiler_args = text;
 
-            // make output window visible:
-            outputGroup->show();
+            if(!(p_console_on_fail))
+            {
+                // make output window visible:
+                actionShowOutputConsole();
+            }
 
             if(p_mydebug)
             {
@@ -1557,6 +1619,8 @@ void MainWindow::actionCompile()
                         "<br>This usually makes more sense, ya know?!",
                         QMessageBox::Ok);
     }
+
+    return 0;
 }
 
 //
@@ -2615,7 +2679,6 @@ bool MainWindow::actionEmulator()
     createStatusBarMessage(tr("Attempting to start UAE..."), 0);
 
     myEmulator.start(command, arguments);
-    //myEmulator.startDetached(command, arguments, s_projectdir);
 
     QObject::connect(&myEmulator, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(emu_finished(int,QProcess::ExitStatus)));
     QObject::connect(&myEmulator, SIGNAL(readyReadStandardOutput()), this, SLOT(emu_readyReadStandardOutput()));
@@ -2631,7 +2694,7 @@ void MainWindow::actionEmuOS13()
 {
     p_defaultEmulator = 0;
     if(!(actionEmulator()))
-        actionPrefsDialog();
+        actionPrefsDialog(3);
 }
 
 //
@@ -2641,7 +2704,7 @@ void MainWindow::actionEmuOS20()
 {
     p_defaultEmulator = 1;
     if(!(actionEmulator()))
-        actionPrefsDialog();
+        actionPrefsDialog(3);
 }
 
 //
@@ -2651,7 +2714,7 @@ void MainWindow::actionEmuOS30()
 {
     p_defaultEmulator = 2;
     if(!(actionEmulator()))
-        actionPrefsDialog();;
+        actionPrefsDialog(3);;
 }
 
 //
@@ -2661,7 +2724,7 @@ void MainWindow::actionEmuOS40()
 {
     p_defaultEmulator = 3;
     if(!(actionEmulator()))
-        actionPrefsDialog();
+        actionPrefsDialog(3);
 }
 
 //
@@ -2754,14 +2817,13 @@ void MainWindow::actionShowEOL()
 //
 //  Open global preferences dialog
 //
-void MainWindow::actionPrefsDialog()
+void MainWindow::actionPrefsDialog(int tabindex = 0)
 {
-    PrefsDialog *acePrefs = new PrefsDialog(this);
+    PrefsDialog *acePrefs = new PrefsDialog(this, tabindex);
     acePrefs->exec();
 
     // afterwards insert new prefs into MainWindow variables for instant use!
     readSettings();
-    //activateGUIdefaultSettings();
 }
 
 //
@@ -3152,18 +3214,9 @@ void MainWindow::initializeGUI()
         connect(compilerCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SelectCompiler(int)));
         connect(compilerButton, SIGNAL(clicked(bool)), this, SLOT(actionCompile()));
     }
-    else
-    {
-        if(p_mydebug)
-            qDebug() << "alternative compiler connection made ready.";
 
-//        connect(actionSelectCompilerGCC(), SIGNAL(currentIndexChanged(int)), this, SLOT(SelectCompiler(int)));
-//        connect(actionSelectCompilerGPP(), SIGNAL(currentIndexChanged(int)), this, SLOT(SelectCompiler(int)));
-//        connect(actionSelectCompilerVBCC(), SIGNAL(currentIndexChanged(int)), this, SLOT(SelectCompiler(int)));
-    }
     connect(btnCloseOutput, SIGNAL(clicked(bool)), this, SLOT(actionCloseOutputConsole()));
 
-    //connect(&proc, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(ProcBeendet(int, QProcess::ExitStatus)));
     QObject::connect(&myProcess, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(finished(int,QProcess::ExitStatus)));
     QObject::connect(&myProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(compiler_readyReadStandardOutput()));
     QObject::connect(&myProcess, SIGNAL(started()), this, SLOT(started()));
@@ -3344,8 +3397,6 @@ int MainWindow::startEmulator()
 
     myProcess.start(command, arguments);
 
-    //QObject::connect(&myProcess, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(finished(int,QProcess::ExitStatus)));
-   // QObject::connect(&myProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(compiler_readyReadStandardOutput()));
     connect(&myProcess, SIGNAL (readyRead()), this, SLOT (readCommand()));
     QObject::connect(&myProcess, SIGNAL(started()), this, SLOT(started()));
 
@@ -3360,6 +3411,7 @@ int MainWindow::startCompiler()
         qDebug() << "startCompiler() called.";
     }
     //debugVars();
+
     QString command = p_selected_compiler;
     QStringList arguments;
     // IMPORTANT! 'arguments' must be a QStringList, NOT a QString, else the compiler call will not work!
@@ -3465,7 +3517,7 @@ void MainWindow::readyReadStandardOutput()
 
     if(p_mydebug)
     {
-        qDebug() << "logfile: " << p_projectdir + QDir::separator() + "compiler_out.txt";
+        qDebug() << "logfile: " << p_projectsRootDir + QDir::separator() + "compiler_out.txt";
     }
     if (data.open(QFile::WriteOnly | QFile::Truncate))
     {
@@ -3484,6 +3536,7 @@ void MainWindow::started()
     }
 
     emulatorAct->setDisabled(true);
+    emulatorMenue->setDisabled(true);
 }
 
 void MainWindow::emu_finished(int exitCode, QProcess::ExitStatus exitStatus)
@@ -3516,6 +3569,7 @@ void MainWindow::emu_finished(int exitCode, QProcess::ExitStatus exitStatus)
     {
       createStatusBarMessage("UAE terminated regularly.", 0);
     }
+    emulatorMenue->setEnabled(true);
     emulatorAct->setEnabled(true);
 }
 
@@ -3607,8 +3661,6 @@ void MainWindow::debugVars()
 ///////////////////////////////////////////////////////////////////////
 void MainWindow::runCommand(QString command, QStringList arguments)
 {
-//    QString command;
-//    QStringList arguments;
     if(p_mydebug)
     {
         qDebug() << "in runCommand()";
@@ -3650,6 +3702,11 @@ void MainWindow::stopCommand(int exitCode, QProcess::ExitStatus exitStatus)
     if (exitStatus==QProcess::CrashExit || exitCode!=0)
     {
         createStatusBarMessage("Compiler error!", 0);
+        if(p_console_on_fail)
+        {
+            actionShowOutputConsole();
+        }
+
         (void)QMessageBox::critical(this, tr("Amiga Cross Editor"),
         tr("Build error!\n"
         "Please check source for errors and recompile."),
@@ -3694,6 +3751,14 @@ void MainWindow::error(QProcess::ProcessError error)
 void MainWindow::stateChanged(QProcess::ProcessState state)
 {
     qDebug() << "Process::stateChanged" << state;
+}
+
+//
+// prefDialog start helper
+//
+void MainWindow::startPrefs()
+{
+    actionPrefsDialog(0);
 }
 
 

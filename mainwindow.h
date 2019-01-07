@@ -169,6 +169,7 @@ private slots:
     bool save();                                    // saves current file
     bool saveAs();                                  // saves current file as...
     void about();                                   // pops up "about" MessageBox
+    void startPrefs();                              // Workaround to start prefsDialog with a parameter
 
     // GUI creation...
     void initializeGUI();
@@ -187,13 +188,13 @@ private slots:
     void documentWasModified();             // marks document as modified if text was changed
     void fitMarginLines();                  // adjusts margin sizes to fit line numbers
     // Menu actions...
-    void actionPrefsDialog();           // open Preferences
+    void actionPrefsDialog(int tabindex);   // open Preferences at given TAB
     void printFile();                   // print current file
     void actionGotoTop();               // jump to line #1
     void actionGotoBottom();            // jump to last line in text
     void actionGoto_Line();             // jump to line X
     void actionGoto_matching_brace();   // jumps to matching brace
-    void actionCompile();               // calls compilation of current file
+    int actionCompile();                // calls compilation of current file
     // Emulator
     bool actionEmulator();              // starts default UAE
     void actionEmuOS13();               // sets UAE default to Workbench 1.3 and calls actionEmulator()
@@ -250,6 +251,7 @@ private slots:
     void actionSelectCompilerGPP();
     // Splitter
     void actionCloseOutputConsole();
+    void actionShowOutputConsole();
 
 
 private:
@@ -365,6 +367,8 @@ private:
     QAction *selectCompilerGCCAct;       // select the compiler to use (vbcc, gcc, g++)
     QAction *selectCompilerGPPAct;       // select the compiler to use (vbcc, gcc, g++)
     QAction *compileAct;                 // calls compilation of current file
+    QAction *showOutputAct;              // pops up compiler output pane
+    QAction *hideOutputAct;              // pops up compiler output pane
     // Actions for toolsMenue
     QAction *emulatorAct;             // start default UAE
     QAction *emulator13Act;           // start UAE with Workbench 1.3
