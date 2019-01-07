@@ -114,7 +114,7 @@ public:
     QString p_compiledFile;                                                     // keep the currently compiled file for file checking
     QString p_compiledFileSuffix;                                               // keep filename suffix for compiled output
     QFileInfo p_stripped_name;
-    QString p_projectdir;
+    //QString p_projectdir;
     QString p_emulator;
     QString p_os13_config;
     QString p_os20_config;
@@ -123,11 +123,11 @@ public:
     int p_defaultEmulator;
     QString p_emulator_to_start;    // Argument for default OS to start, depends on p_defaultEmulator
     QString p_projectsRootDir;
-    QStringList p_Compilers = {"VBCC (C mode only)", "GNU gcc (C mode)", "GNU g++ (C++ mode)"};    // used for building combobox entries
+    QStringList p_Compilers = {"VBCC (C mode only)", "GNU gcc (C mode)", "GNU g++ (C++ mode)"};    // used for building compiler preselection combobox entries
     int p_defaultCompiler;      // set from prefs file
     QString p_default_style;    // set from prefs file
     bool p_blackish;            // use blackish stylesheet?
-    bool p_show_indentation;
+    bool p_show_indentation;    // show indentation guidelines by default?
     // show or hide debugging informations
     bool p_mydebug = false;
     bool p_no_lcd_statusbar;        // use normal text instead of LCD for cursor position view

@@ -1,6 +1,12 @@
 # AmigaED
 AmigaED is an example for writing an advanced coder's editor using the Qt5 and QScintilla frameworks in C++, containing a menu bar, toolbars, menus, a custom context menue, an enhanced statusbar and some sophisticated editing actions. The source is based on Riverbank's original editor example, as provided with the QScintilla sources. This project was started as an entry point for learning how to use QScintilla. Though somewhat of a working editor, this project is meant for studies and as a base for own enhancements.
 
+# ANNOUNCEMENT / Beta-Testers
+Public beta testing phase starts on Tuesday, January 8th 2019.
+Beta-testers please send bug reports, wishlists, suggestions, errata to amigaed@mbergmann-sh.de
+Send beer cans, pizza vouchers and other usefull stuff that coders need directly to my postal adress. If you can't find it and want to support my work, you might consider to make a donation of your likes to my paypal account: mb@mbergmann-sh.de
+Thanks and have fun with Amiga Cross Editor!
+
 # LICENSE
 Copyright (C) 2018/2019 by Michael Bergmann. Placed in the public domain with some restrictions!
 

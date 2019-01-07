@@ -512,7 +512,7 @@ void MainWindow::createActions()
     emulator20Act->setStatusTip(tr("Start Amiga Emulation..."));
     connect(emulator20Act, SIGNAL(triggered()), this, SLOT(actionEmuOS20()));
 
-    emulator30Act = new QAction(QIcon(":/images/workbench.png"), tr("Start Workbench 3.0 in UAE..."), this);
+    emulator30Act = new QAction(QIcon(":/images/workbench.png"), tr("Start Workbench 3.x in UAE..."), this);
     emulator30Act->setShortcut(tr("Ctrl+h"));
     emulator30Act->setStatusTip(tr("Start Amiga Emulation..."));
     connect(emulator30Act, SIGNAL(triggered()), this, SLOT(actionEmuOS30()));
@@ -3545,7 +3545,7 @@ void MainWindow::readyReadStandardOutput()
     QProcess *myProcess = (QProcess *)sender();
     QByteArray buf = myProcess->readAllStandardOutput();
 
-    QFile data(p_projectdir + QDir::separator() + "compiler_out.txt");
+    QFile data(p_projectsRootDir + QDir::separator() + "compiler_out.txt");
 
     if(p_mydebug)
     {
