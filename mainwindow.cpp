@@ -214,10 +214,16 @@ void MainWindow::newFile()
 //
 void MainWindow::open()
 {
+    if(curFile.isEmpty())
+        curFile = p_projectsRootDir;
+    else
+        if(curFile.isEmpty())
+            curFile = QDir::currentPath();
+
     if (maybeSave()) {
         QString fileName = QFileDialog::getOpenFileName(this,
                 "Open source file",
-                QDir::currentPath(),    // look up for files in PROGDIR first!
+                curFile,    // look up for files in PROGDIR first!
                 "C/C++ files (*.c *.cpp *.h *.hpp) ;; "
                 "ASM files (*.a *.asm *.s *.S *.m) ;; Makefiles (Make*.* *.mak) ;; "
                 "AmigaE files (*.e *.m) ;; Pascal files (*.p *.pas) ;; "
@@ -238,8 +244,10 @@ bool MainWindow::save()
     // if no file name has been given until now..
     if (curFile.isEmpty())
     {
+        qDebug() << "curFile: " << curFile;
         return saveAs();        // ...call saveAs dialog!
-    } else
+    }
+    else
     {
         return saveFile(curFile);
     }
@@ -250,6 +258,9 @@ bool MainWindow::save()
 //
 bool MainWindow::saveAs()
 {
+    if(curFile.isEmpty())
+        curFile = p_projectsRootDir;
+
     QString fileName = QFileDialog::getSaveFileName(this,
                                                     "Save source file",
                                                     curFile,    // save files into last used folder
@@ -476,10 +487,30 @@ void MainWindow::createActions()
     connect(compileAct, SIGNAL(triggered()), this, SLOT(actionCompile()));
 
     /* --- Tools -----------------------------------------------------------------------*/
-    emulatorAct = new QAction(QIcon(":/images/workbench.png"), tr("Start UA&E..."), this);
+    emulatorAct = new QAction(QIcon(":/images/workbench.png"), tr("Start default Workbench in UA&E..."), this);
     emulatorAct->setShortcut(tr("Ctrl+e"));
     emulatorAct->setStatusTip(tr("Start Amiga Emulation..."));
     connect(emulatorAct, SIGNAL(triggered()), this, SLOT(actionEmulator()));
+
+    emulator13Act = new QAction(QIcon(":/images/workbench.png"), tr("Start Workbench 1.3 in UAE..."), this);
+    emulator13Act->setShortcut(tr("Ctrl+f"));
+    emulator13Act->setStatusTip(tr("Start Amiga Emulation..."));
+    connect(emulator13Act, SIGNAL(triggered()), this, SLOT(actionEmuOS13()));
+
+    emulator20Act = new QAction(QIcon(":/images/workbench.png"), tr("Start Workbench 2.1 in UAE..."), this);
+    emulator20Act->setShortcut(tr("Ctrl+g"));
+    emulator20Act->setStatusTip(tr("Start Amiga Emulation..."));
+    connect(emulator20Act, SIGNAL(triggered()), this, SLOT(actionEmuOS20()));
+
+    emulator30Act = new QAction(QIcon(":/images/workbench.png"), tr("Start Workbench 3.0 in UAE..."), this);
+    emulator30Act->setShortcut(tr("Ctrl+h"));
+    emulator30Act->setStatusTip(tr("Start Amiga Emulation..."));
+    connect(emulator30Act, SIGNAL(triggered()), this, SLOT(actionEmuOS30()));
+
+    emulator40Act = new QAction(QIcon(":/images/workbench.png"), tr("Start Workbench 4.1 in UAE..."), this);
+    emulator40Act->setShortcut(tr("Ctrl+i"));
+    emulator40Act->setStatusTip(tr("Start Amiga Emulation..."));
+    connect(emulator40Act, SIGNAL(triggered()), this, SLOT(actionEmuOS40()));
 
     /* --- Syntax -----------------------------------------------------------------------*/
     lexCPPAct = new QAction(tr("C/C++..."), this);
@@ -827,7 +858,13 @@ void MainWindow::createMenus()
 
     // Tools menue
     toolsMenue = menuBar()->addMenu(tr("&Tools"));
-    toolsMenue->addAction(emulatorAct);
+    emulatorMenue = toolsMenue->addMenu(tr("Emulator..."));
+    emulatorMenue->addAction(emulator13Act);
+    emulatorMenue->addAction(emulator20Act);
+    emulatorMenue->addAction(emulator30Act);
+    emulatorMenue->addAction(emulator40Act);
+    emulatorMenue->addSeparator();
+    emulatorMenue->addAction(emulatorAct);
 
     // Help menue
     helpMenue = menuBar()->addMenu(tr("&Help"));
@@ -994,7 +1031,7 @@ void MainWindow::loadFile(const QString &fileName)
 }
 
 //
-// user defined file creationloading for source files
+// user defined file creation loading for source files
 // used for command line file loading
 //
 int MainWindow::loadNonExistantFile(const QString &fileName)
@@ -1201,7 +1238,7 @@ void MainWindow::actionGotoTop()
         textEdit->foldAll(false);
     }
     textEdit->setCursorPosition(i-1,0);
-    //textEdit->setCaretLineVisible(true);
+    textEdit->setCaretLineVisible(true);
 }
 
 //
@@ -1301,9 +1338,14 @@ void MainWindow::SelectCompiler(int index)
 {
     if(p_mydebug)
     {
-        qDebug() << "Compiler selection called.";
-        qDebug() << "Value: " << index;
+        qDebug() << "in SelectCompiler(index)";
+        qDebug() << "index: " << index;
+        qDebug() << "p_selected_compiler_args: " << p_selected_compiler_args;
+        qDebug() << "\nCommand: " << p_defaultCompiler;
+        qDebug() << "Arguments: " << p_compiler_call;
+
     }
+
 
     // Toggle statusbar combobox:
     if(!(p_no_compilerbuttons))    // react on user prefs: show or hide compiler combo and -button
@@ -1334,6 +1376,16 @@ void MainWindow::SelectCompiler(int index)
             // check selected menu item, uncheck others
             selectCompilerGPPAct->setChecked(true);
             break;
+    }
+
+    if(p_mydebug)
+    {
+        qDebug() << "in SelectCompiler(index) AFTER index selection";
+        qDebug() << "index: " << index;
+        qDebug() << "p_selected_compiler_args: " << p_selected_compiler_args;
+        qDebug() << "\nCommand: " << p_defaultCompiler;
+        qDebug() << "Arguments: " << p_compiler_call;
+
     }
 }
 
@@ -1374,6 +1426,11 @@ void MainWindow::actionCompile()
                 {
                     compilerCombo->setCurrentIndex(2);
                 }
+                else
+                {
+                   if(selectCompilerGPPAct->isChecked())
+                       SelectCompiler(2);
+                }
 
                 // give a user warning
                 (void)QMessageBox::warning(this,
@@ -1398,6 +1455,12 @@ void MainWindow::actionCompile()
                 {
                     compilerCombo->setCurrentIndex(2);
                 }
+                else
+                {
+                   if(selectCompilerGPPAct->isChecked())
+                       SelectCompiler(2);
+                }
+
 
                 // give a user warning
                 (void)QMessageBox::warning(this,
@@ -1450,6 +1513,15 @@ void MainWindow::actionCompile()
 
             // make output window visible:
             outputGroup->show();
+
+            if(p_mydebug)
+            {
+                qDebug() << "in actionCompile()";
+
+                qDebug() << "p_selected_compiler_args: " << p_selected_compiler_args;
+                qDebug() << "text: " << text;
+
+            }
 
             //
             // put REAL compiler start HERE!
@@ -2495,22 +2567,101 @@ void MainWindow::actionInsertSnippet4()
 
 //
 // Start UAE emulation
-// CHANGE THIS according to your installation path and UAE flavour!
+// CHANGE Programm Prefs according to your installation path and UAE flavour!
 //
-void MainWindow::actionEmulator()
+bool MainWindow::actionEmulator()
 {
+    QString command = p_emulator;
+    QStringList arguments;
+
     qDebug() << "in Emulator";
+    switch(p_defaultEmulator)
+    {
+        case 0:
+            p_emulator_to_start = p_os13_config;
+            break;
 
-    popNotImplemented();
+        case 1:
+            p_emulator_to_start = p_os20_config;
+            break;
 
-    bool ok;
-          QString text = QInputDialog::getText(this, tr("Start Emulator"),
-                                               tr("UAE Options:"), QLineEdit::Normal,
-                                               "C:/Program Files/WinUAE/winuae64.exe -f E:/AmiKit/WinUAE/Configurations/GCC-AmigaOS_HD.uae", &ok);
-          if (ok && !text.isEmpty())
-          {
-              ;
-          }
+        case 2:
+            p_emulator_to_start = p_os30_config;
+            break;
+
+        case 3:
+            p_emulator_to_start = p_os40_config;
+            break;
+
+        default:
+            p_emulator_to_start = "--help";
+    }
+
+    if(p_emulator_to_start.isEmpty())
+    {
+        // give a user warning
+        (void)QMessageBox::critical(this,
+                       "Amiga Cross Editor", "There seems to be <i><b>NO config file</b></i> for your requested <b><i>Emulation startup!</i></b><br> "
+                        "Please revisit the Prefs editor and name a configuration.<br>"
+                        "<br>This helps, ya know?!",
+                        QMessageBox::Ok);
+
+        return (false);
+    }
+
+
+    arguments << p_emulator_to_start;
+
+    createStatusBarMessage(tr("Attempting to start UAE..."), 0);
+
+    myEmulator.start(command, arguments);
+    //myEmulator.startDetached(command, arguments, s_projectdir);
+
+    QObject::connect(&myEmulator, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(emu_finished(int,QProcess::ExitStatus)));
+    QObject::connect(&myEmulator, SIGNAL(readyReadStandardOutput()), this, SLOT(emu_readyReadStandardOutput()));
+    QObject::connect(&myEmulator, SIGNAL(started()), this, SLOT(started()));
+
+    return (true);
+}
+
+//
+// start Workbench 1.3 emulation
+//
+void MainWindow::actionEmuOS13()
+{
+    p_defaultEmulator = 0;
+    if(!(actionEmulator()))
+        actionPrefsDialog();
+}
+
+//
+// start Workbench 2.1 emulation
+//
+void MainWindow::actionEmuOS20()
+{
+    p_defaultEmulator = 1;
+    if(!(actionEmulator()))
+        actionPrefsDialog();
+}
+
+//
+// start Workbench 3.x emulation
+//
+void MainWindow::actionEmuOS30()
+{
+    p_defaultEmulator = 2;
+    if(!(actionEmulator()))
+        actionPrefsDialog();;
+}
+
+//
+// start Workbench 4.1 emulation
+//
+void MainWindow::actionEmuOS40()
+{
+    p_defaultEmulator = 3;
+    if(!(actionEmulator()))
+        actionPrefsDialog();
 }
 
 //
@@ -2892,11 +3043,11 @@ void MainWindow::initializeGUI()
     else
     {
         this->statusContainer_X = new QLabel(this);
-        this->statusContainer_X->setFrameShape(QFrame::Panel);
-        this->statusContainer_X->setFrameShadow(QFrame::Sunken);
-        this->statusContainer_X->setMinimumWidth(40);
-        this->statusContainer_X->setAlignment(Qt::AlignRight);
-        this->statusContainer_X->setText("0");
+        statusContainer_X->setFrameShape(QFrame::Panel);
+        statusContainer_X->setFrameShadow(QFrame::Sunken);
+        statusContainer_X->setMinimumWidth(42);
+        statusContainer_X->setAlignment(Qt::AlignRight);
+        statusContainer_X->setText("0");
     }
 
     this->statusLabelY = new QLabel(this);
@@ -2909,11 +3060,12 @@ void MainWindow::initializeGUI()
     else
     {
         this->statusContainer_Y = new QLabel(this);
-        this->statusContainer_Y->setFrameShape(QFrame::Panel);
-        this->statusContainer_Y->setFrameShadow(QFrame::Sunken);
-        this->statusContainer_Y->setMinimumWidth(40);
-        this->statusContainer_Y->setAlignment(Qt::AlignRight);
-        this->statusContainer_Y->setText("0");
+        statusContainer_Y->setFrameShape(QFrame::Panel);
+        statusContainer_Y->setFrameShadow(QFrame::Sunken);
+        statusContainer_Y->setMinimumWidth(42);
+        statusContainer_Y->setAlignment(Qt::AlignRight);
+        statusContainer_Y->setText("0");
+
     }
 
     if(!(p_no_compilerbuttons))    // react on user prefs: show or hide compiler combo and -button
@@ -2999,6 +3151,15 @@ void MainWindow::initializeGUI()
     {
         connect(compilerCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SelectCompiler(int)));
         connect(compilerButton, SIGNAL(clicked(bool)), this, SLOT(actionCompile()));
+    }
+    else
+    {
+        if(p_mydebug)
+            qDebug() << "alternative compiler connection made ready.";
+
+//        connect(actionSelectCompilerGCC(), SIGNAL(currentIndexChanged(int)), this, SLOT(SelectCompiler(int)));
+//        connect(actionSelectCompilerGPP(), SIGNAL(currentIndexChanged(int)), this, SLOT(SelectCompiler(int)));
+//        connect(actionSelectCompilerVBCC(), SIGNAL(currentIndexChanged(int)), this, SLOT(SelectCompiler(int)));
     }
     connect(btnCloseOutput, SIGNAL(clicked(bool)), this, SLOT(actionCloseOutputConsole()));
 
@@ -3209,14 +3370,18 @@ int MainWindow::startCompiler()
 
     createStatusBarMessage(tr("Compiler run has been started."),0);
 
-    //myProcess.start(command, arguments);
-    runCommand(command, arguments);
-
     if(p_mydebug)
     {
+        qDebug() << "in startCompiler()";
+
+        qDebug() << "p_selected_compiler_args: " << p_selected_compiler_args;
         qDebug() << "\nCommand: " << command;
-        qDebug() << "Argumets: " << myProcess.arguments();
+        qDebug() << "Arguments: " << arguments;
+
     }
+
+    // Fire up compiler!
+    runCommand(command, arguments);
 
     return 0;
 }
@@ -3304,17 +3469,21 @@ void MainWindow::readyReadStandardOutput()
     }
     if (data.open(QFile::WriteOnly | QFile::Truncate))
     {
-      //ui->textBrowser->clear();
       QTextStream out(&data);
       out << buf;
-      //ui->textBrowser->append(buf);
     }
 }
 
 void MainWindow::started()
 {
+    createStatusBarMessage("UAE successfully started.", 0);
     if(p_mydebug)
+    {
         qDebug() << "START: Proc Started";
+        qDebug() << "UAE seems to have started!";
+    }
+
+    emulatorAct->setDisabled(true);
 }
 
 void MainWindow::emu_finished(int exitCode, QProcess::ExitStatus exitStatus)
@@ -3336,17 +3505,18 @@ void MainWindow::emu_finished(int exitCode, QProcess::ExitStatus exitStatus)
 
     if(p_mydebug)
     {
-        qDebug() << "Finished: " << exitCode;
+        qDebug() << "Finished with ExitCode: " << exitCode;
     }
 
     if (exitStatus==QProcess::CrashExit || exitCode!=0)
     {
-     createStatusBarMessage("CrashExit - Problem mit dem Emulator!!", 0);
+     createStatusBarMessage("CrashExit - UAE has a problem!!", 0);
     }
     else
     {
-      createStatusBarMessage("Emulator normal beendet.", 0);
-  }
+      createStatusBarMessage("UAE terminated regularly.", 0);
+    }
+    emulatorAct->setEnabled(true);
 }
 
 void MainWindow::emu_readyReadStandardOutput()
@@ -3439,6 +3609,15 @@ void MainWindow::runCommand(QString command, QStringList arguments)
 {
 //    QString command;
 //    QStringList arguments;
+    if(p_mydebug)
+    {
+        qDebug() << "in runCommand()";
+
+        qDebug() << "p_selected_compiler_args: " << p_selected_compiler_args;
+        qDebug() << "\nCommand: " << command;
+        qDebug() << "Arguments: " << arguments;
+
+    }
     cmd->setProcessChannelMode(QProcess::MergedChannels);
 
     // Empty output widget

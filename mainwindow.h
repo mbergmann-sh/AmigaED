@@ -120,6 +120,7 @@ public:
     QString p_os30_config;
     QString p_os40_config;
     int p_defaultEmulator;
+    QString p_emulator_to_start;    // Argument for default OS to start, depends on p_defaultEmulator
     QString p_projectsRootDir;
     QStringList p_Compilers = {"VBCC (C mode only)", "GNU gcc (C mode)", "GNU g++ (C++ mode)"};    // used for building combobox entries
     int p_defaultCompiler;      // set from prefs file
@@ -128,12 +129,12 @@ public:
     bool p_show_indentation;
     // show or hide debugging informations
     bool p_mydebug = false;
-    bool p_no_lcd_statusbar;    // use normal text instead of LCD for cursor position view
-    bool p_no_compilerbuttons;  // hide compiler selector and compile button from statusbar
-    bool p_simple_statusbar;    // show basic statusbar only
-    bool p_create_icon;         // create icon for compiled program?
-    bool p_console_on_fail;     // open console only if compilation fails
-    bool p_no_warn_requesters;  // reduce messegebox show-up
+    bool p_no_lcd_statusbar;        // use normal text instead of LCD for cursor position view
+    bool p_no_compilerbuttons;      // hide compiler selector and compile button from statusbar
+    bool p_simple_statusbar;        // show basic statusbar only
+    bool p_create_icon;             // create icon for compiled program?
+    bool p_console_on_fail;         // open console only if compilation fails
+    bool p_no_warn_requesters;      // reduce messegebox show-up
 
     // Setter for prefs vars
     void setCompilerGCC(QString compiler);
@@ -194,13 +195,14 @@ private slots:
     void actionGoto_matching_brace();   // jumps to matching brace
     void actionCompile();               // calls compilation of current file
     // Emulator
-    void actionEmulator();              // starts UAE
-//    void actionEmuOS13();
-//    void actionEmuOS20();
-//    void actionEmuOS30();
-//    void actionEmuOS40();
-//    void actionEmuDefault();
-    void actionSearch();                // opens a search dialog
+    bool actionEmulator();              // starts default UAE
+    void actionEmuOS13();               // sets UAE default to Workbench 1.3 and calls actionEmulator()
+    void actionEmuOS20();               // sets UAE default to Workbench 2.1 and calls actionEmulator()
+    void actionEmuOS30();               // sets UAE default to Workbench 3.x and calls actionEmulator()
+    void actionEmuOS40();               // sets UAE default to Workbench 4.1 and calls actionEmulator()
+
+    // editMenu
+    void actionSearch();                  // opens a search dialog
     // viewMenue and submenue actions
     void actionShowLineNumbers();         // show or hide line numbers
     void actionShowCaretLine();           // show or hide caret line
@@ -296,6 +298,7 @@ private:
     QMenu *tabwidthMenue;       // Submenu of viewMenu, holds different values for tab width
     QMenu *syntaxMenue;         // holds actions to change syntax lexers
     QMenu *toolsMenue;          // holds misc actions
+    QMenu *emulatorMenue;       // Submenue of toolsMenue, holds startups for different Amiga emulation models
     QMenu *helpMenue;           // holds help topics
     QMenu *preprocessorMenue;   // Submenue of insertMenue, holds preprocessor inserts
     QMenu *libraryMenue;        // Submenue of insertMenue, holds library inserts
@@ -361,9 +364,13 @@ private:
     QAction *selectCompilerVBCCAct;      // select the compiler to use (vbcc, gcc, g++)
     QAction *selectCompilerGCCAct;       // select the compiler to use (vbcc, gcc, g++)
     QAction *selectCompilerGPPAct;       // select the compiler to use (vbcc, gcc, g++)
-    QAction *compileAct;                // calls compilation of current file
+    QAction *compileAct;                 // calls compilation of current file
     // Actions for toolsMenue
-    QAction *emulatorAct;           // start UAE
+    QAction *emulatorAct;             // start default UAE
+    QAction *emulator13Act;           // start UAE with Workbench 1.3
+    QAction *emulator20Act;           // start UAE with Workbench 2.1
+    QAction *emulator30Act;           // start UAE with Workbench 3.x
+    QAction *emulator40Act;           // start UAE with Workbench 4.1
     // Actions for syntaxMenue
     QAction *lexCPPAct;             // switch lexer to C++ syntax
     QAction *lexBatchAct;           // switch lexer to Batch / Shell syntax
@@ -439,6 +446,7 @@ private:
     bool p_main_set = false;
     bool p_versionstring_set = false;
     int p_proc_is_started = 0;
+    int p_index = 0;
 
 
 protected:
