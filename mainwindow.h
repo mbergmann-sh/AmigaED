@@ -159,6 +159,7 @@ public slots:
     void runCommand(QString command, QStringList arguments);
     void readCommand();
     void stopCommand(int exitCode, QProcess::ExitStatus exitStatus);
+    void actionKillEmulator();
 
 
 private slots:
@@ -277,6 +278,7 @@ private:
     void setCurrentFile(const QString &fileName);       // will be called to store current filename and put it into window title
     QString strippedName(const QString &fullFileName);  // gives back current filename without path
     void activateGUIdefaultSettings();
+    void delay();
 
 
     // Qscintila Editor widget instance
@@ -376,6 +378,7 @@ private:
     QAction *emulator20Act;           // start UAE with Workbench 2.1
     QAction *emulator30Act;           // start UAE with Workbench 3.x
     QAction *emulator40Act;           // start UAE with Workbench 4.1
+    QAction *killEmulatorAct;         // attempt to kil a running Emulation
     // Actions for syntaxMenue
     QAction *lexCPPAct;             // switch lexer to C++ syntax
     QAction *lexBatchAct;           // switch lexer to Batch / Shell syntax
@@ -452,6 +455,7 @@ private:
     bool p_versionstring_set = false;
     int p_proc_is_started = 0;
     int p_index = 0;
+    qint64 proc_pid;
 
 
 protected:

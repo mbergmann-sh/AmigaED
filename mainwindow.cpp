@@ -115,6 +115,9 @@ MainWindow::MainWindow(QString cmdFileName)
     initializeGUI();    // most initializations are done within tis method!
     activateGUIdefaultSettings();
 
+    // disable Emulator kill menu entry by default
+    killEmulatorAct->setDisabled(true);
+
     // react if document was modified
     connect(textEdit, SIGNAL(textChanged()), this, SLOT(documentWasModified()));
 
@@ -519,6 +522,11 @@ void MainWindow::createActions()
     emulator40Act->setStatusTip(tr("Start Amiga Emulation..."));
     connect(emulator40Act, SIGNAL(triggered()), this, SLOT(actionEmuOS40()));
 
+    killEmulatorAct = new QAction(QIcon(":/images/fileexit.png"), tr("Stop running Emulation..."), this);
+    killEmulatorAct->setShortcut(tr("Alt+s"));
+    killEmulatorAct->setStatusTip(tr("Stop Amiga Emulation..."));
+    connect(killEmulatorAct, SIGNAL(triggered()), this, SLOT(actionKillEmulator()));
+
     /* --- Syntax -----------------------------------------------------------------------*/
     lexCPPAct = new QAction(tr("C/C++..."), this);
     lexCPPAct->setStatusTip(tr("highlight C/C++ syntax"));
@@ -875,6 +883,8 @@ void MainWindow::createMenus()
     emulatorMenue->addAction(emulator40Act);
     emulatorMenue->addSeparator();
     emulatorMenue->addAction(emulatorAct);
+    toolsMenue->addSeparator();
+    toolsMenue->addAction(killEmulatorAct);
 
     // Help menue
     helpMenue = menuBar()->addMenu(tr("&Help"));
@@ -2676,10 +2686,14 @@ bool MainWindow::actionEmulator()
     createStatusBarMessage(tr("Attempting to start UAE..."), 0);
 
     myEmulator.start(command, arguments);
+    qDebug() << "process pid: " << myEmulator.pid();
+    // save process pid for termination checking!
+    proc_pid = myEmulator.pid();
 
     QObject::connect(&myEmulator, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(emu_finished(int,QProcess::ExitStatus)));
     QObject::connect(&myEmulator, SIGNAL(readyReadStandardOutput()), this, SLOT(emu_readyReadStandardOutput()));
     QObject::connect(&myEmulator, SIGNAL(started()), this, SLOT(started()));
+
 
     return (true);
 }
@@ -2712,6 +2726,27 @@ void MainWindow::actionEmuOS30()
     p_defaultEmulator = 2;
     if(!(actionEmulator()))
         actionPrefsDialog(3);;
+}
+
+//
+// Kill a running Emulator
+//
+void MainWindow::actionKillEmulator()
+{
+    disconnect(&myEmulator, 0, 0, 0);
+    myEmulator.terminate();
+
+    qDebug() <<"PID after kill: " << myEmulator.pid();
+
+    // wait ome time, so OS has time to delete PID!
+    delay();
+
+    if(myEmulator.pid() != proc_pid)
+    {
+        emulatorAct->setEnabled(true);
+        emulatorMenue->setEnabled(true);
+        killEmulatorAct->setDisabled(true);
+    }
 }
 
 //
@@ -3534,6 +3569,7 @@ void MainWindow::started()
 
     emulatorAct->setDisabled(true);
     emulatorMenue->setDisabled(true);
+    killEmulatorAct->setEnabled(true);
 }
 
 void MainWindow::emu_finished(int exitCode, QProcess::ExitStatus exitStatus)
@@ -3568,6 +3604,7 @@ void MainWindow::emu_finished(int exitCode, QProcess::ExitStatus exitStatus)
     }
     emulatorMenue->setEnabled(true);
     emulatorAct->setEnabled(true);
+    killEmulatorAct->setDisabled(true);
 }
 
 void MainWindow::emu_readyReadStandardOutput()
@@ -3756,6 +3793,16 @@ void MainWindow::stateChanged(QProcess::ProcessState state)
 void MainWindow::startPrefs()
 {
     actionPrefsDialog(0);
+}
+
+//
+// HELPER: wait some time withou freezing the gui
+//
+void MainWindow::delay()
+{
+    QTime dieTime= QTime::currentTime().addSecs(1);
+    while (QTime::currentTime() < dieTime)
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
 }
 
 
