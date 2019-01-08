@@ -498,27 +498,27 @@ void MainWindow::createActions()
 
     /* --- Tools -----------------------------------------------------------------------*/
     emulatorAct = new QAction(QIcon(":/images/workbench.png"), tr("Start default Workbench in UA&E..."), this);
-    emulatorAct->setShortcut(tr("Ctrl+e"));
+    emulatorAct->setShortcut(tr("Alt+e"));
     emulatorAct->setStatusTip(tr("Start Amiga Emulation..."));
     connect(emulatorAct, SIGNAL(triggered()), this, SLOT(actionEmulator()));
 
     emulator13Act = new QAction(QIcon(":/images/workbench.png"), tr("Start Workbench 1.3 in UAE..."), this);
-    emulator13Act->setShortcut(tr("Ctrl+f"));
+    emulator13Act->setShortcut(tr("Alt+f"));
     emulator13Act->setStatusTip(tr("Start Amiga Emulation..."));
     connect(emulator13Act, SIGNAL(triggered()), this, SLOT(actionEmuOS13()));
 
     emulator20Act = new QAction(QIcon(":/images/workbench.png"), tr("Start Workbench 2.1 in UAE..."), this);
-    emulator20Act->setShortcut(tr("Ctrl+g"));
+    emulator20Act->setShortcut(tr("Alt+g"));
     emulator20Act->setStatusTip(tr("Start Amiga Emulation..."));
     connect(emulator20Act, SIGNAL(triggered()), this, SLOT(actionEmuOS20()));
 
     emulator30Act = new QAction(QIcon(":/images/workbench.png"), tr("Start Workbench 3.x in UAE..."), this);
-    emulator30Act->setShortcut(tr("Ctrl+h"));
+    emulator30Act->setShortcut(tr("Alt+h"));
     emulator30Act->setStatusTip(tr("Start Amiga Emulation..."));
     connect(emulator30Act, SIGNAL(triggered()), this, SLOT(actionEmuOS30()));
 
     emulator40Act = new QAction(QIcon(":/images/workbench.png"), tr("Start Workbench 4.1 in UAE..."), this);
-    emulator40Act->setShortcut(tr("Ctrl+i"));
+    emulator40Act->setShortcut(tr("Alt+i"));
     emulator40Act->setStatusTip(tr("Start Amiga Emulation..."));
     connect(emulator40Act, SIGNAL(triggered()), this, SLOT(actionEmuOS40()));
 
@@ -954,6 +954,7 @@ void MainWindow::readSettings()
     p_description = (settings.value("Project/Description").toString());
     p_purpose = (settings.value("Project/Purpose").toString());
     p_projectsRootDir = (settings.value("Project/ProjectRootDir").toString());
+    p_default_icon = (settings.value("Project/DefaultIcon").toString());
 
     // TAB: GCC
     p_compiler_gcc = (settings.value("GCC/GccPath").toString());
@@ -3470,65 +3471,6 @@ int MainWindow::startCompiler()
     return 0;
 }
 
-void MainWindow::finished(int exitCode, QProcess::ExitStatus exitStatus)
-{
-    if(exitCode == 0)
-    {
-//        ui->actionStart_im_Emulator->setEnabled(true);
-//        ui->btnStart->setEnabled(true);
-//        ui->actionCompilieren->setDisabled(true);
-//        ui->btnCompile->setDisabled(true);
-//        ui->leSource->clear();
-//        ui->leTarget->clear();
-    }
-    else
-    {
-//        ui->actionStart_im_Emulator->setDisabled(true);
-//        ui->btnStart->setDisabled(true);
-//        ui->actionCompilieren->setDisabled(true);
-//        ui->btnCompile->setDisabled(true);
-
-    }
-    if(p_mydebug)
-        qDebug() << "Finished: " << exitCode;
-
-  if (exitStatus==QProcess::CrashExit || exitCode!=0)
-  {      
-      createStatusBarMessage("Compiler error!", 0);
-      (void)QMessageBox::critical(this, tr("Amiga Cross Editor"),
-      tr("Build error!\n"
-      "Please check source for errors and recompile."),
-      QMessageBox::Ok);
-  }
-  else
-  {
-      // Let's check if the compiler produced an executable file:
-      if(fileExists(p_compiledFile))
-      {
-          createStatusBarMessage("Compiler run finished.", 0);
-          //ui->actionStart_im_Emulator->setEnabled(true);
-
-          (void)QMessageBox::information(this, tr("Amiga Cross Editor"),
-          tr("Successfully compiled.\n"
-          "You may now want to test it in UAE."),
-          QMessageBox::Ok);
-
-          createStatusBarMessage("Compiler run finished successfully.", 0);
-      }
-      else
-      {
-          //ui->actionStart_im_Emulator->setEnabled(true);
-
-          (void)QMessageBox::information(this, tr("Amiga Cross Editor"),
-          tr("No success in building your executable file!.\n"
-          "Please check for Errors and recompile."),
-          QMessageBox::Ok);
-
-          createStatusBarMessage("Compiler run finished unsuccessfully.", 0);
-      }
-
-  }
-}
 
 void MainWindow::readyReadStandardError()
 {
@@ -3718,7 +3660,7 @@ void MainWindow::runCommand(QString command, QStringList arguments)
 void MainWindow::readCommand(){
     output->append(cmd->readAll()); // output is QTextBrowser
 }
-void MainWindow::stopCommand(int exitCode, QProcess::ExitStatus exitStatus)
+int MainWindow::stopCommand(int exitCode, QProcess::ExitStatus exitStatus)
 {
     output->append(cmd->readAll());
     output->append("cmd finished:\t");
@@ -3741,10 +3683,13 @@ void MainWindow::stopCommand(int exitCode, QProcess::ExitStatus exitStatus)
             actionShowOutputConsole();
         }
 
-        (void)QMessageBox::critical(this, tr("Amiga Cross Editor"),
-        tr("Build error!\n"
-        "Please check source for errors and recompile."),
-        QMessageBox::Ok);
+        if(!(p_no_warn_requesters))
+        {
+            (void)QMessageBox::critical(this, tr("Amiga Cross Editor"),
+            tr("Build error!\n"
+            "Please check source for errors and recompile."),
+            QMessageBox::Ok);
+        }
     }
     else
     {
@@ -3754,12 +3699,52 @@ void MainWindow::stopCommand(int exitCode, QProcess::ExitStatus exitStatus)
             createStatusBarMessage("Compiler run finished.", 0);
             //ui->actionStart_im_Emulator->setEnabled(true);
 
-            (void)QMessageBox::information(this, tr("Amiga Cross Editor"),
-            tr("Successfully compiled.\n"
-            "You may now want to test it in UAE."),
+            if(!(p_no_warn_requesters))
+            {
+                (void)QMessageBox::information(this, tr("Amiga Cross Editor"),
+                tr("Successfully compiled.\n"
+                "You may now want to test it in UAE."),
             QMessageBox::Ok);
+            }
 
             createStatusBarMessage("Compiler run finished successfully.", 0);
+
+            // create icon for this app?
+            if(p_create_icon)
+            {
+                if(p_default_icon.isEmpty())    // if no icon file is set...
+                {
+                    (void)QMessageBox::warning(this, tr("Amiga Cross Editor"),
+                    tr("Default Amiga icon file not defined!\n"
+                    "You may now wset its location in preferences editor.\n\n"
+                       "Don't forget to restart Amiga Cross Editor afterwards!"),
+                QMessageBox::Ok);
+
+                    actionPrefsDialog(0);   // ...call prefsDialog's first TAB and exit this method!
+                    return 1;
+                }
+                else
+                {
+                    // get executable path and build icon filename
+                    QString iconcopyfile = p_compiledFile + ".info";
+
+                    // copy icon file to that path..
+                    if(!(QFile::copy(p_default_icon, iconcopyfile)))
+                    {
+                        if(p_mydebug)
+                            qDebug() << "Icon could not be copied!";
+
+                        (void)QMessageBox::information(this, tr("Amiga Cross Editor"),
+                        tr("Sorry - icon file could not bee created!\n"),
+                        QMessageBox::Ok);
+                    }
+                    else
+                    {
+                        if(p_mydebug)
+                            qDebug() << "Icon was successfully copied!";
+                    }
+                }
+            }
         }
         else
         {
@@ -3774,6 +3759,7 @@ void MainWindow::stopCommand(int exitCode, QProcess::ExitStatus exitStatus)
         }
 
     }
+    return 0;
 }
 
 void MainWindow::error(QProcess::ProcessError error)

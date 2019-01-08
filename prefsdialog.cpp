@@ -7,8 +7,8 @@ PrefsDialog::PrefsDialog(QWidget *parent, int tabindex) :
     ui(new Ui::PrefsDialog)
 {
     ui->setupUi(this);
-
-    qDebug() << "tabindex = " << tabindex;
+    // Remove Close-, help-, size gadgets
+    this->setWindowFlags(Qt::Dialog | Qt::Desktop | Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
 
     // Start Tabwidget with first tab visible allways
     ui->tabWidget->setCurrentIndex(tabindex);
@@ -247,6 +247,7 @@ void PrefsDialog::save_mySettings()
     mySettings.setValue("Project/Description", ui->lineEdit_description->text());
     mySettings.setValue("Project/Purpose", ui->lineEdit_purpose->text());
     mySettings.setValue("Project/ProjectRootDir", ui->lineEdit_projectsRootDir->text());
+    mySettings.setValue("Project/DefaultIcon", ui->lineEdit_getDefaultIcon->text());
 
     // TAB: GCC
     mySettings.setValue("GCC/GccPath", ui->lineEdit_getGCCexefile->text());
@@ -293,6 +294,7 @@ void PrefsDialog::load_mySettings()
     ui->lineEdit_description->setText(mySettings.value("Project/Description").toString());
     ui->lineEdit_purpose->setText(mySettings.value("Project/Purpose").toString());
     ui->lineEdit_projectsRootDir->setText(mySettings.value("Project/ProjectRootDir").toString());
+    ui->lineEdit_getDefaultIcon->setText(mySettings.value("Project/DefaultIcon").toString());
 
     // TAB: GCC
     ui->lineEdit_getGCCexefile->setText(mySettings.value("GCC/GccPath").toString());
@@ -373,3 +375,12 @@ void PrefsDialog::on_checkBoxNoCompileButton_clicked()
 {
     simpleStatusbar();
 }
+
+void PrefsDialog::on_btn_getDefaultIcon_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this,
+            tr("Path Amiga icon file"), QDir::homePath(),
+            tr("Amiga Icon Files (*.info);;All Files (*)"));
+    ui->lineEdit_getDefaultIcon->setText(fileName);
+}
+

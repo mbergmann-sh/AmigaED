@@ -97,6 +97,7 @@ public:
     QString p_version = "1.0";
     QString p_revision = "0";
     QString p_description;
+    QString p_default_icon;
     QString p_compiler ;                     // C-Compiler to call...
     QString p_compiler_call;
     QString p_compiler_gcc;
@@ -147,7 +148,7 @@ public slots:
     // methods for launching a compiler
     void error(QProcess::ProcessError error);
     void stateChanged(QProcess::ProcessState state);
-    void finished(int exitCode, QProcess::ExitStatus exitStatus);
+
     void readyReadStandardError();
     void readyReadStandardOutput();
     void started();
@@ -158,7 +159,7 @@ public slots:
     void debugVars();
     void runCommand(QString command, QStringList arguments);
     void readCommand();
-    void stopCommand(int exitCode, QProcess::ExitStatus exitStatus);
+    int stopCommand(int exitCode, QProcess::ExitStatus exitStatus);
     void actionKillEmulator();
 
 

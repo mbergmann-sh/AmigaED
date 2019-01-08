@@ -64,6 +64,8 @@ private slots:
 
     void on_checkBoxNoCompileButton_clicked();
 
+    void on_btn_getDefaultIcon_clicked();
+
 private:
     Ui::PrefsDialog *ui;
     bool p_prefs_changed;

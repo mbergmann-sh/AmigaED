@@ -30,7 +30,8 @@ DISTFILES += \
     syntax-examples/README.txt \
     syntax-examples/fortran-example.f \
     syntax-examples/Makefile_sample.mak \
-    syntax-examples/pascal_boublesort.pas
+    syntax-examples/pascal_boublesort.pas \
+    abandonned_methods.txt
 
 FORMS += \
     prefsdialog.ui \

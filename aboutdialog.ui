@@ -80,6 +80,9 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Noto Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Amiga Cross Editor&lt;/span&gt; &lt;span style=&quot; font-style:italic;&quot;&gt;(ACED)&lt;/span&gt; is meant to be the missing link between advanced Cross Compiler Toolchains and the comfort of editing and compiling source files in a decent environment.&lt;br /&gt;Originally started as an example for writing an advanced coder's editor using the &lt;span style=&quot; font-style:italic;&quot;&gt;Qt5&lt;/span&gt; and &lt;span style=&quot; font-style:italic;&quot;&gt;QScintilla&lt;/span&gt; frameworks in C++, containing a menu bar, toolbars, menus, a custom context menue, an enhanced statusbar and some sophisticated editing actions, ACED finally grew into a full-fleshed IDE. The source is based on Riverbank's original editor example, as provided with the &lt;span style=&quot; font-style:italic;&quot;&gt;QScintilla sources&lt;/span&gt;. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
+         <property name="openLinks">
+          <bool>false</bool>
+         </property>
         </widget>
        </item>
       </layout>
@@ -102,6 +105,9 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Further information about QScintilla licensing is available at: &lt;a href=&quot;https://www.riverbankcomputing.com/software/qscintilla/license&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;https://www.riverbankcomputing.com/software/qscintilla/license&lt;/span&gt;&lt;/a&gt; or by contacting &lt;a href=&quot;mailto:sales@riverbankcomputing.com&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;sales@riverbankcomputing.com&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;This program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
+         <property name="openLinks">
+          <bool>false</bool>
+         </property>
         </widget>
        </item>
       </layout>
@@ -121,6 +127,9 @@ p, li { white-space: pre-wrap; }
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Matic Kucovec and Kristof Mulier for their great tutorial and website on how to use QScintilla in Python&lt;/li&gt;
 &lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Keith F. Kelly for pointing me out on how to kill an existing QsciLexer&lt;/li&gt;&lt;/ul&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;...and last, but not least all those not personally mentioned people out on stackoverflow.com for beeing patiently helpfull. Thanks for your helping hands when I got stuck, folks. You rock!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="openLinks">
+          <bool>false</bool>
          </property>
         </widget>
        </item>

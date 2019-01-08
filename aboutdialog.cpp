@@ -7,8 +7,7 @@ aboutDialog::aboutDialog(QWidget *parent) :
 {
     ui->setupUi(this);
     // Remove Close-, help-, size gadgets
-    this->setWindowFlags(Qt::Dialog | Qt::Desktop);
-    this->setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
+    this->setWindowFlags(Qt::Dialog | Qt::Desktop | Qt::Window | Qt::WindowTitleHint | Qt::CustomizeWindowHint);
 }
 
 aboutDialog::~aboutDialog()

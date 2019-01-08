@@ -1,0 +1,283 @@
+QString MainWindow::getPrefs()
+{
+    // Construct file path to store values:
+    QString filename = QDir::homePath();
+    filename.append(QDir::separator());
+    filename.append(".amigaed");
+    filename.append(QDir::separator());
+    filename.append("ace.prefs");
+
+    QFile file(filename);
+
+    if(!file.open(QIODevice::ReadOnly))
+    {
+        QMessageBox::critical(this, "Amiga Cross Editor Prefs", "Error while opening prefs file: \n" + file.errorString() + "\n\nPlease edit and save prefs first and\nthen restart Amiga Cross Editor!");
+        return "Fuck you!";        
+    }
+    else
+    {
+        QTextStream in(&file);
+        while(!in.atEnd())
+        {
+            line = in.readLine();
+            fields = line.split(", ");
+        }
+
+        file.close();
+
+        qDebug() << " fields size: " << fields.count();
+
+        // TAB: Project
+        p_author = fields[0];
+        p_email = fields[1];
+        p_website = fields[2];
+        p_description = fields[3];
+        p_purpose = fields[4];
+        p_projectsRootDir =fields[5];
+        // TAB: GCC
+        p_compiler_gcc = fields[6];
+        p_compiler_gpp = fields[7];
+        p_make = fields[8];
+        p_strip = fields[9];
+        p_compiler_gcc_call = fields[10];
+        p_compiler_gpp_call = fields[11];
+        // TAB: VBCC
+        p_compiler_vc = fields[12];
+        p_compiler_vasm = fields[13];
+        p_vbcc_config_dir = fields[14];
+        p_compiler_vc_call = fields[15];
+        // TAB: Emulator
+        p_emulator = fields[16];
+        p_os13_config = fields[17];
+        p_os20_config = fields[18];
+        p_os13_config = fields[19];
+        p_os13_config = fields[20];
+        p_defaultEmulator = fields[21];
+        // TAB: Misc
+        p_default_style = fields[22];
+//        if(fields[23] == "1")
+//            p_blackish = true;
+//        else
+//            p_blackish = false;
+//        if(fields[24] == "1")
+//            p_show_indentation = false;
+//        else
+//            p_show_indentation = true;
+//        if(fields[25] == "1")
+//            p_mydebug = true;
+//        else
+//            p_mydebug = false;
+//       p_defaultCompiler = fields[26];
+    }
+
+    return line;
+}
+
+
+QString PrefsDialog::getPrefs()
+{
+    // Construct file path to store values:
+    QString filename = QDir::homePath();
+    filename.append(QDir::separator());
+    filename.append(".amigaed");
+    filename.append(QDir::separator());
+    filename.append("ace.prefs");
+
+    QFile file(filename);
+
+    if(!file.open(QIODevice::ReadOnly))
+    {
+        //QMessageBox::critical(this, "Amiga Cross Editor Prefs", "Error while opening prefs file: \n" + file.errorString() + "\n\nPlease edit and save prefs first and\nthen restart Amiga Cross Editor!");
+        return "Fuck you!";
+    }
+    else
+    {
+        QTextStream in(&file);
+        while(!in.atEnd())
+        {
+            line = in.readLine();
+            fields = line.split(", ");
+        }
+
+        file.close();
+         qDebug() << "\n" << " in prefsDialog: fields size: " << fields.count();
+
+        // TAB: Project
+        ui->lineEdit_author->setText(fields[0]);
+        ui->lineEdit_email->setText(fields[1]);
+        ui->lineEdit_website->setText(fields[2]);
+        ui->lineEdit_description->setText(fields[3]);
+        ui->lineEdit_purpose->setText(fields[4]);
+        ui->lineEdit_projectsRootDir->setText(fields[5]);
+        // TAB: GCC
+        ui->lineEdit_getGCCexefile->setText(fields[6]);
+        ui->lineEdit_getGPPexefile->setText(fields[7]);
+        ui->lineEdit_getMAKEexefile->setText(fields[8]);
+        ui->lineEdit_getSTRIPexefile->setText(fields[9]);
+        ui->lineEdit_GCCdefaultOpts->setText(fields[10]);
+        ui->lineEdit_GPPdefaultOpts->setText(fields[11]);
+        // TAB: VBCC
+        ui->lineEdit_getVCexefile->setText(fields[12]);
+        ui->lineEdit_getVASMexefile->setText(fields[13]);
+        ui->lineEdit_getVCconfigDir->setText(fields[14]);
+        ui->lineEdit_VCdefaultOpts->setText(fields[15]);
+        // TAB: Emulator
+        ui->lineEdit_getEmulatorExefile->setText(fields[16]);
+        ui->lineEdit_getOS13Configfile->setText(fields[17]);
+        ui->lineEdit_getOS20Configfile->setText(fields[18]);
+        ui->lineEdit_getOS3Configfile->setText(fields[19]);
+        ui->lineEdit_getOS4Configfile->setText(fields[20]);
+        ui->comboBox_defaultEmulator->setCurrentText(fields[21]);
+        // TAB: Misc
+        ui->comboBoxDefaultStyle->setCurrentText(fields[22]);
+        if(fields[23] == "1")
+            ui->checkBoxStylesheet->setChecked(true);
+        else
+            ui->checkBoxStylesheet->setChecked(false);
+        if(fields[24] == "1")
+            ui->checkBoxIndentationLines->setChecked(true);
+        else
+            ui->checkBoxIndentationLines->setChecked(false);
+        if(fields[25] == "1")
+            ui->checkBoxDebugOutput->setChecked(true);
+        else
+            ui->checkBoxDebugOutput->setChecked(false);
+        ui->comboBoxDefaultCompiler->setCurrentText(fields[26]);
+    }
+
+    return line;
+}
+
+
+void PrefsDialog::on_btn_SavePrefs_clicked()
+{
+    save_mySettings();
+//    // Collect values, store them in $HOMEDIR/.amigaed/ace.prefs
+//    // TAB: Project
+//    myPrefs << ui->lineEdit_author->text() << ui->lineEdit_email->text() << ui->lineEdit_website->text() << ui->lineEdit_description->text() << ui->lineEdit_purpose->text() << ui->lineEdit_projectsRootDir->text();
+//    // TAB: GCC
+//    myPrefs << ui->lineEdit_getGCCexefile->text() << ui->lineEdit_getGPPexefile->text() << ui->lineEdit_getMAKEexefile->text() << ui->lineEdit_getSTRIPexefile->text() << ui->lineEdit_GCCdefaultOpts->text() << ui->lineEdit_GPPdefaultOpts->text();
+//    // TAB: VBCC
+//    myPrefs << ui->lineEdit_getVCexefile->text() << ui->lineEdit_getVASMexefile->text() << ui->lineEdit_getVCconfigDir->text() << ui->lineEdit_VCdefaultOpts->text();
+//    // TAB: Emulator
+//    myPrefs << ui->lineEdit_getEmulatorExefile->text() << ui->lineEdit_getOS13Configfile->text() << ui->lineEdit_getOS20Configfile->text() << ui->lineEdit_getOS3Configfile->text() << ui->lineEdit_getOS4Configfile->text() << ui->comboBox_defaultEmulator->currentText();
+//    // TAB: Misc
+//    myPrefs << ui->comboBoxDefaultStyle->currentText() << QString::number(ui->checkBoxStylesheet->isChecked()) << QString::number(ui->checkBoxIndentationLines->isChecked()) << QString::number(ui->checkBoxDebugOutput->isChecked()) << ui->comboBoxDefaultCompiler->currentText();
+
+//     //Debug:
+//     for (int i = 0; i < myPrefs.size(); ++i)
+//             qDebug() << myPrefs.at(i).toLocal8Bit().constData();
+
+//    QString str = myPrefs.join(", ");
+
+//    // Construct file path to store values:
+//    QString filename = QDir::homePath();
+//    filename.append(QDir::separator());
+//    filename.append(".amigaed");
+//    // check if the folder exists!
+//    if(!(QDir(filename).exists()))
+//    {
+//        qDebug() << "Folder does not exist!";
+//        QDir dir(filename);
+//        dir.mkdir(filename);
+//    }
+//    filename.append(QDir::separator());
+//    filename.append("ace.prefs");
+//    // TODO: save values to $HOMEDIR/.amigaed/ace.prefs
+//    qDebug() << " prefs dir: " << filename;
+//    QFile file(filename);
+//    if (file.open(QIODevice::ReadWrite))
+//    {
+//        QTextStream stream(&file);
+//        stream << str << endl;
+//    }
+//    else
+//    {
+//        qDebug() << "File error!";
+//    }
+
+   this->close();  // quit PrefsDialog
+
+   QMessageBox::information(this, tr("Amiga Cross Editor"),
+                       tr("Prefs saved.\n"
+                          "Some changes might require to restart the Application in order to be activated!"),
+                            QMessageBox::Ok);
+}
+
+void PrefsDialog::on_btn_getProjectRootDir_clicked()
+{
+    // getDir dialog
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
+                                                 "/home",
+                                                 QFileDialog::ShowDirsOnly
+                                                 | QFileDialog::DontResolveSymlinks);
+    ui->lineEdit_projectsRootDir->setText(dir);
+
+
+}
+
+
+
+void finished(int exitCode, QProcess::ExitStatus exitStatus);
+void MainWindow::finished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    if(exitCode == 0)
+    {
+//        ui->actionStart_im_Emulator->setEnabled(true);
+//        ui->btnStart->setEnabled(true);
+//        ui->actionCompilieren->setDisabled(true);
+//        ui->btnCompile->setDisabled(true);
+//        ui->leSource->clear();
+//        ui->leTarget->clear();
+    }
+    else
+    {
+//        ui->actionStart_im_Emulator->setDisabled(true);
+//        ui->btnStart->setDisabled(true);
+//        ui->actionCompilieren->setDisabled(true);
+//        ui->btnCompile->setDisabled(true);
+
+    }
+    if(p_mydebug)
+        qDebug() << "Finished: " << exitCode;
+
+  if (exitStatus==QProcess::CrashExit || exitCode!=0)
+  {
+      createStatusBarMessage("Compiler error!", 0);
+      if(!(p_no_warn_requesters))
+      {
+          (void)QMessageBox::critical(this, tr("Amiga Cross Editor"),
+          tr("Build error!\n"
+          "Please check source for errors and recompile."),
+          QMessageBox::Ok);
+      }
+  }
+  else
+  {
+      // Let's check if the compiler produced an executable file:
+      if(fileExists(p_compiledFile))
+      {
+          createStatusBarMessage("Compiler run finished.", 0);
+          //ui->actionStart_im_Emulator->setEnabled(true);
+
+          (void)QMessageBox::information(this, tr("Amiga Cross Editor"),
+          tr("Successfully compiled.\n"
+          "You may now want to test it in UAE."),
+          QMessageBox::Ok);
+
+          createStatusBarMessage("Compiler run finished successfully.", 0);
+      }
+      else
+      {
+          //ui->actionStart_im_Emulator->setEnabled(true);
+
+          (void)QMessageBox::information(this, tr("Amiga Cross Editor"),
+          tr("No success in building your executable file!.\n"
+          "Please check for Errors and recompile."),
+          QMessageBox::Ok);
+
+          createStatusBarMessage("Compiler run finished unsuccessfully.", 0);
+      }
+
+  }
+}

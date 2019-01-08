@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>467</width>
+    <width>535</width>
     <height>366</height>
    </rect>
   </property>
@@ -27,52 +27,13 @@
    <item row="0" column="0" colspan="3">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>4</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tabProject">
       <attribute name="title">
        <string>Project</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="6" column="1">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Expanding</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>3</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Email:</string>
-         </property>
-         <property name="buddy">
-          <cstring>lineEdit_email</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="QLineEdit" name="lineEdit_purpose">
-         <property name="minimumSize">
-          <size>
-           <width>142</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>CHANGE_ME</string>
-         </property>
-        </widget>
-       </item>
        <item row="0" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
@@ -80,42 +41,6 @@
          </property>
          <property name="buddy">
           <cstring>lineEdit_author</cstring>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QLineEdit" name="lineEdit_description">
-         <property name="minimumSize">
-          <size>
-           <width>142</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>CHANGE_ME</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="lineEdit_website">
-         <property name="minimumSize">
-          <size>
-           <width>142</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>http://www.somewhere.com</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_30">
-         <property name="text">
-          <string>Purpose:</string>
-         </property>
-         <property name="buddy">
-          <cstring>lineEdit_website</cstring>
          </property>
         </widget>
        </item>
@@ -132,6 +57,52 @@
          </property>
         </widget>
        </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Email:</string>
+         </property>
+         <property name="buddy">
+          <cstring>lineEdit_email</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="lineEdit_email">
+         <property name="minimumSize">
+          <size>
+           <width>142</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>someone@somewhere.com</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Website:</string>
+         </property>
+         <property name="buddy">
+          <cstring>lineEdit_website</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLineEdit" name="lineEdit_website">
+         <property name="minimumSize">
+          <size>
+           <width>142</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>http://www.somewhere.com</string>
+         </property>
+        </widget>
+       </item>
        <item row="3" column="0">
         <widget class="QLabel" name="label_29">
          <property name="text">
@@ -139,6 +110,42 @@
          </property>
          <property name="buddy">
           <cstring>lineEdit_website</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="lineEdit_description">
+         <property name="minimumSize">
+          <size>
+           <width>142</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>CHANGE_ME</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_30">
+         <property name="text">
+          <string>Purpose:</string>
+         </property>
+         <property name="buddy">
+          <cstring>lineEdit_website</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QLineEdit" name="lineEdit_purpose">
+         <property name="minimumSize">
+          <size>
+           <width>142</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>CHANGE_ME</string>
          </property>
         </widget>
        </item>
@@ -169,6 +176,9 @@
              <height>25</height>
             </size>
            </property>
+           <property name="toolTip">
+            <string>Select default Root Folder for your Projects&lt;br&gt;&lt;b&gt;Tipp:&lt;/b&gt; Should be accessiable by one of your emulated Amiga systems!</string>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -180,28 +190,52 @@
          </item>
         </layout>
        </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="lineEdit_email">
-         <property name="minimumSize">
-          <size>
-           <width>142</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>someone@somewhere.com</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_3">
-         <property name="text">
-          <string>Website:</string>
-         </property>
-         <property name="buddy">
-          <cstring>lineEdit_website</cstring>
-         </property>
-        </widget>
+       <item row="6" column="0" colspan="2">
+        <layout class="QGridLayout" name="gridLayout_12">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_10">
+           <property name="toolTip">
+            <string>Select default icon to be copied to compiled program</string>
+           </property>
+           <property name="text">
+            <string>Default icon:</string>
+           </property>
+           <property name="buddy">
+            <cstring>lineEdit_projectsRootDir</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="lineEdit_getDefaultIcon">
+           <property name="toolTip">
+            <string>Select default icon to be copied to compiled program</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QPushButton" name="btn_getDefaultIcon">
+           <property name="maximumSize">
+            <size>
+             <width>31</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Select default icon to be copied to compiled program</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="application.qrc">
+             <normaloff>:/images/new.png</normaloff>:/images/new.png</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
@@ -977,6 +1011,9 @@
           </item>
           <item row="0" column="2">
            <widget class="QCheckBox" name="checkBoxCreateIcon">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
             <property name="text">
              <string>create icon</string>
             </property>
