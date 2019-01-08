@@ -3652,6 +3652,19 @@ void MainWindow::runCommand(QString command, QStringList arguments)
     }
     cmd->setProcessChannelMode(QProcess::MergedChannels);
 
+    // check if there's allready a compiled file with that name
+    // if it's there - delete it. Just to be sure...
+    bool fileExists = QFileInfo::exists(p_compiledFile) && QFileInfo(p_compiledFile).isFile();
+    if(fileExists)
+    {
+        if(p_mydebug)
+            qDebug() << "Executable allready exists. Now trying to delete!";
+        if(!(QFile::remove(p_compiledFile)))
+            // delete file first!
+            if(p_mydebug)
+                qDebug() << "Icon could not be deleted!";
+    }
+
     // Empty output widget
     output->clear();
     // Give message about started process:
