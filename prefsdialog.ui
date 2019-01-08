@@ -27,7 +27,7 @@
    <item row="0" column="0" colspan="3">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>4</number>
      </property>
      <widget class="QWidget" name="tabProject">
       <attribute name="title">
@@ -1013,6 +1013,9 @@
            <widget class="QCheckBox" name="checkBoxCreateIcon">
             <property name="enabled">
              <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>Create an icon for your successfully compiled Amiga program</string>
             </property>
             <property name="text">
              <string>create icon</string>

@@ -161,6 +161,7 @@ public slots:
     void readCommand();
     int stopCommand(int exitCode, QProcess::ExitStatus exitStatus);
     void actionKillEmulator();
+    void finished(int exitCode, QProcess::ExitStatus exitStatus);
 
 
 private slots:
@@ -173,6 +174,7 @@ private slots:
     bool saveAs();                                  // saves current file as...
     void about();                                   // pops up "about" MessageBox
     void startPrefs();                              // Workaround to start prefsDialog with a parameter
+    void setEmulatorMenu();                         // disable emulator menu entries if no config was specified
 
     // GUI creation...
     void initializeGUI();

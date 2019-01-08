@@ -70,7 +70,8 @@
 
 
 // Processes to start:
-static QProcess myProcess;      // the process for running the compiler
+static QProcess myProcess;      // the process for using as spare for further extensions
+static QProcess cmd;            // the process for running the compiler
 static QProcess myEmulator;     // the process for running the emulator
 
 // Open MainWindow with given filename...
@@ -115,6 +116,8 @@ MainWindow::MainWindow(QString cmdFileName)
     initializeGUI();    // most initializations are done within tis method!
     activateGUIdefaultSettings();
 
+    setEmulatorMenu();  // disable emulator menu entries if no config was set
+
     // disable Emulator kill menu entry by default
     killEmulatorAct->setDisabled(true);
 
@@ -133,7 +136,8 @@ MainWindow::MainWindow(QString cmdFileName)
     // process has some data to read
     connect(cmd, SIGNAL (readyRead()), this, SLOT (readCommand()));
     //process finished
-    connect(cmd, SIGNAL (finished(int, QProcess::ExitStatus)), this, SLOT (stopCommand(int, QProcess::ExitStatus)));
+    //connect(cmd, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT (stopCommand(int, QProcess::ExitStatus)));
+    QObject::connect(cmd, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished), this, &MainWindow::stopCommand);
 
     ////////////////////////////////////////////
     /// command line handling for file input //
@@ -2646,7 +2650,6 @@ bool MainWindow::actionEmulator()
     QString command = p_emulator;
     QStringList arguments;
 
-    qDebug() << "in Emulator";
     switch(p_defaultEmulator)
     {
         case 0:
@@ -2677,6 +2680,8 @@ bool MainWindow::actionEmulator()
                         "Please revisit the Prefs editor and name a configuration.<br>"
                         "<br>This helps, ya know?!",
                         QMessageBox::Ok);
+
+        actionPrefsDialog(3);
 
         return (false);
     }
@@ -3253,7 +3258,6 @@ void MainWindow::initializeGUI()
     QObject::connect(&myProcess, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(finished(int,QProcess::ExitStatus)));
     QObject::connect(&myProcess, SIGNAL(readyReadStandardOutput()), this, SLOT(compiler_readyReadStandardOutput()));
     QObject::connect(&myProcess, SIGNAL(started()), this, SLOT(started()));
-
 }
 
 //
@@ -3660,12 +3664,15 @@ void MainWindow::runCommand(QString command, QStringList arguments)
 void MainWindow::readCommand(){
     output->append(cmd->readAll()); // output is QTextBrowser
 }
+
 int MainWindow::stopCommand(int exitCode, QProcess::ExitStatus exitStatus)
 {
     output->append(cmd->readAll());
     output->append("cmd finished:\t");
     output->append(QString::number(exitCode));
-    qDebug() << "exitCode: " << QString::number(exitCode);
+    if(p_mydebug)
+        qDebug() << "In stopCommand()\nexitCode: " << QString::number(exitCode);
+
     if(QString::number(exitCode) == "0")
     {
         createStatusBarMessage(tr("File compiled."), 0);
@@ -3727,6 +3734,18 @@ int MainWindow::stopCommand(int exitCode, QProcess::ExitStatus exitStatus)
                 {
                     // get executable path and build icon filename
                     QString iconcopyfile = p_compiledFile + ".info";
+                    bool fileExists = QFileInfo::exists(iconcopyfile) && QFileInfo(iconcopyfile).isFile();
+
+                    // check if icon is allready there and delete it in that case!
+                    if(fileExists)
+                    {
+                        if(p_mydebug)
+                            qDebug() << "Icon allready exists. Now trying to delete!";
+                        if(!(QFile::remove(iconcopyfile)))
+                            // delete icon file first!
+                            if(p_mydebug)
+                                qDebug() << "Icon could not be deleted!";
+                    }
 
                     // copy icon file to that path..
                     if(!(QFile::copy(p_default_icon, iconcopyfile)))
@@ -3782,7 +3801,7 @@ void MainWindow::startPrefs()
 }
 
 //
-// HELPER: wait some time withou freezing the gui
+// HELPER: wait some time without freezing the gui
 //
 void MainWindow::delay()
 {
@@ -3791,5 +3810,93 @@ void MainWindow::delay()
         QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
 }
 
+//
+// HELPER: disable Emulator menu entries if no configuration was specified
+//
+void MainWindow::setEmulatorMenu()
+{
+    if(p_os13_config.isEmpty())
+        emulator13Act->setDisabled(true);
+    else
+        emulator13Act->setEnabled(true);
+
+    if(p_os20_config.isEmpty())
+        emulator20Act->setDisabled(true);
+    else
+        emulator20Act->setEnabled(true);
+
+    if(p_os30_config.isEmpty())
+        emulator30Act->setDisabled(true);
+    else
+        emulator30Act->setEnabled(true);
+
+    if(p_os40_config.isEmpty())
+        emulator40Act->setDisabled(true);
+    else
+        emulator40Act->setEnabled(true);
+}
+
+//
+// Convenience method - will never really be executed...
+void MainWindow::finished(int exitCode, QProcess::ExitStatus exitStatus)
+{
+    if(p_mydebug)
+        qDebug() << "We are in MainWindow::finished\n(...this place should have never been reached.)\nThis is the exitCode: " << exitCode;
+
+    if(exitCode == 0)
+    {
+        if(p_mydebug)
+            qDebug() << "Finished: " << exitCode;
+
+    }
+    else
+    {
+        if(p_mydebug)
+            qDebug() << "ExitCode " << exitCode;
+
+    }
+    if(p_mydebug)
+        qDebug() << "Finished: " << exitCode;
+
+  if (exitStatus==QProcess::CrashExit || exitCode!=0)
+  {
+      createStatusBarMessage("Compiler error!", 0);
+      if(!(p_no_warn_requesters))
+      {
+          (void)QMessageBox::critical(this, tr("Amiga Cross Editor"),
+          tr("Build error!\n"
+          "Please check source for errors and recompile."),
+          QMessageBox::Ok);
+      }
+  }
+  else
+  {
+      // Let's check if the compiler produced an executable file:
+      if(fileExists(p_compiledFile))
+      {
+          createStatusBarMessage("Compiler run finished.", 0);
+          //ui->actionStart_im_Emulator->setEnabled(true);
+
+          (void)QMessageBox::information(this, tr("Amiga Cross Editor"),
+          tr("Successfully compiled.\n"
+          "You may now want to test it in UAE."),
+          QMessageBox::Ok);
+
+          createStatusBarMessage("Compiler run finished successfully.", 0);
+      }
+      else
+      {
+          //ui->actionStart_im_Emulator->setEnabled(true);
+
+          (void)QMessageBox::information(this, tr("Amiga Cross Editor"),
+          tr("No success in building your executable file!.\n"
+          "Please check for Errors and recompile."),
+          QMessageBox::Ok);
+
+          createStatusBarMessage("Compiler run finished unsuccessfully.", 0);
+      }
+
+  }
+}
 
 
