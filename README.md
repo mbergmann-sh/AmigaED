@@ -116,6 +116,7 @@ Since there aren't too many working examples on how to write an advanced editor 
 Developing and enhancing this example code is kind of time intensive, though a whole lot of fun. If you like my work and want to support the developent of AmigaED with some beer, books or Espresso, feel free to donate to mb@mbergmann-sh.de via PayPal. Thanks for your support!
 
 # Screenshots
+![aced_testing_iconcreation](https://user-images.githubusercontent.com/23148422/50824174-21ef3f80-1336-11e9-955d-eda2ca12bb67.png)
 ![aced_compile](https://user-images.githubusercontent.com/23148422/50733066-a9964c00-1186-11e9-8a7b-5eb29e18adaa.png)
 ![aced_prefs](https://user-images.githubusercontent.com/23148422/50733067-a9964c00-1186-11e9-8dc6-0ab818d6f368.png)
 ![aced_prefs_uae](https://user-images.githubusercontent.com/23148422/50733068-aa2ee280-1186-11e9-8df9-b134e33c1dce.png)
