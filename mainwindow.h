@@ -458,7 +458,7 @@ private:
     bool p_versionstring_set = false;
     int p_proc_is_started = 0;
     int p_index = 0;
-    qint64 proc_pid;
+    Q_PID proc_pid;
 
 
 protected:

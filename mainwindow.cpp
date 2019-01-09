@@ -2692,7 +2692,9 @@ bool MainWindow::actionEmulator()
     createStatusBarMessage(tr("Attempting to start UAE..."), 0);
 
     myEmulator.start(command, arguments);
-    qDebug() << "process pid: " << myEmulator.pid();
+    if(p_mydebug)
+        qDebug() << "process pid: " << myEmulator.pid();
+
     // save process pid for termination checking!
     proc_pid = myEmulator.pid();
 
@@ -2742,7 +2744,8 @@ void MainWindow::actionKillEmulator()
     disconnect(&myEmulator, 0, 0, 0);
     myEmulator.terminate();
 
-    qDebug() <<"PID after kill: " << myEmulator.pid();
+    if(p_mydebug)
+        qDebug() <<"PID after kill: " << myEmulator.pid();
 
     // wait ome time, so OS has time to delete PID!
     delay();
