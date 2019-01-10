@@ -355,6 +355,11 @@ void MainWindow::createActions()
     prefsAct->setStatusTip(tr("Open global preferences..."));
     connect(prefsAct, SIGNAL(triggered()), this, SLOT(startPrefs()));
 
+    prefsReloadAct = new QAction(tr("Reload settings"), this);
+    prefsReloadAct->setShortcut(tr("Shift+F12"));
+    prefsReloadAct->setStatusTip(tr("Reload global settings..."));
+    connect(prefsReloadAct, SIGNAL(triggered()), this, SLOT(readSettings()));
+
     printAct = new QAction(QIcon(":/images/printer.png"),tr("&Print file..."), this);
     printAct->setShortcut(tr("Ctrl+p"));
     printAct->setStatusTip(tr("Prepare for printing..."));
@@ -461,12 +466,14 @@ void MainWindow::createActions()
 
     /* --- Build -----------------------------------------------------------------------*/
     selectCompilerVBCCAct = new QAction(tr("VBCC vc (C mode only)..."), this);
+    selectCompilerVBCCAct->setShortcut(tr("Shift+Ctrl+v"));
     selectCompilerVBCCAct->setStatusTip(tr("Set Compiler to VBCC (C mode only)..."));
     selectCompilerVBCCAct->setCheckable(true);
     selectCompilerVBCCAct->setChecked(false);
     connect(selectCompilerVBCCAct, SIGNAL(triggered()), this, SLOT(actionSelectCompilerVBCC()));
 
     selectCompilerGCCAct = new QAction(tr("GNU gcc (C mode)..."), this);
+    selectCompilerGCCAct->setShortcut(tr("Shift+Ctrl+g"));
     selectCompilerGCCAct->setStatusTip(tr("Set Compiler to GNU gcc (C mode)..."));
     selectCompilerGCCAct->setCheckable(true);
     selectCompilerGCCAct->setChecked(false);
@@ -747,6 +754,7 @@ void MainWindow::createMenus()
     fileMenue->addAction(printAct);
     fileMenue->addSeparator();
     fileMenue->addAction(prefsAct);
+    fileMenue->addAction(prefsReloadAct);
     fileMenue->addSeparator();
     fileMenue->addAction(exitAct);
 

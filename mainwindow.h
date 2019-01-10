@@ -162,6 +162,7 @@ public slots:
     int stopCommand(int exitCode, QProcess::ExitStatus exitStatus);
     void actionKillEmulator();
     void finished(int exitCode, QProcess::ExitStatus exitStatus);
+    void readSettings();                                // read app settings
 
 
 private slots:
@@ -272,7 +273,6 @@ private:
     // GUI methods...
     void SetLexerAtFileExtension(QString fileName);     // Helper to set approbiate Lexer according to a file's .ext
     void actionSelectCompiler(int index);               // Helper for selcting a compiler to use
-    void readSettings();                                // read app settings
     void writeSettings();                               // write app settings
     bool maybeSave();                                   // will be called if user quits while text has changed
     int loadNonExistantFile(const QString &fileName);   // ask for creation if a file does NOT exist (used for command line loading)
@@ -338,6 +338,7 @@ private:
     QAction *saveAct;               // save file
     QAction *saveAsAct;             // save file as...
     QAction *prefsAct;              // open prefs dialog
+    QAction *prefsReloadAct;        // reload prefs
     QAction *printAct;              // print current file
     QAction *exitAct;               // quit the app
     // Actions for editMenue
