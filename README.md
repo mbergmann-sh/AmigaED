@@ -8,8 +8,8 @@ Send beer cans, pizza vouchers and other usefull stuff that coders need directly
 Thanks and have fun with Amiga Cross Editor!
 
 # Known bugs
-- Compiler fails if path to source contains whitespace (detected under Windows first) - no intention to fix this ATM, please use folders without whitespace for your pathes!!!
-- Thread handling under Windows broken ATM
+- Compiler fails if path to source contains whitespace (detected under Windows first) - no intention to fix this ATM, please use folders without whitespace for your pathes!!! Needs complete rewrite of the ways QStringList commands is constructed.
+
 
 # LICENSE
 Copyright (C) 2018/2019 by Michael Bergmann. Placed in the public domain with some restrictions!
