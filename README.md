@@ -7,6 +7,10 @@ Beta-testers please send bug reports, wishlists, suggestions, errata to amigaed@
 Send beer cans, pizza vouchers and other usefull stuff that coders need directly to my postal adress. If you can't find it and want to support my work, you might consider to make a donation of your likes to my paypal account: mb@mbergmann-sh.de
 Thanks and have fun with Amiga Cross Editor!
 
+# Known bugs
+- Compiler fails if path to source contains whitespace (detected under Windows first)
+- Thread handling under Windows broken ATM
+
 # LICENSE
 Copyright (C) 2018/2019 by Michael Bergmann. Placed in the public domain with some restrictions!
 
