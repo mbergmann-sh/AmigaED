@@ -533,7 +533,7 @@ void MainWindow::createActions()
     emulator40Act->setStatusTip(tr("Start Amiga Emulation..."));
     connect(emulator40Act, SIGNAL(triggered()), this, SLOT(actionEmuOS40()));
 
-    killEmulatorAct = new QAction(QIcon(":/images/fileexit.png"), tr("Stop running Emulation..."), this);
+    killEmulatorAct = new QAction(QIcon(":/images/noworkbench.png"), tr("Stop running Emulation..."), this);
     killEmulatorAct->setShortcut(tr("Alt+s"));
     killEmulatorAct->setStatusTip(tr("Stop Amiga Emulation..."));
     connect(killEmulatorAct, SIGNAL(triggered()), this, SLOT(actionKillEmulator()));
@@ -934,7 +934,9 @@ void MainWindow::createToolBars()
 
     buildToolBar = addToolBar(tr("Build"));
     buildToolBar->addAction(compileAct);
+    buildToolBar->addSeparator();
     buildToolBar->addAction(emulatorAct);
+    buildToolBar->addAction(killEmulatorAct);
 
     toolsToolBar = addToolBar(tr("Navigation"));
     toolsToolBar->addAction(exitAct);
@@ -975,12 +977,17 @@ void MainWindow::readSettings()
     p_strip = (settings.value("GCC/StripPath").toString());
     p_compiler_gcc_call = (settings.value("GCC/GccDefaultOpts").toString());
     p_compiler_gpp_call = (settings.value("GCC/GppDefaultOpts").toString());
+    p_show_gcc_opts = (settings.value("GCC/ShowGccDefaultOpts").toBool());
 
     // TAB: VBCC
     p_compiler_vc = (settings.value("VBCC/VcPath").toString());
     p_compiler_vasm = (settings.value("VBCC/VasmPath").toString());
     p_vbcc_config_dir = (settings.value("VBCC/VcConfigPath").toString());
-    p_compiler_vc_call = (settings.value("VBCC/VcDefaultOpts").toString());
+    p_compiler_vc13_call = (settings.value("VBCC/VcDefaultOpts13").toString());
+    p_compiler_vc30_call = (settings.value("VBCC/VcDefaultOpts30").toString());
+    p_compiler_vc40_call = (settings.value("VBCC/VcDefaultOpts40").toString());
+    p_compiler_vc_default_target = (settings.value("VBCC/VcDefaultTarget").toInt());
+    p_show_vbcc_opts = (settings.value("VBCC/ShowVbccDefaultOpts").toBool());
 
     // TAB: Emulator
     p_emulator = (settings.value("UAE/UaePath").toString());
@@ -1388,13 +1395,29 @@ void MainWindow::SelectCompiler(int index)
 
     switch(index)
     {
+        // VBCC
         case 0:
+            switch(p_compiler_vc_default_target)
+            {
+                // OS 1.3
+                case 0:
+                    p_selected_compiler_args = p_compiler_vc13_call;
+                    break;
+                // OS 3.x
+                case 1:
+                    p_selected_compiler_args = p_compiler_vc30_call;
+                    break;
+                // OS 4.1
+                case 2:
+                    p_selected_compiler_args = p_compiler_vc40_call;
+                    break;
+            }
             p_selected_compiler = p_compiler_vc;
-            p_selected_compiler_args = p_compiler_vc_call;
             p_compiledFileSuffix = "_vc";
             // check selected menu item, uncheck others
             selectCompilerVBCCAct->setChecked(true);
             break;
+         // GCC
         case 1:
             p_selected_compiler = p_compiler_gcc;
             p_selected_compiler_args = p_compiler_gcc_call;
@@ -1402,6 +1425,7 @@ void MainWindow::SelectCompiler(int index)
             // check selected menu item, uncheck others
             selectCompilerGCCAct->setChecked(true);
             break;
+        // G++
         case 2:
             p_selected_compiler = p_compiler_gpp;
             p_selected_compiler_args = p_compiler_gpp_call;
@@ -1436,6 +1460,7 @@ void MainWindow::actionCloseOutputConsole()
 void MainWindow::actionShowOutputConsole()
 {
     outputGroup->show();
+    jumpCompilerWarnings();
 }
 
 //
@@ -1464,7 +1489,7 @@ int MainWindow::actionCompile()
     }
 
     // check if we have valid compiler arguments in prefs:
-    if(p_compiler_gcc_call.isEmpty() || p_compiler_gpp_call.isEmpty())
+    if(p_compiler_gcc_call.isEmpty() || p_compiler_gpp_call.isEmpty() || p_compiler_vc13_call.isEmpty() || p_compiler_vc30_call.isEmpty() || p_compiler_vc40_call.isEmpty())
     {
         if(p_mydebug)
             qDebug() << "in actionCompile:\nNo valid arguments selected in prefs!\n";
@@ -1566,9 +1591,39 @@ int MainWindow::actionCompile()
         if(p_mydebug)
             qDebug() << "START: Proc started " << p_proc_is_started << " times.";
 
-        text = QInputDialog::getText(this, mbox_title,
-                                           tr("Compiler Options:"), QLineEdit::Normal,
-                                           p_selected_compiler_args, &ok);
+        if(selectCompilerGCCAct->isChecked() || selectCompilerGPPAct->isChecked())
+        {
+            if(p_show_gcc_opts)
+            {
+                text = QInputDialog::getText(this, mbox_title,
+                                                   tr("Compiler Options:"), QLineEdit::Normal,
+                                                   p_selected_compiler_args, &ok);
+            }
+            else
+            {
+                ok = true;
+                text = p_selected_compiler_args;
+            }
+        }
+        else
+        {
+            if(p_show_vbcc_opts)
+            {
+                text = QInputDialog::getText(this, mbox_title,
+                                                   tr("Compiler Options:"), QLineEdit::Normal,
+                                                   p_selected_compiler_args, &ok);
+            }
+            else
+            {
+                ok = true;
+                text = p_selected_compiler_args;
+            }
+        }
+
+
+//        text = QInputDialog::getText(this, mbox_title,
+//                                           tr("Compiler Options:"), QLineEdit::Normal,
+//                                           p_selected_compiler_args, &ok);
         if (ok && !text.isEmpty())
         {
             save();
@@ -2893,7 +2948,8 @@ void MainWindow::actionSearch()
     if (ok && !text.isEmpty())
     {
         qDebug() << text;
-        textEdit->SendScintilla(QsciScintillaBase::SCI_INDICSETSTYLE, 0, 7);
+        textEdit->SendScintilla(QsciScintillaBase::SCI_INDICSETSTYLE, 0, QsciScintilla::INDIC_FULLBOX);
+        textEdit->SendScintilla(QsciScintillaBase::SCI_INDICSETFORE,0, QColor(Qt::blue));
 
         QString docText = textEdit->text();
         int end = docText.lastIndexOf(text);
@@ -2912,6 +2968,38 @@ void MainWindow::actionSearch()
     }
 }
 
+
+//
+// find strings "error", "Warning" and "file" in output pane - make their line information jumpable
+//
+void MainWindow::jumpCompilerWarnings()
+{
+    qDebug() << "in jumpToCompilerWarnings";
+
+    QString text = "error";
+
+    if (!(text.isEmpty()))
+    {
+        qDebug() << text;
+        output->SendScintilla(QsciScintillaBase::SCI_INDICSETSTYLE, 0, QsciScintilla::INDIC_FULLBOX);
+        output->SendScintilla(QsciScintillaBase::SCI_INDICSETFORE,0, QColor(Qt::red));
+
+        QString docText = output->text();
+        int end = docText.lastIndexOf(text);
+        int cur = -1;
+
+        if(end != -1)
+        {
+            while(cur != end)
+            {
+                cur = docText.indexOf(text,cur+1);
+                output->SendScintilla(QsciScintillaBase::SCI_INDICATORFILLRANGE,cur,
+                    text.length());
+            }
+        }
+
+    }
+}
 
 //
 // set default fonts, depending on OS
@@ -3624,7 +3712,7 @@ void MainWindow::debugVars()
         qDebug() << "p_compiler_vc: " << p_compiler_vc;
         qDebug() << "pp_compiler_vasm: " << p_compiler_vasm;
         qDebug() << "p_vbcc_config_dir: " << p_vbcc_config_dir;
-        qDebug() << "p_compiler_vc_call: " << p_compiler_vc_call;
+        qDebug() << "p_compiler_vc13_call: " << p_compiler_vc13_call;
         // TAB: Emulator
         qDebug() << "p_emulator: " << p_emulator;
         qDebug() << "p_os13_config: " << p_os13_config;

@@ -20,6 +20,9 @@ PrefsDialog::PrefsDialog(QWidget *parent, int tabindex) :
     // set items for default compiler combobox:
     ui->comboBoxDefaultCompiler->addItems(p_Compilers);
 
+    // make "Cancel" the default button
+    ui->btn_CancelSave->setFocus();
+
     // load global configuration
     load_mySettings();
     simpleStatusbar();
@@ -256,12 +259,17 @@ void PrefsDialog::save_mySettings()
     mySettings.setValue("GCC/StripPath", ui->lineEdit_getSTRIPexefile->text());
     mySettings.setValue("GCC/GccDefaultOpts", ui->lineEdit_GCCdefaultOpts->text());
     mySettings.setValue("GCC/GppDefaultOpts", ui->lineEdit_GPPdefaultOpts->text());
+    mySettings.setValue("GCC/ShowGccDefaultOpts", ui->checkBox_ShowGccOpts->isChecked());
 
     // TAB: VBCC
     mySettings.setValue("VBCC/VcPath", ui->lineEdit_getVCexefile->text());
     mySettings.setValue("VBCC/VasmPath", ui->lineEdit_getVASMexefile->text());
     mySettings.setValue("VBCC/VcConfigPath", ui->lineEdit_getVCconfigDir->text());
-    mySettings.setValue("VBCC/VcDefaultOpts", ui->lineEdit_VCdefaultOpts->text());
+    mySettings.setValue("VBCC/VcDefaultOpts13", ui->lineEdit_VCdefaultOptsOS13->text());
+    mySettings.setValue("VBCC/VcDefaultOpts30", ui->lineEdit_VCdefaultOptsOS30->text());
+    mySettings.setValue("VBCC/VcDefaultOpts40", ui->lineEdit_VCdefaultOptsOS40->text());
+    mySettings.setValue("VBCC/VcDefaultTarget", ui->comboBoxVbccDefaultTargetOS->currentIndex());
+    mySettings.setValue("VBCC/ShowVbccDefaultOpts", ui->checkBox_ShowVbccOpts->isChecked());
 
     // TAB: Emulator
      mySettings.setValue("UAE/UaePath", ui->lineEdit_getEmulatorExefile->text());
@@ -303,12 +311,17 @@ void PrefsDialog::load_mySettings()
     ui->lineEdit_getSTRIPexefile->setText(mySettings.value("GCC/StripPath").toString());
     ui->lineEdit_GCCdefaultOpts->setText(mySettings.value("GCC/GccDefaultOpts").toString());
     ui->lineEdit_GPPdefaultOpts->setText(mySettings.value("GCC/GppDefaultOpts").toString());
+    ui->checkBox_ShowGccOpts->setChecked(mySettings.value("GCC/ShowGccDefaultOpts").toBool());
 
     // TAB: VBCC
     ui->lineEdit_getVCexefile->setText(mySettings.value("VBCC/VcPath").toString());
     ui->lineEdit_getVASMexefile->setText(mySettings.value("VBCC/VasmPath").toString());
     ui->lineEdit_getVCconfigDir->setText(mySettings.value("VBCC/VcConfigPath").toString());
-    ui->lineEdit_VCdefaultOpts->setText(mySettings.value("VBCC/VcDefaultOpts").toString());
+    ui->lineEdit_VCdefaultOptsOS13->setText(mySettings.value("VBCC/VcDefaultOpts13").toString());
+    ui->lineEdit_VCdefaultOptsOS30->setText(mySettings.value("VBCC/VcDefaultOpts30").toString());
+    ui->lineEdit_VCdefaultOptsOS40->setText(mySettings.value("VBCC/VcDefaultOpts40").toString());
+    ui->checkBox_ShowVbccOpts->setChecked(mySettings.value("VBCC/ShowVbccDefaultOpts").toBool());
+    ui->comboBoxVbccDefaultTargetOS->setCurrentIndex(mySettings.value("VBCC/VcDefaultTarget").toInt());
 
     // TAB: Emulator
     ui->lineEdit_getEmulatorExefile->setText(mySettings.value("UAE/UaePath").toString());

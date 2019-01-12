@@ -100,43 +100,46 @@ public:
     QString p_default_icon;
     QString p_compiler ;                     // C-Compiler to call...
     QString p_compiler_call;
-    QString p_compiler_gcc;
-    QString p_compiler_gpp ;
-    QString p_compiler_vc;
-    QString p_compiler_vasm;
-    QString p_compiler_gcc_call;                // Arguments for compilation..
-    QString p_compiler_vc_call;
-    QString p_compiler_gpp_call;
-    QString p_selected_compiler;
-    QString p_selected_compiler_args;
-    QString p_vbcc_config_dir;
-    QString p_make;
-    QString p_strip;
-    QString p_compiledFile;                                                     // keep the currently compiled file for file checking
-    QString p_compiledFileSuffix;                                               // keep filename suffix for compiled output
-    QFileInfo p_stripped_name;
-    //QString p_projectdir;
-    QString p_emulator;
-    QString p_os13_config;
-    QString p_os20_config;
-    QString p_os30_config;
-    QString p_os40_config;
-    int p_defaultEmulator;
-    QString p_emulator_to_start;    // Argument for default OS to start, depends on p_defaultEmulator
-    QString p_projectsRootDir;
+    QString p_compiler_gcc;             // Path to gcc executable
+    QString p_compiler_gpp;             // Path to g++ executable
+    QString p_compiler_vc;              // Path to vc executable
+    QString p_compiler_vasm;            // Path to vasm executable (unused ATM)
+    QString p_compiler_gcc_call;                // Arguments for compilation with gcc (C-Mode)..
+    QString p_compiler_gpp_call;                // Arguments for compilation with g++ (C++ Mode)..
+    QString p_compiler_vc13_call;               // Arguments for vbcc targetting OS 1.3
+    QString p_compiler_vc30_call;               // Arguments for vbcc targetting OS 2.x up to OS 3.x
+    QString p_compiler_vc40_call;               // Arguments for vbcc targetting OS 4.1
+    int  p_compiler_vc_default_target;          // holds combobox value of selected vbcc default target (OSses 1.3 up to 4.1)
+    QString p_selected_compiler;                // holds value of compiler to use for recent compilation
+    QString p_selected_compiler_args;           // holds value for default compiler args to use (constructed in method 'startCompiler()' )
+    QString p_vbcc_config_dir;                  // Path to vbcc config dir, unused ATM
+    QString p_make;                             // Path to make, unused ATM
+    QString p_strip;                            // Path to strip, unused ATM
+    QString p_compiledFile;                     // keep the currently compiled file for file checking
+    QString p_compiledFileSuffix;               // keep filename suffix for compiled output
+    QFileInfo p_stripped_name;                  // stripped filename for constructing exe file name and icon
+    QString p_emulator;             // path to emulator to start, used as 'command'
+    QString p_os13_config;          // path to OS 1.3 emulator config-file, used as 'argument'
+    QString p_os20_config;          // path to OS 2.1 emulator config-file, used as 'argument'
+    QString p_os30_config;          // path to OS 3.x emulator config-file, used as 'argument'
+    QString p_os40_config;          // path to OS 4.1 emulator config-file, used as 'argument'
+    int p_defaultEmulator;          // default emulator to start, setted by prefs > emulator tab combobox
+    QString p_emulator_to_start;    // Argument for default OS to start in UAE, depends on p_defaultEmulator
+    QString p_projectsRootDir;      // Path to default folder to store projects in (use that path as a hd mount in UAE in order to test compiled app!)
     QStringList p_Compilers = {"VBCC (C mode only)", "GNU gcc (C mode)", "GNU g++ (C++ mode)"};    // used for building compiler preselection combobox entries
-    int p_defaultCompiler;      // set from prefs file
-    QString p_default_style;    // set from prefs file
-    bool p_blackish;            // use blackish stylesheet?
-    bool p_show_indentation;    // show indentation guidelines by default?
-    // show or hide debugging informations
-    bool p_mydebug = false;
+    int p_defaultCompiler;          // set from prefs file
+    QString p_default_style;        // set from prefs file
+    bool p_blackish;                // use blackish stylesheet?
+    bool p_show_indentation;        // show indentation guidelines by default?
+    bool p_mydebug = false;         // show or hide debugging informations
     bool p_no_lcd_statusbar;        // use normal text instead of LCD for cursor position view
     bool p_no_compilerbuttons;      // hide compiler selector and compile button from statusbar
     bool p_simple_statusbar;        // show basic statusbar only
     bool p_create_icon;             // create icon for compiled program?
     bool p_console_on_fail;         // open console only if compilation fails
     bool p_no_warn_requesters;      // reduce messegebox show-up
+    bool p_show_gcc_opts;           // show options requester every time compilation with gcc/g++ is triggered?
+    bool p_show_vbcc_opts;          // show options requester every time compilation with vbcc is triggered?
 
     // Setter for prefs vars
     void setCompilerGCC(QString compiler);
@@ -163,6 +166,7 @@ public slots:
     void actionKillEmulator();
     void finished(int exitCode, QProcess::ExitStatus exitStatus);
     void readSettings();                                // read app settings
+    void jumpCompilerWarnings();                        // jump to error or warning, load file of occurance if not opened (unfinisched yet!)
 
 
 private slots:

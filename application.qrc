@@ -18,5 +18,6 @@
         <file>images/prefs.png</file>
         <file>images/amiga_classic.png</file>
         <file>images/aced-logo.png</file>
+        <file>images/noworkbench.png</file>
     </qresource>
 </RCC>
