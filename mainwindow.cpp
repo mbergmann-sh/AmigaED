@@ -485,6 +485,18 @@ void MainWindow::createActions()
     selectCompilerGPPAct->setChecked(false);
     connect(selectCompilerGPPAct, SIGNAL(triggered()), this, SLOT(actionSelectCompilerGPP()));
 
+    toggleGccDefaultOptsAct = new QAction(tr("Show gcc/g++ options dialog..."), this);
+    toggleGccDefaultOptsAct->setCheckable(true);
+    toggleGccDefaultOptsAct->setChecked(p_show_gcc_opts);
+    toggleGccDefaultOptsAct->setStatusTip(tr("Show or hide gcc/g++ options dialog"));
+    connect(toggleGccDefaultOptsAct, SIGNAL(triggered()), this, SLOT(actionToggleGccDefaultOptsDialog()));
+
+    toggleVbccDefaultOptsAct = new QAction(tr("Show vbcc options dialog..."), this);
+    toggleVbccDefaultOptsAct->setCheckable(true);
+    toggleVbccDefaultOptsAct->setChecked(p_show_vbcc_opts);
+    toggleVbccDefaultOptsAct->setStatusTip(tr("Show or hide vbcc options dialog"));
+    connect(toggleVbccDefaultOptsAct, SIGNAL(triggered()), this, SLOT(actionToggleVbccDefaultOptsDialog()));
+
     // this will put the compilers in our menue into a mutual exclusive
     // group for automatically checking/unchecking each other:
     compilerGroup = new QActionGroup(this);
@@ -841,6 +853,10 @@ void MainWindow::createMenus()
     buildMenue->addSeparator();
     buildMenue->addAction(showOutputAct);
     buildMenue->addAction(hideOutputAct);
+    buildMenue->addSeparator();
+    buildMenue->addAction(toggleGccDefaultOptsAct);
+    buildMenue->addAction(toggleVbccDefaultOptsAct);
+
 
     menuBar()->addSeparator();
 
@@ -1262,6 +1278,30 @@ QString MainWindow::strippedName(const QString &fullFileName)
 }
 
 //
+// react on toogle vbcc show options changed...
+//
+void MainWindow::actionToggleVbccDefaultOptsDialog()
+{
+    if(toggleVbccDefaultOptsAct->isChecked())
+        p_show_vbcc_opts = true;
+    else
+        p_show_vbcc_opts = false;
+}
+
+
+//
+// react on toogle gcc/g++ show options changed...
+//
+void MainWindow::actionToggleGccDefaultOptsDialog()
+{
+    if(toggleGccDefaultOptsAct->isChecked())
+        p_show_gcc_opts = true;
+    else
+        p_show_gcc_opts = false;
+}
+
+
+//
 // jump to line #1
 //
 // BUG: Shortcut not responding! To be fixed...
@@ -1585,13 +1625,15 @@ int MainWindow::actionCompile()
             mbox_title = "m68k-amigaos-g++";
 
 
+        // 'text' holds selected compiler args, 'ok' determines if to use them
         QString text = p_selected_compiler_args;
-
         bool ok;
+
         if(p_mydebug)
             qDebug() << "START: Proc started " << p_proc_is_started << " times.";
 
-        if(selectCompilerGCCAct->isChecked() || selectCompilerGPPAct->isChecked())
+        // Now let's check if user wants to see options dialog(s) for gcc, g++ and vc...
+        if(selectCompilerGCCAct->isChecked() || selectCompilerGPPAct->isChecked())          // Are gcc or g++ selected default compiler...?
         {
             if(p_show_gcc_opts)
             {
@@ -1605,7 +1647,7 @@ int MainWindow::actionCompile()
                 text = p_selected_compiler_args;
             }
         }
-        else
+        else    // ...NO? So vc must be the selected default compiler!
         {
             if(p_show_vbcc_opts)
             {
@@ -1618,12 +1660,8 @@ int MainWindow::actionCompile()
                 ok = true;
                 text = p_selected_compiler_args;
             }
-        }
+        }   // END checking for show/hide default compiler opts dialog
 
-
-//        text = QInputDialog::getText(this, mbox_title,
-//                                           tr("Compiler Options:"), QLineEdit::Normal,
-//                                           p_selected_compiler_args, &ok);
         if (ok && !text.isEmpty())
         {
             save();

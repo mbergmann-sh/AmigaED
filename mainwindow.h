@@ -259,6 +259,8 @@ private slots:
     void actionSelectCompilerVBCC();
     void actionSelectCompilerGCC();
     void actionSelectCompilerGPP();
+    void actionToggleGccDefaultOptsDialog();
+    void actionToggleVbccDefaultOptsDialog();
     // Splitter
     void actionCloseOutputConsole();
     void actionShowOutputConsole();
@@ -380,6 +382,8 @@ private:
     QAction *compileAct;                 // calls compilation of current file
     QAction *showOutputAct;              // pops up compiler output pane
     QAction *hideOutputAct;              // pops up compiler output pane
+    QAction *toggleGccDefaultOptsAct;    // show or hide gcc/g++ default options dialog
+    QAction *toggleVbccDefaultOptsAct;   // show or hide vc default options dialog
     // Actions for toolsMenue
     QAction *emulatorAct;             // start default UAE
     QAction *emulator13Act;           // start UAE with Workbench 1.3
