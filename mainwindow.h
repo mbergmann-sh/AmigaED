@@ -63,6 +63,9 @@
 #include <QSpacerItem>
 #include <QPushButton>
 #include <QShortcut>
+#include <QTimer>
+#include <QElapsedTimer>
+#include <QTime>
 
 #include <QDebug>
 
@@ -75,8 +78,16 @@ class QsciScintilla;
 class PrefsDialog;
 class aboutDialog;
 class SearchDialog;
+class QTimer;
+class QTime;
+class QElapsedTimer;
 class QtGui;
 
+#define CHECKTIME(x)  \
+    QElapsedTimer CONCAT(sb_, __LINE__); \
+    CONCAT(sb_, __LINE__).start(); \
+    x \
+    qDebug() << __FUNCTION__ << ":" << __LINE__ << " Elapsed time: " <<  CONCAT(sb_, __LINE__).elapsed() << " ms.";
 
 class MainWindow : public QMainWindow
 {
@@ -89,6 +100,10 @@ public:
 
     QString line;
     QStringList fields;
+    QTime timerCompile;         // Timer for compilation time
+    int nMilliseconds;          // keeping compile time
+    QString successMessage;     // build success message with compile time
+
 
     // vars for controlling file header comments
     QString p_purpose;

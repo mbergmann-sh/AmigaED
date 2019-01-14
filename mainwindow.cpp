@@ -1717,7 +1717,11 @@ int MainWindow::actionCompile()
             // put REAL compiler start HERE!
             // (uses p_compiler and p_compiler_call in mainwindow.h as default options)
             //
+            timerCompile.start();
             startCompiler();
+            nMilliseconds = timerCompile.elapsed();
+            qDebug() << "Compilation took " << nMilliseconds << "Milliseconds";
+
 
             // afterwards, reset everything to its defaults!
             text.clear();
@@ -3292,6 +3296,7 @@ void MainWindow::initializeGUI()
         this->compilerLabel = new QLabel(this);
         this->compilerCombo = new QComboBox(this);
         this->osCombo = new QComboBox(this);
+        osCombo->setMaximumWidth(70);
     }
 
     this->statusLabelX = new QLabel(this);
@@ -3350,7 +3355,7 @@ void MainWindow::initializeGUI()
         osCombo->addItems(p_targetOS);
         osCombo->setCurrentIndex(p_compiler_vc_default_target);
         osCombo->setDisabled(true);
-        osCombo->setStatusTip(tr("Chance VBCC default target OS"));
+        osCombo->setStatusTip(tr("Change VBCC default target OS"));
         statusBar()->addPermanentWidget(compilerButton);
         compilerButton->setStatusTip(tr("Compile current file..."));
     }
@@ -3888,19 +3893,21 @@ int MainWindow::stopCommand(int exitCode, QProcess::ExitStatus exitStatus)
     {
         // Let's check if the compiler produced an executable file:
         if(fileExists(p_compiledFile))
-        {
-            createStatusBarMessage("Compiler run finished.", 0);
-            //ui->actionStart_im_Emulator->setEnabled(true);
+        {            
+            successMessage = "Compiler run finished, took " + QString::number(nMilliseconds) + " mSecs";
+            createStatusBarMessage(successMessage, 0);
 
             if(!(p_no_warn_requesters))
             {
-                (void)QMessageBox::information(this, tr("Amiga Cross Editor"),
-                tr("Successfully compiled.\n"
-                "You may now want to test it in UAE."),
-            QMessageBox::Ok);
+                (void)QMessageBox::information(this, tr("Compilation finished - Amiga Cross Editor"),
+                tr("Successfully compiled.\nCompilation took %1 milliseconds to finish.\n\n"
+                "You may now want to test it in UAE.").arg(nMilliseconds),
+                QMessageBox::Ok);
             }
 
-            createStatusBarMessage("Compiler run finished successfully.", 0);
+            successMessage = "Compiler run finished successfully. Compile time: " + QString::number(nMilliseconds) + " mSecs";
+            createStatusBarMessage(successMessage, 0);
+
 
             // create icon for this app?
             if(p_create_icon)
@@ -3953,14 +3960,13 @@ int MainWindow::stopCommand(int exitCode, QProcess::ExitStatus exitStatus)
         }
         else
         {
-            //ui->actionStart_im_Emulator->setEnabled(true);
-
             (void)QMessageBox::information(this, tr("Amiga Cross Editor"),
             tr("No success in building your executable file!.\n"
             "Please check for Errors and recompile."),
             QMessageBox::Ok);
 
-            createStatusBarMessage("Compiler run finished unsuccessfully.", 0);
+            successMessage = "Compiler run finished successfully. Compile time: " + QString::number(nMilliseconds) + " mSecs";
+            createStatusBarMessage(successMessage, 0);
         }
 
     }
@@ -4083,20 +4089,19 @@ void MainWindow::finished(int exitCode, QProcess::ExitStatus exitStatus)
       // Let's check if the compiler produced an executable file:
       if(fileExists(p_compiledFile))
       {
-          createStatusBarMessage("Compiler run finished.", 0);
-          //ui->actionStart_im_Emulator->setEnabled(true);
+          successMessage = "Compiler run finished successfully. Compile time: " + QString::number(nMilliseconds) + " mSecs";
+          createStatusBarMessage(successMessage, 0);
 
-          (void)QMessageBox::information(this, tr("Amiga Cross Editor"),
-          tr("Successfully compiled.\n"
-          "You may now want to test it in UAE."),
+          (void)QMessageBox::information(this, tr("Compilation finished - Amiga Cross Editor"),
+          tr("Successfully compiled.\nCompilation took %1 milliseconds to finish.\n\n"
+          "You may now want to test it in UAE.").arg(nMilliseconds),
           QMessageBox::Ok);
 
-          createStatusBarMessage("Compiler run finished successfully.", 0);
+          successMessage = "Compiler run finished successfully. Compile time: " + QString::number(nMilliseconds) + " mSecs";
+          createStatusBarMessage(successMessage, 0);
       }
       else
       {
-          //ui->actionStart_im_Emulator->setEnabled(true);
-
           (void)QMessageBox::information(this, tr("Amiga Cross Editor"),
           tr("No success in building your executable file!.\n"
           "Please check for Errors and recompile."),
