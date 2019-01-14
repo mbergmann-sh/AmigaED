@@ -74,6 +74,7 @@ class QComboBox;
 class QsciScintilla;
 class PrefsDialog;
 class aboutDialog;
+class SearchDialog;
 class QtGui;
 
 
@@ -127,6 +128,7 @@ public:
     QString p_emulator_to_start;    // Argument for default OS to start in UAE, depends on p_defaultEmulator
     QString p_projectsRootDir;      // Path to default folder to store projects in (use that path as a hd mount in UAE in order to test compiled app!)
     QStringList p_Compilers = {"VBCC (C mode only)", "GNU gcc (C mode)", "GNU g++ (C++ mode)"};    // used for building compiler preselection combobox entries
+    QStringList p_targetOS = {"OS 1.3", "OS 3.x", "OS 4.x"};
     int p_defaultCompiler;          // set from prefs file
     QString p_default_style;        // set from prefs file
     bool p_blackish;                // use blackish stylesheet?
@@ -167,6 +169,7 @@ public slots:
     void finished(int exitCode, QProcess::ExitStatus exitStatus);
     void readSettings();                                // read app settings
     void jumpCompilerWarnings();                        // jump to error or warning, load file of occurance if not opened (unfinisched yet!)
+    void setVbccTargetOS(int default_os);               // change VBCC default target OS at runtime
 
 
 private slots:
@@ -453,6 +456,7 @@ private:
     QLabel *statusContainer_X;      // alternative view for cursor position
     QLabel *statusContainer_Y;      // alternative view for cursor position
     QComboBox *compilerCombo;       // puts a Compobox for compiler selection into statusbar
+    QComboBox *osCombo;             // puts a Compobox for AmigaOS target selection into statusbar
     QPushButton *compilerButton;    // puts a dice button for compiler start into statusbar
 
     // Font in use

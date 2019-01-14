@@ -62,10 +62,13 @@
 #include <Qsci/qscilexerbash.h>
 #include <Qsci/qsciprinter.h>
 
+#include <search.h>
+
 // allways get your defaults!
 #include "mainwindow.h"
 #include "prefsdialog.h"
 #include "aboutdialog.h"
+#include "searchdialog.h"
 
 
 
@@ -1431,6 +1434,18 @@ void MainWindow::SelectCompiler(int index)
     if(!(p_no_compilerbuttons))    // react on user prefs: show or hide compiler combo and -button
     {
         this->compilerCombo->setCurrentIndex(index);
+        switch(index)
+        {
+            case 0: // VBCC
+                osCombo->setEnabled(true);
+                break;
+            case 1: // GCC
+                osCombo->setEnabled(false);
+                break;
+            case 2: // G++
+                osCombo->setEnabled(false);
+                break;
+            }
     }
 
     switch(index)
@@ -1463,7 +1478,7 @@ void MainWindow::SelectCompiler(int index)
             p_selected_compiler_args = p_compiler_gcc_call;
             p_compiledFileSuffix = "_gcc";
             // check selected menu item, uncheck others
-            selectCompilerGCCAct->setChecked(true);
+            selectCompilerGCCAct->setChecked(true);           
             break;
         // G++
         case 2:
@@ -2973,6 +2988,12 @@ void MainWindow::actionPrefsDialog(int tabindex = 0)
 //
 void MainWindow::actionSearch()
 {
+    if(p_mydebug)
+    {
+        SearchDialog *aceSearch = new SearchDialog(this);
+        aceSearch->blockSignals(false);
+        aceSearch->show();
+    }
     bool ok;
     qDebug() << "in search";
     QInputDialog *searchDialog = new QInputDialog(this);
@@ -2982,6 +3003,8 @@ void MainWindow::actionSearch()
                                        tr("Search text:"), QLineEdit::Normal,
                                        nullptr, &ok);
     searchDialog->setOkButtonText("Search!");
+
+    //QString text = aceSearch.show();
 
     if (ok && !text.isEmpty())
     {
@@ -3234,7 +3257,7 @@ void MainWindow::showCurrendCursorPosition()
         statusLCD_X->display(line + 1);
         statusLCD_Y->display(index +1);
     }
-    // ...or did we want pain text display?
+    // ...or did we want plain text display?
     else
     {
         statusContainer_X->setText(QString::number(line + 1));
@@ -3268,6 +3291,7 @@ void MainWindow::initializeGUI()
     {
         this->compilerLabel = new QLabel(this);
         this->compilerCombo = new QComboBox(this);
+        this->osCombo = new QComboBox(this);
     }
 
     this->statusLabelX = new QLabel(this);
@@ -3320,7 +3344,15 @@ void MainWindow::initializeGUI()
         statusBar()->addPermanentWidget(compilerCombo);
         compilerCombo->addItems(p_Compilers);
         compilerCombo->setCurrentIndex(p_defaultCompiler);
-        statusBar()->addPermanentWidget(compilerButton);   
+        compilerCombo->setStatusTip(tr("Select compiler to use for this file"));
+        statusBar()->addPermanentWidget(compilerButton);
+        statusBar()->addPermanentWidget(osCombo);
+        osCombo->addItems(p_targetOS);
+        osCombo->setCurrentIndex(p_compiler_vc_default_target);
+        osCombo->setDisabled(true);
+        osCombo->setStatusTip(tr("Chance VBCC default target OS"));
+        statusBar()->addPermanentWidget(compilerButton);
+        compilerButton->setStatusTip(tr("Compile current file..."));
     }
 
     statusBar()->addPermanentWidget(statusLabelX);
@@ -3387,7 +3419,11 @@ void MainWindow::initializeGUI()
     if(!(p_no_compilerbuttons))    // react on user prefs: show or hide compiler combo and -button
     {
         connect(compilerCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(SelectCompiler(int)));
+        connect(osCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(setVbccTargetOS(int)));
         connect(compilerButton, SIGNAL(clicked(bool)), this, SLOT(actionCompile()));
+
+        if(p_defaultCompiler == 0)
+            osCombo->setEnabled(true);
     }
 
     connect(btnCloseOutput, SIGNAL(clicked(bool)), this, SLOT(actionCloseOutputConsole()));
@@ -3987,7 +4023,30 @@ void MainWindow::setEmulatorMenu()
 }
 
 //
+// change VBCC default target OS at runtime
+//
+void MainWindow::setVbccTargetOS(int default_os)
+{
+    switch(default_os)
+    {
+        // OS 1.3
+        case 0:
+            p_selected_compiler_args = p_compiler_vc13_call;
+            break;
+        // OS 3.x
+        case 1:
+            p_selected_compiler_args = p_compiler_vc30_call;
+            break;
+        // OS 4.1
+        case 2:
+            p_selected_compiler_args = p_compiler_vc40_call;
+            break;
+    }
+}
+
+//
 // Convenience method - will never really be executed...
+//
 void MainWindow::finished(int exitCode, QProcess::ExitStatus exitStatus)
 {
     if(p_mydebug)
