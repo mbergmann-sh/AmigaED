@@ -45,6 +45,7 @@ This program is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE WARRA
 - select cross compiler to use: vbcc, gcc or g++
 - Preferences dialog for most important stuff, like compiler settings, et cetera..
 - startup Amiga Emulator, different models and Workbenches selectable
+- jump-to-error [VBCC only ATM]
 
 more to come...
 
@@ -87,7 +88,8 @@ The easy way: Simply import the .pro file into Qt Creator, configure your toolch
 you might also add this folder to your search path instead!
 
 # Roadmap - wanted features (at least hopefully planned...)
-- make error console output clickable, jump to error line
+- make error console output clickable, jump to error line [partially done, VBCC only ATM]
+- write a _better_ error parser!!
 - make the editor drag'n'drop-aware
 - implement inserts and snippets [mostly done]
 - add a search/replace dialog   [partially done]
