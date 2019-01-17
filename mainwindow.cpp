@@ -82,12 +82,13 @@ MainWindow::MainWindow(QString cmdFileName)
 {
     // load preferences
     // restores last saved position and size of the editor window, load other defaults
+    readPosSettings();
     readSettings();
     debugVars();
 
     QApplication::setStyle(p_default_style);
 
-    QsciLexerBash *lexerbash = new QsciLexerBash;
+    //QsciLexerBash *lexerbash = new QsciLexerBash;
     //lexer->setFoldComments(true);
     QList<int> sizes;
     sizes << 320 <<150 << 200;
@@ -97,8 +98,8 @@ MainWindow::MainWindow(QString cmdFileName)
     textEdit = new QsciScintilla;
     lview = new QListView;
     outputGroup = new QGroupBox(tr("Compiler output"));
-    output = new QsciScintilla;
-    output->setLexer(lexerbash);
+    output = new QPlainTextEdit;
+    //output->setLexer(lexerbash);
     //output->setStyleSheet(QString::fromUtf8("background-color: rgb(255,250,250);"));
     output->setReadOnly(true);
 
@@ -129,6 +130,8 @@ MainWindow::MainWindow(QString cmdFileName)
 
     // notify if cursor position changed
     connect(textEdit, SIGNAL(cursorPositionChanged(int, int)), this, SLOT(showCurrendCursorPosition()));
+    connect(output, SIGNAL(cursorPositionChanged()), this, SLOT(on_output_cursorPositionChanged()));
+
 
     cmd = new QProcess(this);
     cmd->setProcessChannelMode(QProcess::MergedChannels);
@@ -438,6 +441,7 @@ void MainWindow::createActions()
     connect(showLineNumbersAct, SIGNAL(triggered()), this, SLOT(actionShowLineNumbers()));
 
     showCaretLineAct = new QAction(tr("Show caret line..."), this);
+    showCaretLineAct->setShortcut(tr("Ctrl+#"));
     showCaretLineAct->setCheckable(true);
     showCaretLineAct->setChecked(false);
     showCaretLineAct->setStatusTip(tr("Show or hide caret line"));
@@ -969,17 +973,21 @@ void MainWindow::createStatusBarMessage(QString statusmessage, int timeout)
     statusBar()->showMessage(statusmessage, timeout);
 }
 
-//
-// read app's last saved position and sizes
-//
-void MainWindow::readSettings()
+void MainWindow::readPosSettings()
 {
     QSettings settings("MB-SoftWorX", "Amiga Cross Editor");
     QPoint pos = settings.value("pos", QPoint(200, 200)).toPoint();
     QSize size = settings.value("size", QSize(400, 400)).toSize();
     resize(size);
     move(pos);
+}
 
+//
+// read app's last saved prefs
+//
+void MainWindow::readSettings()
+{
+    QSettings settings("MB-SoftWorX", "Amiga Cross Editor");
     // TAB: Project
     p_author = (settings.value("Project/Author").toString());
     p_email = (settings.value("Project/Email").toString());
@@ -1362,8 +1370,6 @@ void MainWindow::actionGoto_Line()
             textEdit->foldAll(false);
         }
         textEdit->setCursorPosition(i-1,0);
-        textEdit->setCaretLineVisible(true);
-        this->showCaretLineAct->setChecked(true);
     }
 }
 
@@ -1385,6 +1391,7 @@ void MainWindow::actionSelectCompilerVBCC()
     {
         compilerCombo->setCurrentIndex(0);
     }
+    p_defaultCompiler = 0;
     SelectCompiler(0);
 }
 
@@ -1398,6 +1405,7 @@ void MainWindow::actionSelectCompilerGCC()
     {
         compilerCombo->setCurrentIndex(1);
     }
+    p_defaultCompiler = 1;
     SelectCompiler(1);
 }
 
@@ -1411,6 +1419,7 @@ void MainWindow::actionSelectCompilerGPP()
     {
         compilerCombo->setCurrentIndex(2);
     }
+    p_defaultCompiler = 2;
     SelectCompiler(2);
 }
 
@@ -1438,12 +1447,15 @@ void MainWindow::SelectCompiler(int index)
         {
             case 0: // VBCC
                 osCombo->setEnabled(true);
+                p_defaultCompiler = 0;
                 break;
             case 1: // GCC
                 osCombo->setEnabled(false);
+                p_defaultCompiler = 1;
                 break;
             case 2: // G++
                 osCombo->setEnabled(false);
+                p_defaultCompiler = 2;
                 break;
             }
     }
@@ -3039,31 +3051,7 @@ void MainWindow::actionSearch()
 //
 void MainWindow::jumpCompilerWarnings()
 {
-    qDebug() << "in jumpToCompilerWarnings";
-
-    QString text = "error";
-
-    if (!(text.isEmpty()))
-    {
-        qDebug() << text;
-        output->SendScintilla(QsciScintillaBase::SCI_INDICSETSTYLE, 0, QsciScintilla::INDIC_FULLBOX);
-        output->SendScintilla(QsciScintillaBase::SCI_INDICSETFORE,0, QColor(Qt::red));
-
-        QString docText = output->text();
-        int end = docText.lastIndexOf(text);
-        int cur = -1;
-
-        if(end != -1)
-        {
-            while(cur != end)
-            {
-                cur = docText.indexOf(text,cur+1);
-                output->SendScintilla(QsciScintillaBase::SCI_INDICATORFILLRANGE,cur,
-                    text.length());
-            }
-        }
-
-    }
+    ;
 }
 
 //
@@ -3648,7 +3636,7 @@ int MainWindow::startCompiler()
     }
 
     // Fire up compiler!
-    runCommand(command, arguments);
+    runCommand(command, arguments);    
 
     return 0;
 }
@@ -3846,21 +3834,48 @@ void MainWindow::runCommand(QString command, QStringList arguments)
     // Empty output widget
     output->clear();
     // Give message about started process:
-    output->append("Run process...\nCompiler started:\n");
+    //output->append("Run process...\nCompiler started:\n");
 
     // fire up our process:
     cmd->start(command, arguments);
 }
 
-void MainWindow::readCommand(){
-    output->append(cmd->readAll()); // output is QTextBrowser
+void MainWindow::readCommand()
+{
+    QString Buffer = cmd->readAll();    // buffer compiler output!
+    QStringList listToFilter;           // List that keeps output items
+    QStringList filterList;             // filtered List without line feed, containing only errors and warnings
+
+    // feed buffer list with buffered output, stripping line feed
+    listToFilter = Buffer.split("\n");
+
+    // Now, let's filter!
+    foreach (QString item, listToFilter)
+    {
+        // We only need messages containing errors and warnings...
+        if(!(item.isEmpty()) && (item.contains("error", Qt::CaseInsensitive) || item.contains("warning", Qt::CaseInsensitive)) && !(item.contains("error found!", Qt::CaseInsensitive)) )
+        {
+            // add filtered items to our second list...
+            if(!(item.isEmpty()))
+                filterList << item;
+        }
+    }
+
+    // put filtered List together for usage as a QString, separated by "\n":
+    QString joinedMessages = filterList.join("\n");
+
+    // put it all into console output:
+    output->appendPlainText(joinedMessages);    // 'output' is our QPlainTextBrowser in splitter output pane
 }
 
+
+//
+// things to do when execution of startCompiler() has stopped
+//
 int MainWindow::stopCommand(int exitCode, QProcess::ExitStatus exitStatus)
 {
-    output->append(cmd->readAll());
-    output->append("cmd finished:\t");
-    output->append(QString::number(exitCode));
+    output->appendPlainText(cmd->readAll());
+
     if(p_mydebug)
         qDebug() << "In stopCommand()\nexitCode: " << QString::number(exitCode);
 
@@ -3876,6 +3891,10 @@ int MainWindow::stopCommand(int exitCode, QProcess::ExitStatus exitStatus)
     if (exitStatus==QProcess::CrashExit || exitCode!=0)
     {
         createStatusBarMessage("Compiler error!", 0);
+        textEdit->setCaretLineVisible(true);
+        this->showCaretLineAct->setChecked(true);
+        textEdit->setFocus();
+
         if(p_console_on_fail)
         {
             actionShowOutputConsole();
@@ -3901,7 +3920,7 @@ int MainWindow::stopCommand(int exitCode, QProcess::ExitStatus exitStatus)
             {
                 (void)QMessageBox::information(this, tr("Compilation finished - Amiga Cross Editor"),
                 tr("Successfully compiled.\nCompilation took %1 milliseconds to finish.\n\n"
-                "You may now want to test it in UAE.").arg(nMilliseconds),
+                "You may now want to test your program in UAE.").arg(nMilliseconds),
                 QMessageBox::Ok);
             }
 
@@ -4083,6 +4102,7 @@ void MainWindow::finished(int exitCode, QProcess::ExitStatus exitStatus)
           "Please check source for errors and recompile."),
           QMessageBox::Ok);
       }
+      //output->moveCursor(QTextCursor::Start);
   }
   else
   {
@@ -4094,7 +4114,7 @@ void MainWindow::finished(int exitCode, QProcess::ExitStatus exitStatus)
 
           (void)QMessageBox::information(this, tr("Compilation finished - Amiga Cross Editor"),
           tr("Successfully compiled.\nCompilation took %1 milliseconds to finish.\n\n"
-          "You may now want to test it in UAE.").arg(nMilliseconds),
+          "You may now want to test your program in UAE.").arg(nMilliseconds),
           QMessageBox::Ok);
 
           successMessage = "Compiler run finished successfully. Compile time: " + QString::number(nMilliseconds) + " mSecs";
@@ -4113,4 +4133,348 @@ void MainWindow::finished(int exitCode, QProcess::ExitStatus exitStatus)
   }
 }
 
+//
+// get line of text that was selected and store it in variable text_to_search
+// connect to output!
+//
+void MainWindow::on_output_cursorPositionChanged()
+{
 
+    QString text_to_search;                         // keeps the line of text to parse
+    text_to_search.clear();
+
+    QTextCursor txtCursor = output->textCursor();
+    QTextBlockFormat t_format;
+
+    QString data = output->toPlainText();
+    QStringList strList = data.split(QRegExp("[\n]"),QString::SkipEmptyParts);
+
+    if(txtCursor.blockNumber() <= (strList.count()) -1 )
+    {
+        QString content = strList[txtCursor.blockNumber()];
+        if(!(content.isEmpty()))
+        {
+            //ui->lineEdit_Searchstring->setText(strList[txtCursor.blockNumber()]);
+            qDebug() << "Line accepted. ";
+            qDebug() << "now looking for warnings and errors...";
+            text_to_search = strList[txtCursor.blockNumber()];
+        }
+        else
+        {
+            text_to_search.clear();
+        }
+    }
+
+    // Now let's do all the work for jumping to error/warning!
+    if (!(text_to_search.isEmpty()))
+    {
+        qDebug() << "Searchtext = " << text_to_search;
+        // do something usefull!
+        switch(p_defaultCompiler)
+        {
+        case 0:
+            qDebug() << "Now checking for VBCC";
+            checkVBCC(text_to_search);
+            jumpToError(line_nr, 0);
+            break;
+        case 1:
+        case 2:
+            qDebug() << "Now checking for gcc/g++";
+            jumpToError(line_nr, column_nr);
+            break;
+        }
+    }
+
+    qDebug() << "//----------------------------------------------------//";
+}
+
+
+//
+// RegEx parse VBCC output
+//
+void MainWindow::checkVBCC(QString str_to_search)
+{
+    QString re1="((?:[a-z][a-z]+))";	// Word 1
+    QString re2=".*?";	//# Non-greedy match on filler
+    QString re3="(?:[a-z][a-z]+)";	//# Uninteresting: word
+    QString re4=".*?";	//# Non-greedy match on filler
+    QString re5="((?:[a-z][a-z]+))";	//# Word 2
+    QString re6=".*?";	//# Non-greedy match on filler
+    QString re7="(\\d+)";	// # Integer Number 1
+    QString re8=".*?";	//# Non-greedy match on filler
+    QString re9="((?:\\/[\\w\\.\\-]+)+)";	//# Unix Path 1
+    QStringList strlist;
+    strlist << re1 << re2 << re3 << re4 << re5 << re6 << re7 << re8 << re9;
+    QString reg = re1 + re2 + re3 + re4 + re5 + re6 + re7 + re8 + re9;
+
+    if(!(str_to_search.isEmpty()))
+    {
+        QRegularExpression rx_line("(\\d+)");                       // check for line (and column, if available)
+        QRegularExpression rx_words("((?:\"[a-z][a-z]+\\.c)\")");   // check for ALL strings starting with \", containing .c, ending with \"
+        QRegularExpression rx_file("((?:\\/[\\w\\.\\-]+)+)");       // unix path
+        QRegularExpression rx_messagetype("(error)");               // check if error or warning
+
+
+        QList<int> list;    // List to hold search results (integer values)
+        QStringList list1;  // List to hold string-type results
+
+        //
+        // check if error or warning
+        //
+        QRegularExpressionMatchIterator i = rx_messagetype.globalMatch(str_to_search);
+        while (i.hasNext())
+        {
+            QRegularExpressionMatch match = i.next();
+            QString word = match.captured(1);
+            list1 << word;
+        }
+
+        if(!(list1.isEmpty()))
+        {
+            if(list1[0] == "error")
+            {
+                createStatusBarMessage("Error while parsing jumplist", 0);
+
+            }
+            else
+            {
+                createStatusBarMessage("Error while parsing jumplist", 0);
+            }
+
+            qDebug() << "List entries: " << list1 << "List count: " << list1.count();
+
+        }
+        else
+        {
+            //ui->label_MessageType->setText("Warning");
+            qDebug() << "No matches!";
+        }
+
+        //
+        // check for simple filename
+        //
+        list1.clear();
+        QRegularExpressionMatchIterator w = rx_words.globalMatch(str_to_search);
+        while (w.hasNext())
+        {
+            QRegularExpressionMatch match = w.next();
+            QString word = match.captured(1);
+            list1 << word;
+        }
+
+        if(!(list1.isEmpty()))
+        {
+            qDebug() << "List entries: " << list1 << "List count: " << list1.count();
+            //ui->lineEdit_Filepath->setText(list1[0]);
+        }
+        else
+            qDebug() << "no simple filename";
+
+
+        //
+        // check for unix path
+        //
+        list1.clear();
+        QRegularExpressionMatchIterator f = rx_file.globalMatch(str_to_search);
+        while (f.hasNext())
+        {
+            QRegularExpressionMatch match = f.next();
+            QString word = match.captured(1);
+            list1 << word;
+        }
+
+        if(!(list1.isEmpty()))
+        {
+            qDebug() << "List entries: " << list1 << "List count: " << list1.count();
+            //ui->lineEdit_Filepath->setText(list1[0]);
+        }
+        else
+            qDebug() << "no unix path!";
+
+
+
+        //
+        // check for line and column
+        //
+        QRegularExpressionMatchIterator lc = rx_line.globalMatch(str_to_search);
+        while (lc.hasNext())
+        {
+            QRegularExpressionMatch match = lc.next();
+            QString word = match.captured(1);
+            list << word.toInt();
+        }
+
+        if(!(list.isEmpty()))
+        {
+            int index = 0;
+            qDebug() << "List entries: " << list << "List count: " << list.count();
+            if(index <= list.count() -1)
+                error_nr = list[index];
+
+            ++index;
+
+            if(index <= list.count() -1)
+                //ui->lcdNumber_Line->display(QString::number(list[index]));
+                qDebug() << "goto line:" << QString::number(list[index]);
+
+            line_nr = list[index];
+        }
+        else
+            qDebug() << "WTF!";
+
+    } // END str_to_search.isEmpty()
+} // END checkVBCC()
+
+//
+// RegEx parse GCC/G++ output
+//
+void MainWindow::checkGCC(QString str_to_search)
+{
+    QString search ="error 0 in line 25 of \"/home/bergmann/Dokumente/Qt5/gitAmigaED/build-application-Desktop-Release/jumptest.c\": declaration expected'; ";
+    QString re1="((?:[a-z][a-z]+))";	// Word 1
+    QString re2=".*?";	//# Non-greedy match on filler
+    QString re3="(?:[a-z][a-z]+)";	//# Uninteresting: word
+    QString re4=".*?";	//# Non-greedy match on filler
+    QString re5="((?:[a-z][a-z]+))";	//# Word 2
+    QString re6=".*?";	//# Non-greedy match on filler
+    QString re7="(\\d+)";	// # Integer Number 1
+    QString re8=".*?";	//# Non-greedy match on filler
+    QString re9="((?:\\/[\\w\\.\\-]+)+)";	//# Unix Path 1
+    QStringList strlist;
+    strlist << re1 << re2 << re3 << re4 << re5 << re6 << re7 << re8 << re9;
+    QString reg = re1 + re2 + re3 + re4 + re5 + re6 + re7 + re8 + re9;
+
+    if(!(str_to_search.isEmpty()))
+    {
+        QRegularExpression rx_line("(\\d+)");                       // check for line (and column, if available)
+        QRegularExpression rx_words("((?:[a-z][a-z]+\\.c))");       // check for ALL strings containing .c
+        QRegularExpression rx_file("((?:\\/[\\w\\.\\-]+)+)");       // unix path
+        QRegularExpression rx_messagetype("(error)");               // check if error or warning
+
+
+        QList<int> list;    // List to hold search results (integer values)
+        QStringList list1;  // List to hold string-type results
+
+        //
+        // check if error or warning
+        //
+        QRegularExpressionMatchIterator i = rx_messagetype.globalMatch(str_to_search);
+        while (i.hasNext())
+        {
+            QRegularExpressionMatch match = i.next();
+            QString word = match.captured(1);
+            list1 << word;
+        }
+
+        if(!(list1.isEmpty()))
+        {
+            if(list1[0] == "error")
+            {
+                //ui->label_MessageType->setText("Error");
+            }
+            else
+            {
+                //ui->label_MessageType->setText("Warning");
+            }
+        }
+        else
+        {
+            //ui->label_MessageType->setText("Warning");
+            qDebug() << "No matches!";
+        }
+
+        //
+        // check for simple filename
+        //
+        list1.clear();
+        QRegularExpressionMatchIterator w = rx_words.globalMatch(str_to_search);
+        while (w.hasNext())
+        {
+            QRegularExpressionMatch match = w.next();
+            QString word = match.captured(1);
+            list1 << word;
+        }
+
+        if(!(list1.isEmpty()))
+        {
+            qDebug() << "List entries: " << list1 << "List count: " << list1.count();
+            debugfilename = list1[0];
+        }
+        else
+            qDebug() << "WTF!";
+
+        //
+        // check for unix path
+        //
+        list1.clear();
+        QRegularExpressionMatchIterator f = rx_file.globalMatch(str_to_search);
+        while (f.hasNext())
+        {
+            QRegularExpressionMatch match = f.next();
+            QString word = match.captured(1);
+            list1 << word;
+        }
+
+        if(!(list1.isEmpty()))
+        {
+            qDebug() << "List entries: " << list1 << "List count: " << list1.count();
+            debugfilename = list1[0];
+        }
+        else
+            qDebug() << "WTF!";
+
+        //
+        // check for line and column
+        //
+        QRegularExpressionMatchIterator lc = rx_line.globalMatch(str_to_search);
+        while (lc.hasNext())
+        {
+            QRegularExpressionMatch match = lc.next();
+            QString word = match.captured(1);
+            list << word.toInt();
+        }
+
+        if(!(list.isEmpty()))
+        {
+            int index = 0;
+            qDebug() << "List entries: " << list << "List count: " << list.count();
+            if(index <= list.count() -1)
+            {
+                line_nr = list[index];
+            }
+
+
+            ++index;
+
+            if(index <= list.count() -1)
+                column_nr = list[index];
+
+        }
+        else
+            qDebug() << "WTF!";
+
+    } // END str_to_search.isEmpty()
+}
+
+//
+// Jump to line No. X...
+//
+void MainWindow::jumpToError(int error_line, int error_column)
+{
+    int max = textEdit->lines(); // max. count of lines in code window
+    bool ok = true;
+    textEdit->setFocus();
+
+    if (ok)
+    {
+        // check if text is folded!
+        QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!textEdit->folding()) * 5);
+
+        // if folded: unfold first!!
+        if (state > 0)
+        {
+            textEdit->foldAll(false);
+        }
+        textEdit->setCursorPosition(error_line-1, error_column);
+    }
+}

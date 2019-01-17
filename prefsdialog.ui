@@ -62,7 +62,7 @@
    <item row="0" column="0" colspan="3">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tabProject">
       <attribute name="title">
@@ -620,7 +620,7 @@
          <item row="0" column="1">
           <widget class="QLineEdit" name="lineEdit_VCdefaultOptsOS13">
            <property name="text">
-            <string>+kick13 -v -O2 -size -I$NDK13_INC -L$NDK13_LIB -lamiga</string>
+            <string>+kick13 -cpp-comments -v -O2 -size -cpu=68020 -I$NDK13_INC -L$NDK13_LIB -lauto</string>
            </property>
           </widget>
          </item>
@@ -641,7 +641,7 @@
          <item row="0" column="1">
           <widget class="QLineEdit" name="lineEdit_VCdefaultOptsOS30">
            <property name="text">
-            <string>+aos68k -v -O2 -size -I$NDK39_INC -L$NDK39_LIB -lamiga</string>
+            <string>+aos68k -cpp-comments  -v -O2 -size -cpu=68030 -I$NDK39_INC -L$NDK39_LIB -lmieee -lauto -lamiga</string>
            </property>
           </widget>
          </item>
@@ -662,7 +662,7 @@
          <item row="0" column="1">
           <widget class="QLineEdit" name="lineEdit_VCdefaultOptsOS40">
            <property name="text">
-            <string>+aosppc -v -O2 -size -I$NDK40_INC -L$NDK40_LIB -lamiga</string>
+            <string>+aosppc -cpp-comments  -v -O2 -size -I$NDK40_INC -L$NDK40_LIB -lauto</string>
            </property>
           </widget>
          </item>

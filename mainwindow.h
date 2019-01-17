@@ -58,6 +58,8 @@
 #include <QListView>
 #include <QTextBrowser>
 #include <QTextEdit>
+#include <QPlainTextEdit>
+#include <QTextCursor>
 #include <QGroupBox>
 #include <QVBoxLayout>
 #include <QSpacerItem>
@@ -97,12 +99,17 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QString cmdFileName);
     bool fileExists(QString path);
+    bool allready_selected = false;
+    int last_selected_line = -1;
 
     QString line;
     QStringList fields;
     QTime timerCompile;         // Timer for compilation time
     int nMilliseconds;          // keeping compile time
     QString successMessage;     // build success message with compile time
+    int line_nr = 0, column_nr = 0, error_nr = 0;   // keeps line and column numbers
+    QString errortype;                              // keeps error type ('error' or 'warning')
+    QString debugfilename;                          // keeps filename or unixpath
 
 
     // vars for controlling file header comments
@@ -182,9 +189,14 @@ public slots:
     int stopCommand(int exitCode, QProcess::ExitStatus exitStatus);
     void actionKillEmulator();
     void finished(int exitCode, QProcess::ExitStatus exitStatus);
+    void readPosSettings();
     void readSettings();                                // read app settings
     void jumpCompilerWarnings();                        // jump to error or warning, load file of occurance if not opened (unfinisched yet!)
     void setVbccTargetOS(int default_os);               // change VBCC default target OS at runtime
+    void on_output_cursorPositionChanged();             // react on user click in order to jump to error/warning in editor window
+    void checkVBCC(QString str_to_search);              // RegEX VBCC messages : jump to line x
+    void checkGCC(QString str_to_search);               // RegEX GCC/G++ messages : jump to line x
+    void jumpToError(int error_line, int error_column); // set cursor to error line and column
 
 
 private slots:
@@ -313,7 +325,7 @@ private:
     // Instances for Splitter
     QSplitter *splitter;
     QListView *lview;
-    QsciScintilla *output;
+    QPlainTextEdit *output;
     QGroupBox *outputGroup;
     QPushButton *btnCloseOutput;
 
