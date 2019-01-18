@@ -64,7 +64,7 @@
 
 #include <search.h>
 
-// allways get your defaults!
+// allways get your defaults...
 #include "mainwindow.h"
 #include "prefsdialog.h"
 #include "aboutdialog.h"
@@ -1732,7 +1732,9 @@ int MainWindow::actionCompile()
             timerCompile.start();
             startCompiler();
             nMilliseconds = timerCompile.elapsed();
-            qDebug() << "Compilation took " << nMilliseconds << "Milliseconds";
+
+            if(p_mydebug)
+                qDebug() << "Compilation took " << nMilliseconds << "Milliseconds";
 
 
             // afterwards, reset everything to its defaults!
@@ -4144,7 +4146,7 @@ void MainWindow::on_output_cursorPositionChanged()
     text_to_search.clear();
 
     QTextCursor txtCursor = output->textCursor();
-    QTextBlockFormat t_format;
+    QTextBlockFormat t_format;                      // for higlighting...
 
     QString data = output->toPlainText();
     QStringList strList = data.split(QRegExp("[\n]"),QString::SkipEmptyParts);
@@ -4154,9 +4156,12 @@ void MainWindow::on_output_cursorPositionChanged()
         QString content = strList[txtCursor.blockNumber()];
         if(!(content.isEmpty()))
         {
-            //ui->lineEdit_Searchstring->setText(strList[txtCursor.blockNumber()]);
-            qDebug() << "Line accepted. ";
-            qDebug() << "now looking for warnings and errors...";
+            if(p_mydebug)
+            {
+                qDebug() << "Line accepted. ";
+                qDebug() << "now looking for warnings and errors...";
+            }
+            // set search string for regEX checkup:
             text_to_search = strList[txtCursor.blockNumber()];
         }
         else
@@ -4168,24 +4173,28 @@ void MainWindow::on_output_cursorPositionChanged()
     // Now let's do all the work for jumping to error/warning!
     if (!(text_to_search.isEmpty()))
     {
-        qDebug() << "Searchtext = " << text_to_search;
-        // do something usefull!
         switch(p_defaultCompiler)
         {
         case 0:
-            qDebug() << "Now checking for VBCC";
+            if(p_mydebug)
+                qDebug() << "Now checking for VBCC";
+
             checkVBCC(text_to_search);
             jumpToError(line_nr, 0);
             break;
         case 1:
         case 2:
-            qDebug() << "Now checking for gcc/g++";
-            jumpToError(line_nr, column_nr);
+            if(p_mydebug)
+                qDebug() << "Now checking for gcc/g++";
+
+            checkGCC(text_to_search);
+            jumpToError(line_nr, column_nr - 1);
             break;
         }
     }
 
-    qDebug() << "//----------------------------------------------------//";
+    if(p_mydebug)
+        qDebug() << "//--- END on_outputCursorPositionChanged() DEBUG --------//";
 }
 
 
@@ -4315,6 +4324,7 @@ void MainWindow::checkVBCC(QString str_to_search)
 
             if(index <= list.count() -1)
                 //ui->lcdNumber_Line->display(QString::number(list[index]));
+                qDebug() << "in checkVBCC()";
                 qDebug() << "goto line:" << QString::number(list[index]);
 
             line_nr = list[index];
@@ -4323,6 +4333,13 @@ void MainWindow::checkVBCC(QString str_to_search)
             qDebug() << "WTF!";
 
     } // END str_to_search.isEmpty()
+    qDebug() << "|-----------------------------------------------------|";
+    qDebug() << "error_nr: " << error_nr;
+    qDebug() << "errortype: " << errortype;
+    qDebug() << "line_nr: " << line_nr;
+    qDebug() << "column_nr: " << column_nr;
+    qDebug() << "debugfilename: " << debugfilename;
+    qDebug() << "|-----------------------------------------------------|";
 } // END checkVBCC()
 
 //
@@ -4330,130 +4347,60 @@ void MainWindow::checkVBCC(QString str_to_search)
 //
 void MainWindow::checkGCC(QString str_to_search)
 {
-    QString search ="error 0 in line 25 of \"/home/bergmann/Dokumente/Qt5/gitAmigaED/build-application-Desktop-Release/jumptest.c\": declaration expected'; ";
-    QString re1="((?:[a-z][a-z]+))";	// Word 1
-    QString re2=".*?";	//# Non-greedy match on filler
-    QString re3="(?:[a-z][a-z]+)";	//# Uninteresting: word
-    QString re4=".*?";	//# Non-greedy match on filler
-    QString re5="((?:[a-z][a-z]+))";	//# Word 2
-    QString re6=".*?";	//# Non-greedy match on filler
-    QString re7="(\\d+)";	// # Integer Number 1
-    QString re8=".*?";	//# Non-greedy match on filler
-    QString re9="((?:\\/[\\w\\.\\-]+)+)";	//# Unix Path 1
-    QStringList strlist;
-    strlist << re1 << re2 << re3 << re4 << re5 << re6 << re7 << re8 << re9;
-    QString reg = re1 + re2 + re3 + re4 + re5 + re6 + re7 + re8 + re9;
+    QList<int> list;    // List to hold search results (integer values)
+    QStringList list1;  // List to hold string-type results
 
-    if(!(str_to_search.isEmpty()))
+    // get name of file to debug:
+    QRegularExpression rx_debugfile("(.*?):(\\d+):(\\d+:)? (.*)");
+    QRegularExpressionMatchIterator i = rx_debugfile.globalMatch(str_to_search);
+    while (i.hasNext())
     {
-        QRegularExpression rx_line("(\\d+)");                       // check for line (and column, if available)
-        QRegularExpression rx_words("((?:[a-z][a-z]+\\.c))");       // check for ALL strings containing .c
-        QRegularExpression rx_file("((?:\\/[\\w\\.\\-]+)+)");       // unix path
-        QRegularExpression rx_messagetype("(error)");               // check if error or warning
+        QRegularExpressionMatch match = i.next();
+        QString word = match.captured(1);
+        list1 << word;
+    }
+    // set name of file to debug:
+    if(!(list1.isEmpty()))
+    {
+        debugfilename = list1[0];
+    }
 
+    //------ next regEX ----------------------------------------//
 
-        QList<int> list;    // List to hold search results (integer values)
-        QStringList list1;  // List to hold string-type results
+    // get line and column
+    QRegularExpression rx_line("(\\d+)");
 
-        //
-        // check if error or warning
-        //
-        QRegularExpressionMatchIterator i = rx_messagetype.globalMatch(str_to_search);
-        while (i.hasNext())
-        {
-            QRegularExpressionMatch match = i.next();
-            QString word = match.captured(1);
-            list1 << word;
-        }
+    // check for line and column
+    QRegularExpressionMatchIterator lc = rx_line.globalMatch(str_to_search);
+    while (lc.hasNext())
+    {
+        QRegularExpressionMatch match = lc.next();
+        QString word = match.captured(1);
+        list << word.toInt();
+    }
+    // set line and column:
+    if(!(list.isEmpty()) && list.count() == 2)
+    {
+        line_nr = list[0];
+        column_nr = list[1];
+    }
+    else
+    {
+        createStatusBarMessage("no valid line and column data!", 0);
+    }
 
-        if(!(list1.isEmpty()))
-        {
-            if(list1[0] == "error")
-            {
-                //ui->label_MessageType->setText("Error");
-            }
-            else
-            {
-                //ui->label_MessageType->setText("Warning");
-            }
-        }
-        else
-        {
-            //ui->label_MessageType->setText("Warning");
-            qDebug() << "No matches!";
-        }
-
-        //
-        // check for simple filename
-        //
-        list1.clear();
-        QRegularExpressionMatchIterator w = rx_words.globalMatch(str_to_search);
-        while (w.hasNext())
-        {
-            QRegularExpressionMatch match = w.next();
-            QString word = match.captured(1);
-            list1 << word;
-        }
-
-        if(!(list1.isEmpty()))
-        {
-            qDebug() << "List entries: " << list1 << "List count: " << list1.count();
-            debugfilename = list1[0];
-        }
-        else
-            qDebug() << "WTF!";
-
-        //
-        // check for unix path
-        //
-        list1.clear();
-        QRegularExpressionMatchIterator f = rx_file.globalMatch(str_to_search);
-        while (f.hasNext())
-        {
-            QRegularExpressionMatch match = f.next();
-            QString word = match.captured(1);
-            list1 << word;
-        }
-
-        if(!(list1.isEmpty()))
-        {
-            qDebug() << "List entries: " << list1 << "List count: " << list1.count();
-            debugfilename = list1[0];
-        }
-        else
-            qDebug() << "WTF!";
-
-        //
-        // check for line and column
-        //
-        QRegularExpressionMatchIterator lc = rx_line.globalMatch(str_to_search);
-        while (lc.hasNext())
-        {
-            QRegularExpressionMatch match = lc.next();
-            QString word = match.captured(1);
-            list << word.toInt();
-        }
-
-        if(!(list.isEmpty()))
-        {
-            int index = 0;
-            qDebug() << "List entries: " << list << "List count: " << list.count();
-            if(index <= list.count() -1)
-            {
-                line_nr = list[index];
-            }
-
-
-            ++index;
-
-            if(index <= list.count() -1)
-                column_nr = list[index];
-
-        }
-        else
-            qDebug() << "WTF!";
-
-    } // END str_to_search.isEmpty()
+    if(p_mydebug)
+    {
+        qDebug() << "|-----------------------------------------------------|";
+        qDebug() << "gcc debugfilename List entries: " << list1 << "List count: " << list1.count();
+        qDebug() << "gcc line/column List entries: " << list << "List count: " << list.count();
+        qDebug() << "error_nr: " << error_nr;
+        qDebug() << "errortype: " << errortype;
+        qDebug() << "line_nr: " << line_nr;
+        qDebug() << "column_nr: " << column_nr;
+        qDebug() << "debugfilename: " << debugfilename;
+        qDebug() << "|-----------------------------------------------------|";
+    }
 }
 
 //
@@ -4461,7 +4408,6 @@ void MainWindow::checkGCC(QString str_to_search)
 //
 void MainWindow::jumpToError(int error_line, int error_column)
 {
-    int max = textEdit->lines(); // max. count of lines in code window
     bool ok = true;
     textEdit->setFocus();
 
@@ -4477,4 +4423,64 @@ void MainWindow::jumpToError(int error_line, int error_column)
         }
         textEdit->setCursorPosition(error_line-1, error_column);
     }
+}
+
+
+//
+// gcc regEX testing area!
+// to be deleted ASAP
+//
+void MainWindow::testGCCregEx(QString str_to_search)
+{
+    QList<int> list;    // List to hold search results (integer values)
+    QStringList list1;  // List to hold string-type results
+
+    // get name of file to debug:
+    QRegularExpression rx_debugfile("(.*?):(\\d+):(\\d+:)? (.*)");
+    QRegularExpressionMatchIterator i = rx_debugfile.globalMatch(str_to_search);
+    while (i.hasNext())
+    {
+        QRegularExpressionMatch match = i.next();
+        QString word = match.captured(1);
+        list1 << word;
+    }
+    // set name of file to debug:
+    if(!(list1.isEmpty()))
+    {
+        debugfilename = list1[0];
+    }
+
+    //------ next regEX ----------------------------------------//
+
+    // get line and column
+    QRegularExpression rx_line("(\\d+)");
+
+    // check for line and column
+    QRegularExpressionMatchIterator lc = rx_line.globalMatch(str_to_search);
+    while (lc.hasNext())
+    {
+        QRegularExpressionMatch match = lc.next();
+        QString word = match.captured(1);
+        list << word.toInt();
+    }
+    // set line and column:
+    if(!(list.isEmpty()) && list.count() == 2)
+    {
+        line_nr = list[0];
+        column_nr = list[1];
+    }
+    else
+    {
+        createStatusBarMessage("no valid line and column data!", 0);
+    }
+
+    qDebug() << "|-----------------------------------------------------|";
+    qDebug() << "gcc debugfilename List entries: " << list1 << "List count: " << list1.count();
+    qDebug() << "gcc line/column List entries: " << list << "List count: " << list.count();
+    qDebug() << "error_nr: " << error_nr;
+    qDebug() << "errortype: " << errortype;
+    qDebug() << "line_nr: " << line_nr;
+    qDebug() << "column_nr: " << column_nr;
+    qDebug() << "debugfilename: " << debugfilename;
+    qDebug() << "|-----------------------------------------------------|";
 }

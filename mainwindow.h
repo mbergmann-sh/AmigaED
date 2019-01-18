@@ -197,7 +197,7 @@ public slots:
     void checkVBCC(QString str_to_search);              // RegEX VBCC messages : jump to line x
     void checkGCC(QString str_to_search);               // RegEX GCC/G++ messages : jump to line x
     void jumpToError(int error_line, int error_column); // set cursor to error line and column
-
+    void testGCCregEx(QString str_to_search);    // to be deleted ASAP!
 
 private slots:
     int startEmulator();                            // starts a process (f.e. Emulator)
