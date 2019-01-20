@@ -68,6 +68,12 @@
 #include <QTimer>
 #include <QElapsedTimer>
 #include <QTime>
+#include <QGridLayout>
+#include <QFormLayout>
+#include <QCheckBox>
+#include <QLineEdit>
+#include <QLabel>
+#include <QSpacerItem>
 
 #include <QDebug>
 
@@ -101,6 +107,25 @@ public:
     bool fileExists(QString path);
     bool allready_selected = false;
     int last_selected_line = -1;
+
+    // Layout and content for searchGroup
+    QGridLayout *gridLayout_2;
+    QLabel *label_find;
+    QLineEdit *lineEdit_find;
+    QGridLayout *gridLayout;
+    QPushButton *btn_previous;
+    QPushButton *btn_next;
+    QLabel *label_replace;
+    QLineEdit *lineEdit_replace;
+    QFormLayout *formLayout_2;
+    QPushButton *btn_replace;
+    QPushButton *btn_replace_all;
+    QPushButton *btn_hide;
+    QFormLayout *formLayout;
+    QCheckBox *checkBox_CaseSensitive;
+    QCheckBox *checkBox_WholeWords;
+    QSpacerItem *horizontalSpacer_2;
+    QWidget *centerSearchForm;
 
     QString line;
     QStringList fields;
@@ -327,6 +352,7 @@ private:
     QListView *lview;
     QPlainTextEdit *output;
     QGroupBox *outputGroup;
+    QGroupBox *searchGroup;
     QPushButton *btnCloseOutput;
 
     // stores name of the file currently in use

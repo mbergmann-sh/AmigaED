@@ -281,3 +281,94 @@ void MainWindow::finished(int exitCode, QProcess::ExitStatus exitStatus)
 
   }
 }
+
+// place the elements for searching into gridLayout_2 (topmost container for stuff in search and replace):
+gridlayout_2 = new QGridLayout;
+label_find = new QLabel;
+label_find->setObjectName(QString::fromUtf8("label_find"));
+label_find->setText(tr("Find:"));
+gridlayout_2->addWidget(label_find, 0, 0, 1, 1);            // add label "Find:"
+
+lineEdit_find = new QLineEdit;
+lineEdit_find->setObjectName(QString::fromUtf8("lineEdit_find"));
+lineEdit_find->setClearButtonEnabled(true);
+gridlayout_2->addWidget(lineEdit_find, 0, 1, 1, 2);
+
+// place the buttons for searching into gridLayout:
+gridlayout = new QGridLayout;
+btn_previous = new QPushButton;
+btn_previous->setObjectName(QString::fromUtf8("btn_previous"));
+btn_previous->setMaximumSize(QSize(18, 18));
+QIcon icon;
+icon.addFile(QString::fromUtf8(":/images/btn_prev.png"), QSize(), QIcon::Normal, QIcon::Off);
+btn_previous->setIcon(icon);
+gridlayout->addWidget(btn_previous, 0, 0, 1, 1);            // add button "previous"
+
+btn_next = new QPushButton;
+btn_next->setObjectName(QString::fromUtf8("btn_previous"));
+btn_next->setMaximumSize(QSize(18, 18));
+QIcon icon1;
+icon1.addFile(QString::fromUtf8(":/images/btn_next.png"), QSize(), QIcon::Normal, QIcon::Off);
+btn_next->setIcon(icon1);
+gridlayout->addWidget(btn_next, 0, 1, 1, 1);            // add button "next"
+//...now. we add gridLayout to gridLayout_2:
+gridlayout_2->addLayout(gridlayout, 0, 3, 1, 1);
+
+// next line: we add label_replace and lineEdit_replace:
+label_replace = new QLabel;
+label_replace->setObjectName(QString::fromUtf8("label_replace"));
+label_replace->setText(tr("Find:"));
+gridlayout_2->addWidget(label_replace, 1, 0, 1, 1);            // add label "Replace:"
+
+lineEdit_replace = new QLineEdit;
+lineEdit_replace->setObjectName(QString::fromUtf8("lineEdit_replace"));
+lineEdit_replace->setClearButtonEnabled(true);
+gridlayout_2->addWidget(lineEdit_replace, 1, 1, 1, 2);
+
+//...and now: The 3 buttons into a formLayout:
+formLayout_2 = new QFormLayout;
+btn_replace = new QPushButton;
+btn_replace->setObjectName(QString::fromUtf8("btn_replace"));
+btn_replace->setMaximumSize(QSize(18, 18));
+QIcon icon2;
+icon2.addFile(QString::fromUtf8(":/images/find-and-replace.png"), QSize(), QIcon::Normal, QIcon::Off);
+btn_replace->setIcon(icon2);
+formLayout_2->setWidget(0, QFormLayout::LabelRole, btn_replace);            // add button "replace"
+
+btn_replace_all = new QPushButton;
+btn_replace_all->setObjectName(QString::fromUtf8("btn_replace_all"));
+btn_replace_all->setMaximumSize(QSize(18, 18));
+QIcon icon3;
+icon3.addFile(QString::fromUtf8(":/images/ico_out.png"), QSize(), QIcon::Normal, QIcon::Off);
+btn_replace->setIcon(icon3);
+formLayout_2->setWidget(0, QFormLayout::FieldRole, btn_replace_all);        // add button "replace all"
+
+gridlayout_2->addLayout(formLayout_2, 1, 3, 1, 1);
+
+btn_hide = new QPushButton;
+btn_hide->setObjectName(QString::fromUtf8("btn_hide"));
+btn_hide->setMaximumSize(QSize(18, 18));
+QIcon icon4;
+icon4.addFile(QString::fromUtf8(":/images/find-and-replace.png"), QSize(), QIcon::Normal, QIcon::Off);
+btn_hide->setIcon(icon4);
+
+gridlayout_2->addWidget(btn_hide, 1, 4, 1, 1);            // add button "hide"
+
+formLayout = new QFormLayout();
+formLayout->setObjectName(QString::fromUtf8("formLayout"));
+checkBox_CaseSensitive = new QCheckBox;
+checkBox_CaseSensitive->setObjectName(QString::fromUtf8("checkBox_CaseSensitive"));
+
+formLayout->setWidget(0, QFormLayout::LabelRole, checkBox_CaseSensitive);
+
+checkBox_WholeWords = new QCheckBox;
+checkBox_WholeWords->setObjectName(QString::fromUtf8("checkBox_WholeWords"));
+
+formLayout->setWidget(0, QFormLayout::FieldRole, checkBox_WholeWords);
+
+
+gridlayout_2->addLayout(formLayout, 2, 1, 1, 1);
+
+horizontalSpacer = new QSpacerItem(204, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+gridlayout->addItem(horizontalSpacer, 2, 2, 1, 1);

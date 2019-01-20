@@ -33,7 +33,11 @@ DISTFILES += \
     syntax-examples/fortran-example.f \
     syntax-examples/Makefile_sample.mak \
     syntax-examples/pascal_boublesort.pas \
-    abandonned_methods.txt
+    abandonned_methods.txt \
+    images/btn_next.png \
+    images/btn_prev.png \
+    images/find-and-replace.png \
+    images/home.png
 
 FORMS += \
     prefsdialog.ui \

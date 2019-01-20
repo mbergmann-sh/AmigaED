@@ -19,5 +19,11 @@
         <file>images/amiga_classic.png</file>
         <file>images/aced-logo.png</file>
         <file>images/noworkbench.png</file>
+        <file>images/btn_next.png</file>
+        <file>images/btn_prev.png</file>
+        <file>images/ico_note_attention.png</file>
+        <file>images/home.png</file>
+        <file>images/ico_out.png</file>
+        <file>images/find-and-replace.png</file>
     </qresource>
 </RCC>

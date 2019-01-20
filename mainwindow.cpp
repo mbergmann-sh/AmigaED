@@ -90,18 +90,163 @@ MainWindow::MainWindow(QString cmdFileName)
 
     //QsciLexerBash *lexerbash = new QsciLexerBash;
     //lexer->setFoldComments(true);
+
+    // Build a vertical Splitter
     QList<int> sizes;
     sizes << 320 <<150 << 200;
     splitter = new QSplitter(this);
     btnCloseOutput = new QPushButton(tr("Hide compiler output"), this);
     btnCloseOutput->setGeometry(50, 40, 75, 30);
+
+    // Prepare Splitter components
     textEdit = new QsciScintilla;
     lview = new QListView;
     outputGroup = new QGroupBox(tr("Compiler output"));
-    output = new QPlainTextEdit;
-    //output->setLexer(lexerbash);
-    //output->setStyleSheet(QString::fromUtf8("background-color: rgb(255,250,250);"));
+    searchGroup = new QGroupBox(tr("Search and replace"));
+    searchGroup->setFixedHeight(120);   // avoid auto sizeing - don't let our serch & replace group grow to high...
+    output = new QPlainTextEdit;    
     output->setReadOnly(true);
+    centerSearchForm = new QWidget;
+
+    if (centerSearchForm->objectName().isEmpty())
+        centerSearchForm->setObjectName(QString::fromUtf8("centerSearchForm"));
+    centerSearchForm->resize(573, 93);
+    centerSearchForm->setMaximumSize(QSize(16777215, 16777215));
+    gridLayout_2 = new QGridLayout(centerSearchForm);
+    gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
+    label_find = new QLabel(centerSearchForm);
+    label_find->setObjectName(QString::fromUtf8("label_find"));
+
+    gridLayout_2->addWidget(label_find, 0, 0, 1, 1);
+
+    lineEdit_find = new QLineEdit(centerSearchForm);
+    lineEdit_find->setObjectName(QString::fromUtf8("lineEdit_find"));
+    lineEdit_find->setClearButtonEnabled(true);
+
+    gridLayout_2->addWidget(lineEdit_find, 0, 1, 1, 2);
+
+    gridLayout = new QGridLayout();
+    gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
+    btn_previous = new QPushButton(centerSearchForm);
+    btn_previous->setObjectName(QString::fromUtf8("btn_previous"));
+    btn_previous->setMaximumSize(QSize(18, 18));
+    QIcon icon;
+    icon.addFile(QString::fromUtf8(":/images/btn_prev.png"), QSize(), QIcon::Normal, QIcon::Off);
+    btn_previous->setIcon(icon);
+
+    gridLayout->addWidget(btn_previous, 0, 0, 1, 1);
+
+    btn_next = new QPushButton(centerSearchForm);
+    btn_next->setObjectName(QString::fromUtf8("btn_next"));
+    btn_next->setMaximumSize(QSize(18, 18));
+    QIcon icon1;
+    icon1.addFile(QString::fromUtf8(":/images/btn_next.png"), QSize(), QIcon::Normal, QIcon::Off);
+    btn_next->setIcon(icon1);
+
+    gridLayout->addWidget(btn_next, 0, 1, 1, 1);
+
+
+    gridLayout_2->addLayout(gridLayout, 0, 3, 1, 1);
+
+    label_replace = new QLabel(centerSearchForm);
+    label_replace->setObjectName(QString::fromUtf8("label_replace"));
+
+    gridLayout_2->addWidget(label_replace, 1, 0, 1, 1);
+
+    lineEdit_replace = new QLineEdit(centerSearchForm);
+    lineEdit_replace->setObjectName(QString::fromUtf8("lineEdit_replace"));
+    lineEdit_replace->setFrame(true);
+    lineEdit_replace->setClearButtonEnabled(true);
+
+    gridLayout_2->addWidget(lineEdit_replace, 1, 1, 1, 2);
+
+    formLayout_2 = new QFormLayout();
+    formLayout_2->setObjectName(QString::fromUtf8("formLayout_2"));
+    btn_replace = new QPushButton(centerSearchForm);
+    btn_replace->setObjectName(QString::fromUtf8("btn_replace"));
+    btn_replace->setMaximumSize(QSize(18, 18));
+    QIcon icon2;
+    icon2.addFile(QString::fromUtf8(":/images/find-and-replace.png"), QSize(), QIcon::Normal, QIcon::Off);
+    btn_replace->setIcon(icon2);
+
+    formLayout_2->setWidget(0, QFormLayout::LabelRole, btn_replace);
+
+    btn_replace_all = new QPushButton(centerSearchForm);
+    btn_replace_all->setObjectName(QString::fromUtf8("btn_replace_all"));
+    btn_replace_all->setMaximumSize(QSize(18, 18));
+    QIcon icon3;
+    icon3.addFile(QString::fromUtf8(":/images/ico_out.png"), QSize(), QIcon::Normal, QIcon::Off);
+    btn_replace_all->setIcon(icon3);
+
+    formLayout_2->setWidget(0, QFormLayout::FieldRole, btn_replace_all);
+
+
+    gridLayout_2->addLayout(formLayout_2, 1, 3, 1, 1);
+
+    btn_hide = new QPushButton(centerSearchForm);
+    btn_hide->setObjectName(QString::fromUtf8("btn_hide"));
+    btn_hide->setMaximumSize(QSize(18, 18));
+    QIcon icon4;
+    icon4.addFile(QString::fromUtf8(":/images/fileexit.png"), QSize(), QIcon::Normal, QIcon::Off);
+    btn_hide->setIcon(icon4);
+
+    gridLayout_2->addWidget(btn_hide, 1, 4, 1, 1);
+
+    formLayout = new QFormLayout();
+    formLayout->setObjectName(QString::fromUtf8("formLayout"));
+    checkBox_CaseSensitive = new QCheckBox(centerSearchForm);
+    checkBox_CaseSensitive->setObjectName(QString::fromUtf8("checkBox_CaseSensitive"));
+
+    formLayout->setWidget(0, QFormLayout::LabelRole, checkBox_CaseSensitive);
+
+    checkBox_WholeWords = new QCheckBox(centerSearchForm);
+    checkBox_WholeWords->setObjectName(QString::fromUtf8("checkBox_WholeWords"));
+
+    formLayout->setWidget(0, QFormLayout::FieldRole, checkBox_WholeWords);
+
+
+    gridLayout_2->addLayout(formLayout, 2, 1, 1, 1);
+
+    horizontalSpacer_2 = new QSpacerItem(204, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+    gridLayout_2->addItem(horizontalSpacer_2, 2, 2, 1, 1);
+
+#ifndef QT_NO_SHORTCUT
+        label_find->setBuddy(lineEdit_find);
+        label_replace->setBuddy(lineEdit_replace);
+#endif // QT_NO_SHORTCUT
+
+        centerSearchForm->setWindowTitle(QString());
+        label_find->setText(QApplication::translate("centerSearchForm", "Find:", nullptr));
+#ifndef QT_NO_TOOLTIP
+        btn_previous->setToolTip(QApplication::translate("centerSearchForm", "goto previous occourance", nullptr));
+#endif // QT_NO_TOOLTIP
+        btn_previous->setText(QString());
+#ifndef QT_NO_TOOLTIP
+        btn_next->setToolTip(QApplication::translate("centerSearchForm", "goto next occourance", nullptr));
+#endif // QT_NO_TOOLTIP
+        btn_next->setText(QString());
+        label_replace->setText(QApplication::translate("centerSearchForm", "Replace:", nullptr));
+#ifndef QT_NO_TOOLTIP
+        btn_replace->setToolTip(QApplication::translate("centerSearchForm", "Replace current occurance", nullptr));
+#endif // QT_NO_TOOLTIP
+        btn_replace->setText(QString());
+#ifndef QT_NO_TOOLTIP
+        btn_replace_all->setToolTip(QApplication::translate("centerSearchForm", "Replace ALL occurances", nullptr));
+#endif // QT_NO_TOOLTIP
+        btn_replace_all->setText(QString());
+#ifndef QT_NO_TOOLTIP
+        btn_hide->setToolTip(QApplication::translate("centerSearchForm", "Hide Search and Replace...", nullptr));
+#endif // QT_NO_TOOLTIP
+        btn_hide->setText(QString());
+        checkBox_CaseSensitive->setText(QApplication::translate("centerSearchForm", "Case sensitive search", nullptr));
+        checkBox_WholeWords->setText(QApplication::translate("centerSearchForm", "Whole words", nullptr));
+
+
+
+    QVBoxLayout *vsearch = new QVBoxLayout;
+    vsearch->addWidget(centerSearchForm);
+    searchGroup->setLayout(gridLayout_2);
 
     QVBoxLayout *vbox = new QVBoxLayout;
     vbox->addWidget(output);
@@ -112,9 +257,11 @@ MainWindow::MainWindow(QString cmdFileName)
     splitter->setHandleWidth(4);
     splitter->insertWidget(0,textEdit);
     splitter->insertWidget(1,outputGroup);
+    splitter->insertWidget(1,searchGroup);
     splitter->setSizes(sizes);
-    //lview->setVisible(false);
+
     outputGroup->hide();
+    searchGroup->hide();
     setCentralWidget(splitter);
 
     initializeGUI();    // most initializations are done within tis method!
@@ -124,6 +271,9 @@ MainWindow::MainWindow(QString cmdFileName)
 
     // disable Emulator kill menu entry by default
     killEmulatorAct->setDisabled(true);
+
+    // react on hid-button of searchGroup:
+    connect(btn_hide, SIGNAL(clicked(bool)), searchGroup, SLOT(hide()));
 
     // react if document was modified
     connect(textEdit, SIGNAL(textChanged()), this, SLOT(documentWasModified()));
@@ -401,7 +551,7 @@ void MainWindow::createActions()
     connect(textEdit, SIGNAL(copyAvailable(bool)), copyAct, SLOT(setEnabled(bool)));  
 
     searchAct = new QAction(QIcon(":/images/search.png"), tr("Sea&rch..."), this);
-    searchAct->setShortcut(tr("Alt+r"));
+    searchAct->setShortcut(tr("Ctrl+f"));
     searchAct->setStatusTip(tr("Search text in document"));
     connect(searchAct, SIGNAL(triggered()), this, SLOT(actionSearch()));
 
@@ -428,7 +578,7 @@ void MainWindow::createActions()
 
     /* --- View -----------------------------------------------------------------------*/
     toggleFoldAct = new QAction(tr("&Fold all..."), this);
-    toggleFoldAct->setShortcut(tr("Ctrl+f"));
+    toggleFoldAct->setShortcut(tr("Ctrl+Alt+f"));
     toggleFoldAct->setCheckable(true);
     toggleFoldAct->setChecked(false);
     toggleFoldAct->setStatusTip(tr("Toggle folding for whole document"));
@@ -3006,25 +3156,30 @@ void MainWindow::actionPrefsDialog(int tabindex = 0)
 //
 void MainWindow::actionSearch()
 {
+    searchGroup->show();
+
     if(p_mydebug)
     {
         SearchDialog *aceSearch = new SearchDialog(this);
         aceSearch->blockSignals(false);
         aceSearch->show();
     }
+
     bool ok;
     qDebug() << "in search";
     QInputDialog *searchDialog = new QInputDialog(this);
 
 
-    QString text = searchDialog->getText(this, tr("Amiga Cross Editor - Search"),
-                                       tr("Search text:"), QLineEdit::Normal,
-                                       nullptr, &ok);
-    searchDialog->setOkButtonText("Search!");
+//    QString text = searchDialog->getText(this, tr("Amiga Cross Editor - Search"),
+//                                       tr("Search text:"), QLineEdit::Normal,
+//                                       nullptr, &ok);
+//    searchDialog->setOkButtonText("Search!");
+
+    QString text = lineEdit_find->text();
 
     //QString text = aceSearch.show();
 
-    if (ok && !text.isEmpty())
+    if ( !text.isEmpty())
     {
         qDebug() << text;
         textEdit->SendScintilla(QsciScintillaBase::SCI_INDICSETSTYLE, 0, QsciScintilla::INDIC_FULLBOX);
