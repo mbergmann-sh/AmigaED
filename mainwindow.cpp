@@ -68,9 +68,6 @@
 #include "mainwindow.h"
 #include "prefsdialog.h"
 #include "aboutdialog.h"
-#include "searchdialog.h"
-
-
 
 // Processes to start:
 static QProcess myProcess;      // the process for using as spare for further extensions

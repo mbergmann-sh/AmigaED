@@ -85,7 +85,6 @@ class QComboBox;
 class QsciScintilla;
 class PrefsDialog;
 class aboutDialog;
-class SearchDialog;
 class QTimer;
 class QTime;
 class QElapsedTimer;

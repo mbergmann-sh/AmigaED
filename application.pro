@@ -10,12 +10,10 @@ macx {
 
 HEADERS      = mainwindow.h \
     prefsdialog.h \
-    aboutdialog.h \
-    searchdialog.h
+    aboutdialog.h
 SOURCES      = main.cpp mainwindow.cpp \
     prefsdialog.cpp \
-    aboutdialog.cpp \
-    searchdialog.cpp
+    aboutdialog.cpp
 RESOURCES    += application.qrc
 
 
@@ -41,5 +39,4 @@ DISTFILES += \
 
 FORMS += \
     prefsdialog.ui \
-    aboutdialog.ui \
-    searchdialog.ui
+    aboutdialog.ui
