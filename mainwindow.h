@@ -320,12 +320,20 @@ private slots:
     void actionCloseOutputConsole();
     void actionShowOutputConsole();
 
+    // search and replace connections:
+    void do_search_and_replace(QString action_str);  // search and replace for matching word
+    void on_btn_next();                         // search for next occurance of matching word
+    void on_btn_previous();                 // search for previous occurance ofmatching word
+    void on_btn_replace();                  // replace current occurance of matching word
+    void on_btn_replace_all();              // replace all occurances of matching word
+    void on_btn_hide();                     // hide search & replace, set p_search_allready_open to false
 
 private:
     QProcess *cmd;
     QProcess proc;
     QProcess myProcess;                                                 // we need a QProcess to run a compiler...
     QProcess myEmulator;
+
     // GUI creation...
     void createActions();                                               // defines actions for menues and toolbars
     void createMenus();                                                 // creates menues from actions
@@ -514,6 +522,9 @@ private:
 
     // Font in use
     QFont myfont;
+
+    // is search allready opened?
+    bool p_search_is_open = false;
 
     // is document text folded?
     bool foldall;

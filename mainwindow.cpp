@@ -272,8 +272,13 @@ MainWindow::MainWindow(QString cmdFileName)
     // disable Emulator kill menu entry by default
     killEmulatorAct->setDisabled(true);
 
-    // react on hid-button of searchGroup:
-    connect(btn_hide, SIGNAL(clicked(bool)), searchGroup, SLOT(hide()));
+    // react on buttons of searchGroup:
+    connect(btn_hide, SIGNAL(clicked(bool)), this, SLOT(on_btn_hide()));
+    connect(btn_next, SIGNAL(clicked(bool)), this, SLOT(on_btn_next()));
+    connect(btn_previous, SIGNAL(clicked(bool)), this, SLOT(on_btn_previous()));
+    connect(btn_replace, SIGNAL(clicked(bool)), this, SLOT(on_btn_replace()));
+    connect(btn_replace_all, SIGNAL(clicked(bool)), this, SLOT(on_btn_replace_all()));
+    connect(lineEdit_find, SIGNAL(textChanged(const QString &)), this, SLOT(do_search_and_replace(QString)));
 
     // react if document was modified
     connect(textEdit, SIGNAL(textChanged()), this, SLOT(documentWasModified()));
@@ -3156,49 +3161,12 @@ void MainWindow::actionPrefsDialog(int tabindex = 0)
 //
 void MainWindow::actionSearch()
 {
-    searchGroup->show();
-
-    if(p_mydebug)
+    if(!(p_search_is_open)) // allready opened?
     {
-        SearchDialog *aceSearch = new SearchDialog(this);
-        aceSearch->blockSignals(false);
-        aceSearch->show();
-    }
-
-    bool ok;
-    qDebug() << "in search";
-    QInputDialog *searchDialog = new QInputDialog(this);
-
-
-//    QString text = searchDialog->getText(this, tr("Amiga Cross Editor - Search"),
-//                                       tr("Search text:"), QLineEdit::Normal,
-//                                       nullptr, &ok);
-//    searchDialog->setOkButtonText("Search!");
-
-    QString text = lineEdit_find->text();
-
-    //QString text = aceSearch.show();
-
-    if ( !text.isEmpty())
-    {
-        qDebug() << text;
-        textEdit->SendScintilla(QsciScintillaBase::SCI_INDICSETSTYLE, 0, QsciScintilla::INDIC_FULLBOX);
-        textEdit->SendScintilla(QsciScintillaBase::SCI_INDICSETFORE,0, QColor(Qt::blue));
-
-        QString docText = textEdit->text();
-        int end = docText.lastIndexOf(text);
-        int cur = -1;
-
-        if(end != -1)
-        {
-            while(cur != end)
-            {
-                cur = docText.indexOf(text,cur+1);
-                textEdit->SendScintilla(QsciScintillaBase::SCI_INDICATORFILLRANGE,cur,
-                    text.length());
-            }
-        }
-
+        searchGroup->show();
+        lineEdit_find->setFocus();
+        p_search_is_open = true;
+        qDebug() << "in actionSearch()";
     }
 }
 
@@ -4639,3 +4607,92 @@ void MainWindow::testGCCregEx(QString str_to_search)
     qDebug() << "debugfilename: " << debugfilename;
     qDebug() << "|-----------------------------------------------------|";
 }
+
+//
+// search & replace:
+// do_search_and_replace() - search for matching word
+//
+void MainWindow::do_search_and_replace(QString action_str)
+{
+    qDebug() <<  "do_search_and_replace()";
+    // just to be sure...
+    if(action_str.isEmpty())
+        action_str == "0";
+
+    int action_nr = action_str.toInt();    // convert argument to int, so we can switch() on it...
+    QString text = lineEdit_find->text();
+    qDebug() <<  "action_nr: " << action_nr;
+
+    if (!( text.isEmpty() ))
+    {
+        qDebug() << text;
+        textEdit->SendScintilla(QsciScintillaBase::SCI_INDICSETSTYLE, 0, QsciScintilla::INDIC_FULLBOX);
+        textEdit->SendScintilla(QsciScintillaBase::SCI_INDICSETFORE,0, QColor(Qt::darkBlue));
+
+        QString docText = textEdit->text();
+        int end = docText.lastIndexOf(text);
+        int cur = -1;
+
+        if(end != -1)
+        {
+            while(cur != end)
+            {
+                cur = docText.indexOf(text,cur+1);
+                textEdit->SendScintilla(QsciScintillaBase::SCI_INDICATORFILLRANGE,cur,
+                    text.length());
+            }
+        }
+    }
+}
+
+//
+// search & replace:
+// on_btn_next() - search for next matching word
+//
+void MainWindow::on_btn_next()
+{
+    qDebug() <<  "on_btn_next()";
+    do_search_and_replace("2");
+}
+
+//
+// search & replace:
+// on_btn_previous() - search for previous matching word
+//
+void MainWindow::on_btn_previous()
+{
+    qDebug() <<  "on_btn_previous()";
+    do_search_and_replace("1");
+}
+
+//
+// search & replace:
+// on_btn_replace() - replace current occourance of matching word
+//
+void MainWindow::on_btn_replace()
+{
+    qDebug() <<  "on_btn_replace()";
+    do_search_and_replace("3");
+}
+
+//
+// search & replace:
+// on_btn_replace_all() - replace all occourances of matching word
+//
+void MainWindow::on_btn_replace_all()
+{
+    qDebug() <<  "on_btn_replace_all()";
+    do_search_and_replace("4");
+}
+
+//
+// search & replace:
+// on_btn_hide() - hide searchGroup
+//
+void MainWindow::on_btn_hide()
+{
+    qDebug() <<  "on_btn_hide()";
+    searchGroup->hide();
+    p_search_is_open = false;
+}
+
