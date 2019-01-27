@@ -684,32 +684,32 @@ void MainWindow::createActions()
     connect(hideOutputAct, SIGNAL(triggered()), this, SLOT(actionCloseOutputConsole()));
 
     /* --- Tools -----------------------------------------------------------------------*/
-    emulatorAct = new QAction(QIcon(":/images/workbench.png"), tr("Start default Workbench in UA&E..."), this);
+    emulatorAct = new QAction(QIcon(":/images/start-emu.png"), tr("Start default Workbench in UA&E..."), this);
     emulatorAct->setShortcut(tr("Alt+e"));
     emulatorAct->setStatusTip(tr("Start Amiga Emulation..."));
     connect(emulatorAct, SIGNAL(triggered()), this, SLOT(actionEmulator()));
 
-    emulator13Act = new QAction(QIcon(":/images/workbench.png"), tr("Start Workbench 1.3 in UAE..."), this);
+    emulator13Act = new QAction(QIcon(":/images/start-emu.png"), tr("Start Workbench 1.3 in UAE..."), this);
     emulator13Act->setShortcut(tr("Alt+f"));
     emulator13Act->setStatusTip(tr("Start Amiga Emulation..."));
     connect(emulator13Act, SIGNAL(triggered()), this, SLOT(actionEmuOS13()));
 
-    emulator20Act = new QAction(QIcon(":/images/workbench.png"), tr("Start Workbench 2.1 in UAE..."), this);
+    emulator20Act = new QAction(QIcon(":/images/start-emu.png"), tr("Start Workbench 2.1 in UAE..."), this);
     emulator20Act->setShortcut(tr("Alt+g"));
     emulator20Act->setStatusTip(tr("Start Amiga Emulation..."));
     connect(emulator20Act, SIGNAL(triggered()), this, SLOT(actionEmuOS20()));
 
-    emulator30Act = new QAction(QIcon(":/images/workbench.png"), tr("Start Workbench 3.x in UAE..."), this);
+    emulator30Act = new QAction(QIcon(":/images/start-emu.png"), tr("Start Workbench 3.x in UAE..."), this);
     emulator30Act->setShortcut(tr("Alt+h"));
     emulator30Act->setStatusTip(tr("Start Amiga Emulation..."));
     connect(emulator30Act, SIGNAL(triggered()), this, SLOT(actionEmuOS30()));
 
-    emulator40Act = new QAction(QIcon(":/images/workbench.png"), tr("Start Workbench 4.1 in UAE..."), this);
+    emulator40Act = new QAction(QIcon(":/images/start-emu.png"), tr("Start Workbench 4.1 in UAE..."), this);
     emulator40Act->setShortcut(tr("Alt+i"));
     emulator40Act->setStatusTip(tr("Start Amiga Emulation..."));
     connect(emulator40Act, SIGNAL(triggered()), this, SLOT(actionEmuOS40()));
 
-    killEmulatorAct = new QAction(QIcon(":/images/noworkbench.png"), tr("Stop running Emulation..."), this);
+    killEmulatorAct = new QAction(QIcon(":/images/stop-emu.png"), tr("Stop running Emulation..."), this);
     killEmulatorAct->setShortcut(tr("Alt+s"));
     killEmulatorAct->setStatusTip(tr("Stop Amiga Emulation..."));
     connect(killEmulatorAct, SIGNAL(triggered()), this, SLOT(actionKillEmulator()));
