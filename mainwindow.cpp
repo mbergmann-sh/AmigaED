@@ -363,13 +363,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
     }
 }
 
-//
-// jump to line #1
-//
-//void MainWindow::mousePressEvent(QMouseEvent *event)
-//{
-//    popNotImplemented();
-//}
 
 //
 // create a new, empty file
@@ -635,21 +628,22 @@ void MainWindow::createActions()
     connect(showIndentationGuidesAct, SIGNAL(triggered()), this, SLOT(actionShowIndentationGuides()));
 
     /* --- Build -----------------------------------------------------------------------*/
-    selectCompilerVBCCAct = new QAction(tr("VBCC vc (C mode only)..."), this);
+    selectCompilerVBCCAct = new QAction(QIcon(":/images/c-logo.png"), tr("VBCC vc (C mode only)..."), this);
     selectCompilerVBCCAct->setShortcut(tr("Shift+Ctrl+v"));
     selectCompilerVBCCAct->setStatusTip(tr("Set Compiler to VBCC (C mode only)..."));
     selectCompilerVBCCAct->setCheckable(true);
     selectCompilerVBCCAct->setChecked(false);
     connect(selectCompilerVBCCAct, SIGNAL(triggered()), this, SLOT(actionSelectCompilerVBCC()));
 
-    selectCompilerGCCAct = new QAction(tr("GNU gcc (C mode)..."), this);
+    selectCompilerGCCAct = new QAction(QIcon(":/images/c-logo.png"), tr("GNU gcc (C mode)..."), this);
     selectCompilerGCCAct->setShortcut(tr("Shift+Ctrl+g"));
     selectCompilerGCCAct->setStatusTip(tr("Set Compiler to GNU gcc (C mode)..."));
     selectCompilerGCCAct->setCheckable(true);
     selectCompilerGCCAct->setChecked(false);
     connect(selectCompilerGCCAct, SIGNAL(triggered()), this, SLOT(actionSelectCompilerGCC()));
 
-    selectCompilerGPPAct = new QAction(tr("GNU g++ (C++ mode)..."), this);
+    selectCompilerGPPAct = new QAction(QIcon(":/images/cpp-logo.png"), tr("GNU g++ (C++ mode)..."), this);
+    selectCompilerGPPAct->setShortcut(tr("Shift+Ctrl+c"));
     selectCompilerGPPAct->setStatusTip(tr("Set Compiler to GNU g++ (C++ mode)..."));
     selectCompilerGPPAct->setCheckable(true);
     selectCompilerGPPAct->setChecked(false);
@@ -3417,7 +3411,6 @@ void MainWindow::initializeGUI()
         this->compilerLabel = new QLabel(this);
         this->compilerCombo = new QComboBox(this);
         this->osCombo = new QComboBox(this);
-        osCombo->setMaximumWidth(70);
     }
 
     this->statusLabelX = new QLabel(this);
@@ -3469,15 +3462,23 @@ void MainWindow::initializeGUI()
         compilerLabel->setText("Compiler:");
         statusBar()->addPermanentWidget(compilerCombo);
         compilerCombo->addItems(p_Compilers);
+        compilerCombo->setItemIcon(0, QIcon(":/images/c-logo.png"));
+        compilerCombo->setItemIcon(1, QIcon(":/images/c-logo.png"));
+        compilerCombo->setItemIcon(2, QIcon(":/images/cpp-logo.png"));
         compilerCombo->setCurrentIndex(p_defaultCompiler);
         compilerCombo->setStatusTip(tr("Select compiler to use for this file"));
-        statusBar()->addPermanentWidget(compilerButton);
-        statusBar()->addPermanentWidget(osCombo);
+
         osCombo->addItems(p_targetOS);
+        osCombo->setItemIcon(0, QIcon(":/images/workbench.png"));
+        osCombo->setItemIcon(1, QIcon(":/images/amiga_classic.png"));
+        osCombo->setItemIcon(2, QIcon(":/images/amiga_boing.png"));
         osCombo->setCurrentIndex(p_compiler_vc_default_target);
+        osCombo->setMinimumWidth(90);
         osCombo->setDisabled(true);
         osCombo->setStatusTip(tr("Change VBCC default target OS"));
+        statusBar()->addPermanentWidget(osCombo);
         statusBar()->addPermanentWidget(compilerButton);
+
         compilerButton->setStatusTip(tr("Compile current file..."));
     }
 
@@ -4057,7 +4058,7 @@ int MainWindow::stopCommand(int exitCode, QProcess::ExitStatus exitStatus)
                 QMessageBox::Ok);
             }
 
-            successMessage = "Compiler run finished successfully. Compile time: " + QString::number(nMilliseconds) + " mSecs";
+            successMessage = "Compiled successfully. Compile time: " + QString::number(nMilliseconds) + " mSecs";
             createStatusBarMessage(successMessage, 0);
 
 
@@ -4117,7 +4118,7 @@ int MainWindow::stopCommand(int exitCode, QProcess::ExitStatus exitStatus)
             "Please check for Errors and recompile."),
             QMessageBox::Ok);
 
-            successMessage = "Compiler run finished successfully. Compile time: " + QString::number(nMilliseconds) + " mSecs";
+            successMessage = "Compiled successfully. Compile time: " + QString::number(nMilliseconds) + " mSecs";
             createStatusBarMessage(successMessage, 0);
         }
 
@@ -4242,7 +4243,7 @@ void MainWindow::finished(int exitCode, QProcess::ExitStatus exitStatus)
       // Let's check if the compiler produced an executable file:
       if(fileExists(p_compiledFile))
       {
-          successMessage = "Compiler run finished successfully. Compile time: " + QString::number(nMilliseconds) + " mSecs";
+          successMessage = "Compiled successfully. Compile time: " + QString::number(nMilliseconds) + " mSecs";
           createStatusBarMessage(successMessage, 0);
 
           (void)QMessageBox::information(this, tr("Compilation finished - Amiga Cross Editor"),
@@ -4250,7 +4251,7 @@ void MainWindow::finished(int exitCode, QProcess::ExitStatus exitStatus)
           "You may now want to test your program in UAE.").arg(nMilliseconds),
           QMessageBox::Ok);
 
-          successMessage = "Compiler run finished successfully. Compile time: " + QString::number(nMilliseconds) + " mSecs";
+          successMessage = "Compiled successfully. Compile time: " + QString::number(nMilliseconds) + " mSecs";
           createStatusBarMessage(successMessage, 0);
       }
       else

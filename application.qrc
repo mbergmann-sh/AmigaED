@@ -27,5 +27,8 @@
         <file>images/find-and-replace.png</file>
         <file>images/c-logo.png</file>
         <file>images/cpp-logo.png</file>
+        <file>images/amiga_boing.png</file>
+        <file>images/stop-emu.png</file>
+        <file>images/start-emu.png</file>
     </qresource>
 </RCC>
