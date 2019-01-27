@@ -106,6 +106,7 @@ public:
     bool fileExists(QString path);
     bool allready_selected = false;
     int last_selected_line = -1;
+    #define MY_MARKER_ID 0
 
     // Layout and content for searchGroup
     QGridLayout *gridLayout_2;
@@ -123,6 +124,7 @@ public:
     QFormLayout *formLayout;
     QCheckBox *checkBox_CaseSensitive;
     QCheckBox *checkBox_WholeWords;
+    QCheckBox *checkBox_SearchForwards;
     QSpacerItem *horizontalSpacer_2;
     QWidget *centerSearchForm;
 
@@ -224,6 +226,8 @@ public slots:
     void testGCCregEx(QString str_to_search);    // to be deleted ASAP!
 
 private slots:
+    void call_do_search_and_replace();
+    void clearMarkers();                            // clear marked occourances in case of new search
     int startEmulator();                            // starts a process (f.e. Emulator)
     int startCompiler();                            // starts a process (f.e. Compiler)
     void popNotImplemented();                       // shows "not implemented" MessageBox

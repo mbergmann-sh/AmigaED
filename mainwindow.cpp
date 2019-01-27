@@ -105,8 +105,10 @@ MainWindow::MainWindow(QString cmdFileName)
     output->setReadOnly(true);
     centerSearchForm = new QWidget;
 
+    // Fill search form with life...
     if (centerSearchForm->objectName().isEmpty())
         centerSearchForm->setObjectName(QString::fromUtf8("centerSearchForm"));
+
     centerSearchForm->resize(573, 93);
     centerSearchForm->setMaximumSize(QSize(16777215, 16777215));
     gridLayout_2 = new QGridLayout(centerSearchForm);
@@ -189,20 +191,27 @@ MainWindow::MainWindow(QString cmdFileName)
 
     gridLayout_2->addWidget(btn_hide, 1, 4, 1, 1);
 
-    formLayout = new QFormLayout();
-    formLayout->setObjectName(QString::fromUtf8("formLayout"));
+    gridLayout = new QGridLayout();
+    gridLayout->setSpacing(6);
+    gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
+
     checkBox_CaseSensitive = new QCheckBox(centerSearchForm);
     checkBox_CaseSensitive->setObjectName(QString::fromUtf8("checkBox_CaseSensitive"));
 
-    formLayout->setWidget(0, QFormLayout::LabelRole, checkBox_CaseSensitive);
+    gridLayout->addWidget(checkBox_CaseSensitive, 0, 0, 1, 1);
 
     checkBox_WholeWords = new QCheckBox(centerSearchForm);
     checkBox_WholeWords->setObjectName(QString::fromUtf8("checkBox_WholeWords"));
 
-    formLayout->setWidget(0, QFormLayout::FieldRole, checkBox_WholeWords);
+    gridLayout->addWidget(checkBox_WholeWords, 0, 1, 1, 1);
 
+    checkBox_SearchForwards = new QCheckBox(centerSearchForm);
+    checkBox_SearchForwards->setObjectName(QString::fromUtf8("checkBox_SearchForwards"));
+    checkBox_SearchForwards->setChecked(true);
 
-    gridLayout_2->addLayout(formLayout, 2, 1, 1, 1);
+    gridLayout->addWidget(checkBox_SearchForwards, 0, 2, 1, 1);
+
+    gridLayout_2->addLayout(gridLayout, 2, 1, 1, 1);
 
     horizontalSpacer_2 = new QSpacerItem(204, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
@@ -238,6 +247,7 @@ MainWindow::MainWindow(QString cmdFileName)
         btn_hide->setText(QString());
         checkBox_CaseSensitive->setText(QApplication::translate("centerSearchForm", "Case sensitive search", nullptr));
         checkBox_WholeWords->setText(QApplication::translate("centerSearchForm", "Whole words", nullptr));
+        checkBox_SearchForwards->setText(QApplication::translate("MainWindow", "Search forwards", nullptr));
 
 
 
@@ -275,7 +285,8 @@ MainWindow::MainWindow(QString cmdFileName)
     connect(btn_previous, SIGNAL(clicked(bool)), this, SLOT(on_btn_previous()));
     connect(btn_replace, SIGNAL(clicked(bool)), this, SLOT(on_btn_replace()));
     connect(btn_replace_all, SIGNAL(clicked(bool)), this, SLOT(on_btn_replace_all()));
-    connect(lineEdit_find, SIGNAL(textChanged(const QString &)), this, SLOT(do_search_and_replace(QString)));
+    connect(lineEdit_find, SIGNAL(returnPressed()), this, SLOT(call_do_search_and_replace()));
+    connect(lineEdit_find, SIGNAL(textChanged(const QString &)), this, SLOT(clearMarkers())); // Reset marked text items
 
     // react if document was modified
     connect(textEdit, SIGNAL(textChanged()), this, SLOT(documentWasModified()));
@@ -3455,7 +3466,7 @@ void MainWindow::initializeGUI()
     if(!(p_no_compilerbuttons))    // react on user prefs: show or hide compiler combo and -button
     {
         statusBar()->addPermanentWidget(compilerLabel);
-        compilerLabel->setText("Compiler:");
+        //compilerLabel->setText("Compiler:");
         statusBar()->addPermanentWidget(compilerCombo);
         compilerCombo->addItems(p_Compilers);
         compilerCombo->setCurrentIndex(p_defaultCompiler);
@@ -4606,11 +4617,24 @@ void MainWindow::testGCCregEx(QString str_to_search)
 }
 
 //
+// search and replace:
+// Helper slot for compatible call of do_search_and_replace()
+// from editingFinished()
+// void call_do_search_and_replace()
+//
+void MainWindow::call_do_search_and_replace()
+{
+    do_search_and_replace("0");
+}
+
+//
 // search & replace:
 // do_search_and_replace() - search for matching word
 //
 void MainWindow::do_search_and_replace(QString action_str)
 {
+    //clearMarkers();
+    int line, index;
     qDebug() <<  "do_search_and_replace()";
     // just to be sure...
     if(action_str.isEmpty())
@@ -4618,28 +4642,80 @@ void MainWindow::do_search_and_replace(QString action_str)
 
     int action_nr = action_str.toInt();    // convert argument to int, so we can switch() on it...
     QString text = lineEdit_find->text();
+    QString docText = textEdit->text();
     qDebug() <<  "action_nr: " << action_nr;
 
-    if (!( text.isEmpty() ))
+    textEdit->getCursorPosition(&line, &index);
+    textEdit->setCursorPosition(line - 1, index);
+    clearMarkers();
+
+    //
+    // first part: Find first occurance of search term and select it
+    //
+    bool use_regular_expression, is_case_sensitive, match_whole_word_only, use_wrap, search_forward;
+    use_regular_expression = false;
+    is_case_sensitive = checkBox_CaseSensitive->isChecked();
+    match_whole_word_only = checkBox_WholeWords->isChecked();
+    use_wrap = true;
+    search_forward = checkBox_SearchForwards->isChecked();
+
+    textEdit->SendScintilla(QsciScintillaBase::SCI_INDICSETSTYLE, 0, QsciScintilla::INDIC_FULLBOX);
+    textEdit->SendScintilla(QsciScintillaBase::SCI_INDICSETFORE,0, QColor(Qt::darkBlue));
+
+    bool found = textEdit->findFirst(text, use_regular_expression, is_case_sensitive, match_whole_word_only, use_wrap, search_forward);
+    qDebug() <<  "START: found = " << found;
+    while(found)
+    {
+        textEdit->getCursorPosition(&line, &index);
+
+        qDebug() << "line: " << line << " index: " << index;
+        qDebug() << text;
+
+        // pattern: found = findFirst(pattern, use_regular_expression, is_case_sensitive, match_whole_word_only, use_wrap, search_forward)
+        //found = ui->textEdit->findFirst(text, use_regular_expression, is_case_sensitive, match_whole_word_only, use_wrap, search_forward);
+
+        if(found && !text.isEmpty())
+        {
+            textEdit->SendScintilla(QsciScintillaBase::SCI_INDICATORFILLRANGE, line, text.length());
+            int start = textEdit->positionFromLineIndex(line, index);
+            int end = textEdit->positionFromLineIndex(line, index + text.length());
+            qDebug() << "line: " << line << " start: " << start << " end: " << end;
+
+//            found = ui->textEdit->findNext();
+//            ui->textEdit->SendScintilla(QsciScintillaBase::SCI_INDICATORFILLRANGE, line, text.length());
+
+        }
+
+        found = false;
+    }
+
+    //
+    // second part: Mark all occurances of search term
+    //
+    found = textEdit->findFirst(text, use_regular_expression, is_case_sensitive, match_whole_word_only, use_wrap, search_forward);
+    if (!( text.isEmpty() ) && found == true)
     {
         qDebug() << text;
+        qDebug() << "found in markALL: " << found;
         textEdit->SendScintilla(QsciScintillaBase::SCI_INDICSETSTYLE, 0, QsciScintilla::INDIC_FULLBOX);
         textEdit->SendScintilla(QsciScintillaBase::SCI_INDICSETFORE,0, QColor(Qt::darkBlue));
 
-        QString docText = textEdit->text();
+
         int end = docText.lastIndexOf(text);
         int cur = -1;
 
         if(end != -1)
         {
+            textEdit->getCursorPosition(&line, &index);
+            qDebug() << "line: " << line << " index: " << index;
             while(cur != end)
             {
-                cur = docText.indexOf(text,cur+1);
-                textEdit->SendScintilla(QsciScintillaBase::SCI_INDICATORFILLRANGE,cur,
-                    text.length());
+                cur = docText.indexOf(text,cur + 1);
+                textEdit->SendScintilla(QsciScintillaBase::SCI_INDICATORFILLRANGE,cur, text.length());
             }
         }
-    }
+    } // END text.isEmpty(), END mark ALL
+
 }
 
 //
@@ -4693,3 +4769,11 @@ void MainWindow::on_btn_hide()
     p_search_is_open = false;
 }
 
+//
+// Reset search Markers
+//
+void MainWindow::clearMarkers()
+{
+    int lastLine = textEdit->lines() - 1;
+    textEdit->clearIndicatorRange( 0, 0, lastLine, textEdit->text( lastLine ).length() - 1, MY_MARKER_ID );
+}
