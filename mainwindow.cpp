@@ -3466,7 +3466,7 @@ void MainWindow::initializeGUI()
     if(!(p_no_compilerbuttons))    // react on user prefs: show or hide compiler combo and -button
     {
         statusBar()->addPermanentWidget(compilerLabel);
-        //compilerLabel->setText("Compiler:");
+        compilerLabel->setText("Compiler:");
         statusBar()->addPermanentWidget(compilerCombo);
         compilerCombo->addItems(p_Compilers);
         compilerCombo->setCurrentIndex(p_defaultCompiler);

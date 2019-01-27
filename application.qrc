@@ -25,5 +25,7 @@
         <file>images/home.png</file>
         <file>images/ico_out.png</file>
         <file>images/find-and-replace.png</file>
+        <file>images/c-logo.png</file>
+        <file>images/cpp-logo.png</file>
     </qresource>
 </RCC>

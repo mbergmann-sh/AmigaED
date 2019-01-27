@@ -175,7 +175,7 @@ public:
     int p_defaultEmulator;          // default emulator to start, setted by prefs > emulator tab combobox
     QString p_emulator_to_start;    // Argument for default OS to start in UAE, depends on p_defaultEmulator
     QString p_projectsRootDir;      // Path to default folder to store projects in (use that path as a hd mount in UAE in order to test compiled app!)
-    QStringList p_Compilers = {"VBCC (C mode only)", "GNU gcc (C mode)", "GNU g++ (C++ mode)"};    // used for building compiler preselection combobox entries
+    QStringList p_Compilers = {"VBCC - C", "GNU - C", "GNU - C++"};    // used for building compiler preselection combobox entries
     QStringList p_targetOS = {"OS 1.3", "OS 3.x", "OS 4.x"};
     int p_defaultCompiler;          // set from prefs file
     QString p_default_style;        // set from prefs file
@@ -486,7 +486,7 @@ private:
     QAction *if_elseAct;            // inserts if(condition){...} else {...} statement
     // Loops
     QAction *whileAct;              // inserts while(condition) {...} loop
-    QAction *forAct;           // inserts while(condition) {...}do loop
+    QAction *forAct;                // inserts while(condition) {...}do loop
     QAction *do_whileAct;           // inserts do{...}while(condition) loop
     QAction *switchAct;             // inserts switch(condition) select case statements
     // Class
