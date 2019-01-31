@@ -355,6 +355,7 @@ MainWindow::MainWindow(QString cmdFileName)
 //
 void MainWindow::closeEvent(QCloseEvent *event)
 {
+    actionKillEmulator();
     if (maybeSave()) {
         writeSettings();
         event->accept();    // OK: Quit the app!
@@ -1693,6 +1694,8 @@ void MainWindow::actionShowOutputConsole()
 //
 int MainWindow::actionCompile()
 {
+    QString new_compiler_args;
+
     // check if we have a valid compiler to call:
     if(p_selected_compiler.isEmpty())
     {
@@ -1848,6 +1851,8 @@ int MainWindow::actionCompile()
 
         if (ok && !text.isEmpty())
         {
+            new_compiler_args = text;   // store args if changed!
+            qDebug() << "text in line 1850: " << text;
             save();
             QString outName = QFileInfo(curFile).baseName();
             QString outPath = QFileInfo(curFile).absolutePath();
@@ -1922,6 +1927,9 @@ int MainWindow::actionCompile()
                         "<br>This usually makes more sense, ya know?!",
                         QMessageBox::Ok);
     }
+
+    // keep changes if any...
+    p_selected_compiler_args = new_compiler_args;
 
     return 0;
 }
